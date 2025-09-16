@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>نظام المكتبة</title>
+</head>
+
+<body>
+
+    <div style="border: 40px solid;">
+
+        <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
+            <a href="index2.html"> <img src="tlp-logo.svg"></a>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="index2.html">الرئيسية</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        قائمة
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">١</a></li>
+                        <li><a class="dropdown-item" href="#">٢</a></li>
+                        <li><a class="dropdown-item" href="#">٣</a></li>
+                        <li><a class="dropdown-item" href="#">٤</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <button type="button" class="btn btn-primary">
+                الإشعارات <span class="badge bg-secondary">0</span>
+            </button>
+
+        </header>
+    </div>
+
+    <div class="dropdown" id="leftlang">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            اللغة
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="index.html">الإنجليزية</a></li>
+            <li><a class="dropdown-item" href="index2.html">العربية</a></li>
+        </ul>
+    </div>
+    <div class="alert alert-danger" role="alert">
+        للوصول إلى أكثر من ٢٠,٠٠٠ كتاب، يرجى <a href="#">التسجيل</a> أو <a href="#">تسجيل الدخول</a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 g-3">
+        <div class="col">
+            <div class="card">
+                <img src="kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
+                <div class="card-body" style="text-align: center;">
+                    <h5 class="card-title">سهولة تنسيق الكتب</h5>
+                    <p class="card-text">لا حاجة للتنقل بين المواقع لتغيير صيغة الكتاب إلى AZW3 لجهاز كيندل أو أي جهاز
+                        آخر، بداية سريعة للقراءة!</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="text-align: center;">
+                <img src="adding.png" id="imgrid2" class="card-img-top" alt="card-grid-image">
+                <div class="card-body">
+                    <h5 class="card-title">رفع كتاب/كتب</h5>
+                    <p class="card-text">خطوات سهلة تتيح لك المساهمة وتنمية عائلتنا عبر إضافة كتاب/كتب لقاعدة البيانات.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="text-align: center;">
+                <img src="kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
+                <div class="card-body">
+                    <h5 class="card-title">عنوان البطاقة</h5>
+                    <p class="card-text">هذه بطاقة أطول مع نص توضيحي أدناه كمدخل طبيعي لمحتوى إضافي.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card" style="text-align: center;">
+                <img src="kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
+                <div class="card-body">
+                    <h5 class="card-title">عنوان البطاقة</h5>
+                    <p class="card-text">هذه بطاقة أطول مع نص توضيحي أدناه كمدخل طبيعي لمحتوى إضافي. هذا المحتوى أطول
+                        قليلاً.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white pt-5 pb-4">
+        <div class="container text-center text-md-start">
+            <div class="row text-center text-md-start">
+                © ٢٠٢٥ XXXXXX. جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
