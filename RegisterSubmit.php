@@ -46,8 +46,9 @@ password VARCHAR(255) NOT NULL,
 role VARCHAR(20) NOT NULL
 )";
 $insertDefaultAdmin = "INSERT IGNORE INTO users (username,password,role) values ('admin', 'admin', 'admin')";
-$insertDefaultCustomer = "INSERT IGNORE INTO users (username,password,role) values ('customer', 'customer', 'customer')";
-$sql = "INSERT IGNORE INTO users (username,password,role) values ('$username', '$password', 'customer')";
+$insertDefaultStaff = "INSERT IGNORE INTO users (username,password,role) values ('staff', 'staff', 'staff')";
+$insertDefaultStudent = "INSERT IGNORE INTO users (username,password,role) values ('student', 'student', 'student')";
+$sql = "INSERT IGNORE INTO users (username,password,role) values ('$username', '$password', 'student')";
 
 if(mysqli_query($conn, $createUsersTable)){
 
@@ -57,7 +58,11 @@ if(mysqli_query($conn, $insertDefaultAdmin)){
 
 }
 
-if(mysqli_query($conn, $insertDefaultCustomer)){
+if(mysqli_query($conn, $insertDefaultStaff)){
+
+}
+
+if(mysqli_query($conn, $insertDefaultStudent)){
 
 }
        

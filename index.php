@@ -3,23 +3,7 @@
 
 /* Functional requirements:
 
-Search
-Borrow
-Reserve
-Availability Notification
-Return
-Borrow History
-Renew
-Request Book
-Pay Fines
-Add Book
-Edit Book
-Delete Book
-Book History
 
-DONE:
-Login
-Register
 
 */
 

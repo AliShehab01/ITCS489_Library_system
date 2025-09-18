@@ -33,6 +33,11 @@ session_start();
     if($found){
         $_SESSION["username"] = $username;
         echo "Login successful";
+
+        if($_SESSION['username'] == 'admin'){
+            $_SESSION['role'] = 'admin';
+        }
+
         header("Location: index.php");
     }else{
         echo "Invalid username or password";

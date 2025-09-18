@@ -11,9 +11,8 @@
 
     <?php
     session_start();
-    ?>
 
-    <div style="border: 40px solid;">
+    echo '<div style="border: 40px solid;">
 
         <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
             <a href="index.html"> <img src="imgs/tlp-logo.svg"></a>
@@ -33,13 +32,21 @@
                         <li><a class="dropdown-item" href="#">4</a></li>
                     </ul>
                 </li>
-            </ul>
+            </ul>';
+
+            if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'){
+                echo "<a href=AdminArea.php style='margin-right: 20px; color:red'> Admin Area </a>";
+            }
+
+            echo '
             <button type="button" class="btn btn-primary" id="notific">
                 Notifications <span class="badge bg-secondary">0</span>
             </button>
 
         </header>
-    </div>
+    </div>';
+
+    ?>
 
     <div class="dropdown" id="leftlang">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
