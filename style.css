@@ -1,16 +1,120 @@
-#imgrid {
-    width: 390px !important;
-    display: block;
-    margin: auto;
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+:root{
+  --nav-h: 72px;
+  --space-1: .5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
 }
 
-#imgrid2 {
-    width: 300px !important;
-    display: block;
-    margin: auto;
+/* Keep content from hiding under fixed navbar */
+body{ padding-top: var(--nav-h); }
+
+/* Navbar*/
+header.navbar{
+  padding-block: var(--space-1);
+  padding-inline: var(--space-2);
+  margin: 0;
 }
 
-#leftlang {
-    display: block;
-
+header .nav{
+  margin: 0;
+  gap: var(--space-1);
 }
+
+/* Containers */
+.container, .container-fluid{
+  padding-inline: var(--space-2);
+}
+
+/* Grid spacing */
+.row{ row-gap: var(--space-3); }
+
+/* Cards equal height */
+.row > [class*="col"]{ display: flex; }
+.card{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-radius: .75rem;  
+  margin: 0;
+  overflow: hidden;      
+}
+.card-body{
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+  margin: 0;
+}
+.card .btn, .card .btn-group{ margin-top: auto; }
+
+/* Responsive images with aspect ratio */
+.card-img-top,
+#imgrid,
+#imgrid2{
+  width: 100%;
+  aspect-ratio: 16 / 9;   
+  object-fit: cover;      
+  object-position: center;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;       
+}
+
+
+#imgrid, #imgrid2{
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Language dropdowns & alert */
+#leftlang, #rightlang{
+  display: block;
+  padding: .5rem 1rem;
+  margin: .75rem auto;
+  width: fit-content;
+}
+.alert{ margin: .75rem auto; padding: .75rem 1rem; }
+
+/* Footer */
+footer{
+  margin-top: var(--space-3);
+  padding: var(--space-2);
+}
+
+/*  Small screens mobile */
+@media (max-width: 576px){
+  body{ padding-top: calc(var(--nav-h) - 8px); }
+  .container, .container-fluid{ padding-inline: .75rem; }
+  .card-img-top, #imgrid, #imgrid2{
+    aspect-ratio: 1 / 1; 
+  }
+}
+
+/* Medium screens tablet*/
+@media (min-width: 577px) and (max-width: 991px){
+  .card-img-top, #imgrid, #imgrid2{
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/*  Large screens desktop*/
+@media (min-width: 992px){
+  .card-img-top, #imgrid, #imgrid2{
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/*  Utilities */
+.mt-0 { margin-top: 0 !important; }
+.mb-0 { margin-bottom: 0 !important; }
+.pt-0 { padding-top: 0 !important; }
+.pb-0 { padding-bottom: 0 !important; }
