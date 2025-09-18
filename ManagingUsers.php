@@ -33,10 +33,6 @@ if(mysqli_num_rows($result) > 0){
 
     while($row = mysqli_fetch_assoc($result)){
 
-        if($row["username"] == 'admin'){
-            continue;
-        }
-
         echo "<tr>";
         echo "<td>" . $row['id'] . "</td>";
         echo "<td>" . $row['username'] . "</td>";

@@ -60,8 +60,8 @@
     </div>
     <div class="alert alert-danger" role="alert"> <!--this need JS and cookies-->
        <?php
-       if(isset($_SESSION['username'])){
-         echo 'Welcome ' . $_SESSION['username'] . " !" . ' <a href="logout.php">Logout</a>';
+       if(isset($_SESSION['first_name'])){
+         echo 'Welcome ' . $_SESSION['first_name'] . " !" . ' <a href="logout.php">Logout</a>';
        }else{
         echo 'To access our +20,000 books, please <a href="signup.php">sign up</a> or <a href="login.php">log in</a>';
        }

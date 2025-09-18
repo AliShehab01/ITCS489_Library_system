@@ -1,7 +1,7 @@
 <?php
 
-    ini_set("display_errors", 0);
-   error_reporting(0);
+    ini_set("display_errors", 1);
+   error_reporting(E_ALL);
     session_start();
 ?>
 <!DOCTYPE html>
@@ -14,18 +14,23 @@
 <body>
     <?php
  
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-        require 'dbconnect.php';
-        include 'navbar.php';
-        
-        $username = trim($_POST["username"]);
-        $password = trim($_POST["password"]);
+require 'CreateDefaultDBTables.php';
 
-        if(empty ($username) || empty ($password)){
-            echo "username or password cannot be empty";
+
+
+  $username = trim($_POST["username"]);
+        $password = trim($_POST["password"]);
+        $first_name = trim($_POST["first_name"]);
+        $last_name = trim($_POST["last_name"]);
+        $email = trim($_POST["email"]);
+        $phone_number = trim($_POST["phone_number"]);
+
+         if(empty ($username) || empty ($password) || empty($first_name) || empty($last_name)){
+            echo "Please fill all the required fields";
             exit;
         }
 
+       
         $result = mysqli_query($conn, "SELECT username FROM users");
 
         $found = false;
@@ -38,49 +43,37 @@
                 break;
             }
         }
-
-$createUsersTable = "CREATE TABLE IF NOT EXISTS users (
-id INT AUTO_INCREMENT PRIMARY KEY,
-username VARCHAR(50) NOT NULL UNIQUE,
-password VARCHAR(255) NOT NULL,
-role VARCHAR(20) NOT NULL
-)";
-$insertDefaultAdmin = "INSERT IGNORE INTO users (username,password,role) values ('admin', 'admin', 'admin')";
-$insertDefaultStaff = "INSERT IGNORE INTO users (username,password,role) values ('staff', 'staff', 'staff')";
-$insertDefaultStudent = "INSERT IGNORE INTO users (username,password,role) values ('student', 'student', 'student')";
-$sql = "INSERT IGNORE INTO users (username,password,role) values ('$username', '$password', 'student')";
-
-if(mysqli_query($conn, $createUsersTable)){
-
-}
-
-if(mysqli_query($conn, $insertDefaultAdmin)){
-
-}
-
-if(mysqli_query($conn, $insertDefaultStaff)){
-
-}
-
-if(mysqli_query($conn, $insertDefaultStudent)){
-
-}
-       
-    if($found){
+ 
+            if($found){
         
         echo "username already exists.";
+        exit;
 
     }else{
+        $sql = "INSERT IGNORE INTO users (username,password,email,firstName,lastName,phoneNumber,role) values ('$username', '$password', '$email','$first_name','$last_name','$phone_number', 'Student')";
         if(mysqli_query($conn, $sql)){
-            $_SESSION['username'] = $username;
-            header("Location: index.php");
+             $_SESSION['username'] = $username;
+            $_SESSION['first_name'] = $first_name;
+header("Location: index.php");
+exit;
+
 
         }else{
             echo "An error occured";
         }
     }
 
-    }
+
+       
+
+
+
+       
+
+
+       
+
+    
     ?>
 
 </body>
