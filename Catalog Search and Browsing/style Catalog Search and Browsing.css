@@ -1,0 +1,64 @@
+/* styleLibrary.css */
+
+/* Root vars */
+:root {
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --primary-light:#bfdbfe;
+  --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+  --radius:.5rem;
+  --transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+
+/* Utility shadow class */
+.shadow-custom {
+  box-shadow: var(--shadow);
+}
+
+/* الباقي نفس ملفك السابق */
+body{ background:#f9fafb; }
+
+/* header nav tweaks */
+.navbar .nav-link{ transition:var(--transition); }
+.navbar .nav-link:hover{ color:#fff !important; transform:translateY(-1px); }
+
+/* search bar under header */
+.searchBar{ padding:20px 0; background:#fff; box-shadow:var(--shadow); margin-top:0; }
+.searchBar .form-control{
+  border-color:var(--primary);
+  height:48px;
+}
+
+/* filters + sort + title row */
+.filtersArea{
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:18px 0;
+  margin-top:16px;
+}
+.filtersArea h2{ font-size:1.25rem; }
+.sortWrap, .filtersWrap .filterBlock{ min-width:180px; }
+.form-select{ border-color:var(--primary); }
+
+/* catalog grid + cards */
+.catalog{ padding:24px 0; }
+.bookCard{
+  background:#fff;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.bookHead{ display:flex; justify-content:space-between; align-items:start; gap:8px; }
+.bookTitle{ font-size:1rem; }
+.bookMeta{ color:#555; line-height:1.5; }
+.bookActions{ display:flex; gap:8px; }
+
+/* responsive */
+@media (max-width:768px){
+  .filtersArea .d-flex{ gap:12px; }
+  .filtersWrap{ width:100%; }
+}
