@@ -15,10 +15,10 @@
     echo '<div style="border: 40px solid;">
 
         <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
-            <a href="index.html"> <img src="imgs/tlp-logo.svg"></a>
+            <a href="index.php"> <img src="imgs/tlp-logo.svg"></a>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#!">Home</a>
+                    <a class="nav-link active" href="index.php">Home</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
