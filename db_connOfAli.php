@@ -1,5 +1,5 @@
 <?php
-$dns = "mysql:host=localhost;dbname=apitry";
+$dns = "mysql:host=localhost;dbname=489";
 $user = "root";
 $pass = "";
 $conn = new PDO($dns, $user, $pass);

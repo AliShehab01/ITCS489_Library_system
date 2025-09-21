@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,9 @@
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <title>Document</title>
 </head>
-<body>
 
+<body>
+    <!-- nav url (#) do not working-->
     <?php
     session_start();
 
@@ -25,8 +27,8 @@
                         aria-expanded="false">
                         Dropdown
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">1</a></li>
+                    <ul class="dropdown-menu"> 
+                        <li><a class="dropdown-item" href="bookPage.php">Book Contributing</a></li>
                         <li><a class="dropdown-item" href="#">2</a></li>
                         <li><a class="dropdown-item" href="#">3</a></li>
                         <li><a class="dropdown-item" href="#">4</a></li>
@@ -34,11 +36,11 @@
                 </li>
             </ul>';
 
-            if(isset($_SESSION['role']) && $_SESSION['role'] == 'admin'){
-                echo "<a href=AdminArea.php style='margin-right: 20px; color:red'> Admin Area </a>";
-            }
+    if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
+        echo "<a href=AdminArea.php style='margin-right: 20px; color:red'> Admin Area </a>";
+    }
 
-            echo '
+    echo '
             <button type="button" class="btn btn-primary" id="notific">
                 Notifications <span class="badge bg-secondary">0</span>
             </button>
@@ -58,14 +60,18 @@
             <li><a class="dropdown-item" href="index2.html">عربي</a></li>
         </ul>
     </div>
-    <div class="alert alert-danger" role="alert"> <!--this need JS and cookies-->
-       <?php
-       if(isset($_SESSION['first_name'])){
-         echo 'Welcome ' . $_SESSION['first_name'] . " !" . ' <a href="logout.php">Logout</a>';
-       }else{
-        echo 'To access our +20,000 books, please <a href="signup.php">sign up</a> or <a href="login.php">log in</a>';
-       }
-       ?>
+
+    <div class="alert 
+     <?php echo isset($_SESSION['first_name']) ? 'alert-success' : 'alert-danger'; ?>" role="alert">
+
+        <?php
+        if (isset($_SESSION['first_name'])) {
+            echo 'Welcome ' . $_SESSION['first_name'] . " !" . ' <a href="logout.php">Logout</a>';
+        } else {
+            echo 'To access our +20,000 books, please <a href="signup.php">sign up</a> or <a href="login.php">log in</a>';
+        }
+        ?>
     </div>
 </body>
+
 </html>

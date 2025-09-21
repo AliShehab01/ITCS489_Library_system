@@ -75,9 +75,3 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         echo json_encode(["error" => $e->getMessage()]);
     }
 }
-
-
-
-
-
-//$users = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetch all rows as an associative array

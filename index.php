@@ -1,4 +1,3 @@
-
 <?php
 
 /* Functional requirements:
@@ -26,7 +25,7 @@
 <body>
 
 
-    <?php 
+    <?php
     include 'navbar.php';
     ?>
 
