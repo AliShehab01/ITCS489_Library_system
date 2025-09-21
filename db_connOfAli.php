@@ -8,12 +8,13 @@ $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $query = "CREATE table if not exists books (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    image_path VARCHAR(255) NOT NULL, 
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
     isbn VARCHAR(50) NOT NULL,
     category VARCHAR(100),
     publisher VARCHAR(255),
-    year INT,
+    year INT(9),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP )";
 $stmt = $conn->prepare($query);
 $stmt->execute();
