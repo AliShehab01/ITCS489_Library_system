@@ -7,9 +7,7 @@ if (!isset($_SESSION['username'])) {
 }
 
 
-$stmt = $conn->query("SELECT b.*, c.image_path 
-                      FROM books b 
-                      LEFT JOIN bookcover c ON b.id = c.book_id");
+$stmt = $conn->query("SELECT * FROM books");
 $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -24,7 +22,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body class="bg-light">
     <h1 class="text-center">Book Management</h1>
     <div class="container mt-5">
         <h2 class="mb-4">Add New Book</h2>
@@ -114,6 +112,110 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p id="updateMessage" class="mt-3"></p>
     </div>
 
+    <div class="container">
+        <h2>Remove Book by ISBN</h2>
+        <div class="col-md-6">
+            <form>
+                <label class="form-label">ISBN of book:</label>
+                <input type="number" name="isbntodel" id="isbnToDelete" class="form-control">
+            </form>
+        </div>
+        <button id="deleteBtn" class="btn btn-danger mt-2">Delete Book</button>
+    </div>
+    <p id="delRes" class="mt-3"></p>
+    <script>
+        resmsg = document.getElementById('delRes');
+        document.getElementById('deleteBtn').addEventListener('click', function() {
+            const isbn = document.getElementById('isbnToDelete').value.trim();
+            if (!isbn) {
+                res.textContent = "Please enter an ISBN.";
+                return;
+            }
+
+
+            fetch('deleterecord.php', {
+                method: 'Post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    isbn: isbn
+                })
+            }).then(res => res.json()).then(data => {
+                resmsg.textContent = data.success || data.error;
+            }).catch(err => {
+                resmsg.textContent = "Error: " + err;
+            });
+        });
+    </script>
+
+
+
+    <form method="POST" class="container mt-5">
+        <h2 class="mb-4">Change Status of a Book by ISBN</h2>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label for="isbn" class="form-label">ISBN:</label>
+                <input type="text" id="isbn" name="isbn" class="form-control" placeholder="Enter ISBN" required>
+            </div>
+
+
+            <div class="col-md-6">
+                <label for="options" class="form-label">Status:</label>
+                <select id="options" name="status" class="form-select" required>
+                    <option value="">--Select an option--</option>
+                    <option value="available">Available</option>
+                    <option value="unavailable">Unavailable</option>
+                </select>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-12">
+                <button type="submit" id="b1" class="btn btn-primary">Submit</button>
+                <p id="status_res" class="mt-3"></p>
+            </div>
+        </div>
+    </form>
+    <script>
+        const res = document.getElementById("status_res");
+
+
+        document.getElementById("b1").addEventListener("click", function(e) {
+            e.preventDefault();
+            const status = document.getElementById("options").value;
+            const isbn = document.getElementById("isbn").value.trim();
+            if (!isbn || !status) {
+                alert("Please fill in all fields");
+            }
+
+            fetch("changestatus.php", {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    isbn: isbn,
+                    status: status
+                })
+            }).then(res => res.json()).then(data => {
+                res.textContent = data.message || data.error;
+            }).catch(err => {
+                document.getElementById("status_res").textContent = "Error: " + err;
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+
 
 
     <div class="container mt-5">
@@ -135,7 +237,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-        document.getElementById("updateBookForm").addEventListener("submit", function e() {
+        document.getElementById("updateBookForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const formdata = new FormData(this);
             const book = {}

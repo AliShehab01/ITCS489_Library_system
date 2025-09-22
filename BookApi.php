@@ -5,45 +5,49 @@ header("Content-Type: application/json");
 $data = json_decode(file_get_contents('php://input'), true); // Parse JSON input
 
 require_once "db_connOfAli.php";  //PDO
-//get all users
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Expect multipart form for image
     if (!isset($_POST['title'], $_POST['author'], $_POST['isbn'])) {
         echo json_encode(["error" => "Missing required fields"]);
         exit;
     }
 
     try {
-        // 1️⃣ Insert book (without image)
-        $stmt = $conn->prepare("INSERT INTO books (title, author, isbn, category, publisher, year) 
-                                VALUES (:title, :author, :isbn, :category, :publisher, :year)");
-        $stmt->execute([
-            ':title' => $_POST['title'],
-            ':author' => $_POST['author'],
-            ':isbn' => $_POST['isbn'],
-            ':category' => $_POST['category'] ?? null,
-            ':publisher' => $_POST['publisher'] ?? null,
-            ':year' => $_POST['year'] ?? null
-        ]);
-
-        $bookId = $conn->lastInsertId();
-
-        // 2️⃣ Handle image upload (if any)
+        // 1️⃣ Handle image upload
+        $imagePath = 'placeholder.jpg';
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = "uploads/";
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
+            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
+
             $filename = time() . "_" . basename($_FILES['image']['name']);
             $targetPath = $uploadDir . $filename;
-            move_uploaded_file($_FILES['image']['tmp_name'], $targetPath);
 
-            $stmt = $conn->prepare("INSERT INTO bookcover (book_id, image_path) VALUES (:book_id, :image_path)");
-            $stmt->execute([
-                ':book_id' => $bookId,
-                ':image_path' => $targetPath
-            ]);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
+                $imagePath = $targetPath;
+            }
         }
+
+        // 2️⃣ Prepare insert with bindParam
+        $stmt = $conn->prepare("INSERT INTO books (title, author, isbn, category, publisher, year, image_path)
+                                VALUES (:title, :author, :isbn, :category, :publisher, :year, :image_path)");
+
+        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+        $stmt->bindParam(':author', $author, PDO::PARAM_STR);
+        $stmt->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+        $stmt->bindParam(':category', $category, PDO::PARAM_STR);
+        $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
+        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
+        $stmt->bindParam(':image_path', $imagePath, PDO::PARAM_STR);
+
+        // Assign values
+        $title = $_POST['title'];
+        $author = $_POST['author'];
+        $isbn = $_POST['isbn'];
+        $category = $_POST['category'] ?? null;
+        $publisher = $_POST['publisher'] ?? null;
+        $year = $_POST['year'] ?? null;
+
+        $stmt->execute();
 
         echo json_encode(["success" => true, "message" => "Book added successfully"]);
     } catch (PDOException $e) {
@@ -51,31 +55,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-
-
 if ($_SERVER["REQUEST_METHOD"] == "PUT") {
-    // UPDATE existing book by ISBN
     if (!isset($data['title'], $data['author'], $data['isbn'])) {
         echo json_encode(["error" => "Missing required fields"]);
         exit;
     }
+
     try {
-        $stmt = $conn->prepare("UPDATE books set title=:title, author=:author,
-        category = :category, publisher = :publisher, year = :year
-                                WHERE isbn = :isbn");
+        $stmt = $conn->prepare("UPDATE books SET title=:title, author=:author, 
+                                category=:category, publisher=:publisher, year=:year
+                                WHERE isbn=:isbn");
+
+        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+        $stmt->bindParam(':author', $author, PDO::PARAM_STR);
+        $stmt->bindParam(':category', $category, PDO::PARAM_STR);
+        $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
+        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
+        $stmt->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+
+        // Assign values
         $title = $data['title'];
         $author = $data['author'];
+        $category = $data['category'] ?? null;
+        $publisher = $data['publisher'] ?? null;
+        $year = $data['year'] ?? null;
         $isbn = $data['isbn'];
-        $category = $data['category'];
-        $publisher = $data['publisher'];
-        $year = $data['year'];
 
-        $stmt->bindParam(":title", $title);
-        $stmt->bindParam(":author", $author);
-        $stmt->bindParam(":isbn", $isbn);
-        $stmt->bindParam(":category", $category);
-        $stmt->bindParam(":publisher", $publisher);
-        $stmt->bindParam(":year", $year);
         $stmt->execute();
 
         if ($stmt->rowCount() > 0) {
