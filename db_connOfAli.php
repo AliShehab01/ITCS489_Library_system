@@ -15,7 +15,7 @@ $query = "CREATE TABLE IF NOT EXISTS books (
     category ENUM('Science','Engineering','History','Literature','Business','Other') DEFAULT 'Other',
     publisher VARCHAR(255),
     year INT(9),
-    availability ENUM('available','reserved','unavailable') DEFAULT 'available',
+    availability ENUM('available','reserved','issued') DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 $stmt = $conn->prepare($query);
