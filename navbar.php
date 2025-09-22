@@ -17,7 +17,7 @@
     echo '<div style="border: 40px solid;">
 
         <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
-            <a href="index.php"> <img src="imgs/tlp-logo.svg"></a>
+            <a href="HomePage-EN.php"> <img src="imgs/tlp-logo.svg"></a>
             <ul class="nav nav-tabs">
                 <li class="nav-item">
                     <a class="nav-link active" href="index.php">Home</a>
@@ -25,10 +25,10 @@
 <div class="btn-group">
   <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" style="border: 5px white solid ; ">Menu</button>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="#">Library</a></li>
-    <li><a class="dropdown-item" href="#">My account</a></li>
-    <li><a class="dropdown-item" href="#">Action</a></li>
-    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="Catalog Search and Browsing-EN.html">Catalog</a></li>
+              <li><a class="dropdown-item" href="#">My Account</a></li>
+              <li><a class="dropdown-item" href="#">Borrowed</a></li>
+              <li><a class="dropdown-item" href="#">Reservations</a></li>
   </ul>
 </div>
             </ul>';
