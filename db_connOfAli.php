@@ -18,3 +18,13 @@ $query = "CREATE table if not exists books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP )";
 $stmt = $conn->prepare($query);
 $stmt->execute();
+
+//book cover
+$query = "CREATE table if not exists bookcover ( 
+ id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT NOT NULL,
+    image_path VARCHAR(255) NOT NULL,
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE)";
+
+$stmt = $conn->prepare($query);
+$stmt->execute();

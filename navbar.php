@@ -22,18 +22,15 @@
                 <li class="nav-item">
                     <a class="nav-link active" href="index.php">Home</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu"> 
-                        <li><a class="dropdown-item" href="bookPage.php">Book Contributing</a></li>
-                        <li><a class="dropdown-item" href="#">2</a></li>
-                        <li><a class="dropdown-item" href="#">3</a></li>
-                        <li><a class="dropdown-item" href="#">4</a></li>
-                    </ul>
-                </li>
+<div class="btn-group">
+  <button class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" style="border: 5px white solid ; ">Menu</button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="#">Library</a></li>
+    <li><a class="dropdown-item" href="#">My account</a></li>
+    <li><a class="dropdown-item" href="#">Action</a></li>
+    <li><a class="dropdown-item" href="#">Action</a></li>
+  </ul>
+</div>
             </ul>';
 
     if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
