@@ -17,7 +17,7 @@ $conn->set_charset('utf8mb4');
 
 // Serve GET requests
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  $q = "SELECT id, image_path, title, author, isbn, category, publisher, year, created_at FROM books";
+  $q = "SELECT id, image_path, title, author, isbn, category, availability, publisher, year, created_at FROM books";
   $r = $conn->query($q);
 
   if (!$r) {
@@ -35,9 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
       "author"     => $row["author"],
       "isbn"       => $row["isbn"],
       "category"   => $row["category"],
+      "availability" => $row["availability"],
       "publisher"  => $row["publisher"],
       "year"       => is_null($row["year"]) ? null : (int)$row["year"],
-      "created_at" => $row["created_at"]
+      "created_at" => $row["created_at"],
+      
     ];
   }
   echo json_encode($out);

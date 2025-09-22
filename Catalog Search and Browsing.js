@@ -22,11 +22,12 @@ const i18n = pageLang.startsWith('ar') ? {
 
 // Category labels (AR)
 const categoryMap = pageLang.startsWith('ar') ? {
-  'Science': 'علوم',
+   'Science': 'علوم',
   'Engineering': 'هندسة',
   'History': 'تاريخ',
   'Literature': 'أدب',
-  'Business': 'أعمال'
+  'Business': 'أعمال',
+  'Other': 'أخرى'
 } : {};
 
 // Fetch books
