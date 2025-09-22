@@ -1,8 +1,6 @@
 
-*,
-*::before,
-*::after { box-sizing: border-box; }
-
+/* Box sizing and reset */
+*, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 
 :root{
@@ -13,38 +11,33 @@ html, body { margin: 0; padding: 0; }
   --space-4: 2rem;
 }
 
-/* Keep content from hiding under fixed navbar */
+/* Keep content below fixed navbar */
 body{ padding-top: var(--nav-h); }
 
-/* Navbar*/
+/* Navbar layout */
 header.navbar{
   padding-block: var(--space-1);
   padding-inline: var(--space-2);
   margin: 0;
+  width: 100%;
 }
+header .nav{ margin: 0; gap: var(--space-1); }
 
-header .nav{
-  margin: 0;
-  gap: var(--space-1);
-}
-
-/* Containers */
-.container, .container-fluid{
-  padding-inline: var(--space-2);
-}
+/* Containers full-width */
+.container, .container-fluid{ padding-inline: 0; max-width: 100%; }
 
 /* Grid spacing */
 .row{ row-gap: var(--space-3); }
 
-/* Cards equal height */
+/* Equal-height cards */
 .row > [class*="col"]{ display: flex; }
 .card{
   display: flex;
   flex-direction: column;
   flex: 1;
-  border-radius: .75rem;  
+  border-radius: .75rem;
   margin: 0;
-  overflow: hidden;      
+  overflow: hidden;
 }
 .card-body{
   display: flex;
@@ -55,28 +48,20 @@ header .nav{
 }
 .card .btn, .card .btn-group{ margin-top: auto; }
 
-/* Responsive images with aspect ratio */
-.card-img-top,
-#imgrid,
-#imgrid2{
+/* Responsive image ratio */
+.card-img-top{
   width: 100%;
-  aspect-ratio: 16 / 9;   
-  object-fit: cover;      
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
   object-position: center;
   display: block;
   margin: 0;
   padding: 0;
-  border-radius: 0;       
+  border-radius: 0;
 }
 
-
-#imgrid, #imgrid2{
-  max-width: none !important;
-  width: 100% !important;
-}
-
-/* Language dropdowns & alert */
-#leftlang, #rightlang{
+/* Language selector and alerts */
+#leftlang{
   display: block;
   padding: .5rem 1rem;
   margin: .75rem auto;
@@ -84,36 +69,31 @@ header .nav{
 }
 .alert{ margin: .75rem auto; padding: .75rem 1rem; }
 
-/* Footer */
-footer{
-  margin-top: var(--space-3);
-  padding: var(--space-2);
-}
+/* Section spacing */
+.announcements{ margin-bottom: 1.5rem; }
+.overview{ margin-top: 1.5rem; }
 
-/*  Small screens mobile */
+/* Footer spacing */
+footer{ margin-top: var(--space-3); padding: var(--space-2); }
+
+/* Small screens */
 @media (max-width: 576px){
   body{ padding-top: calc(var(--nav-h) - 8px); }
   .container, .container-fluid{ padding-inline: .75rem; }
-  .card-img-top, #imgrid, #imgrid2{
-    aspect-ratio: 1 / 1; 
-  }
+  .card-img-top{ aspect-ratio: 1 / 1; }
 }
 
-/* Medium screens tablet*/
+/* Medium screens */
 @media (min-width: 577px) and (max-width: 991px){
-  .card-img-top, #imgrid, #imgrid2{
-    aspect-ratio: 4 / 3;
-  }
+  .card-img-top{ aspect-ratio: 4 / 3; }
 }
 
-/*  Large screens desktop*/
+/* Large screens */
 @media (min-width: 992px){
-  .card-img-top, #imgrid, #imgrid2{
-    aspect-ratio: 16 / 9;
-  }
+  .card-img-top{ aspect-ratio: 16 / 9; }
 }
 
-/*  Utilities */
+/* Utility helpers */
 .mt-0 { margin-top: 0 !important; }
 .mb-0 { margin-bottom: 0 !important; }
 .pt-0 { padding-top: 0 !important; }
