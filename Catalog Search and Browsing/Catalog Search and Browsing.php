@@ -1,4 +1,5 @@
 <?php
+
 header("Content-Type: application/json");
 
  $host='127.0.0.1';
@@ -16,7 +17,7 @@ if($conn->connect_errno){
 
 $conn->set_charset('utf8mb4');
 
-// GET ONLY
+// Serve GET requests
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $q = "SELECT id,title,author,category,availability,isbn,publication_year,created_at FROM books";
   $r = $conn->query($q);
