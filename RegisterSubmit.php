@@ -50,10 +50,12 @@ require 'CreateDefaultDBTables.php';
         exit;
 
     }else{
-        $sql = "INSERT IGNORE INTO users (username,password,email,firstName,lastName,phoneNumber,role) values ('$username', '$password', '$email','$first_name','$last_name','$phone_number', 'Student')";
+        $sql = "INSERT IGNORE INTO users (username,password,email,firstName,lastName,phoneNumber,currentNumOfBorrows,role) values ('$username', '$password', '$email','$first_name','$last_name','$phone_number', 3,'Student')";
         if(mysqli_query($conn, $sql)){
              $_SESSION['username'] = $username;
             $_SESSION['first_name'] = $first_name;
+            $_SESSION["user_id"] = $rows[$i]['id'];
+            $_SESSION["BorrowLimit"] = 3;
 header("Location: index.php");
 exit;
 

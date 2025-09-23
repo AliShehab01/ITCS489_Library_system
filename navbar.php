@@ -27,7 +27,7 @@
   <ul class="dropdown-menu">
     <li><a class="dropdown-item" href="Catalog Search and Browsing-EN.html">Catalog</a></li>
               <li><a class="dropdown-item" href="#">My Account</a></li>
-              <li><a class="dropdown-item" href="#">Borrowed</a></li>
+              <li><a class="dropdown-item" href="BorrowedDashboard.php">Borrowed</a></li>
               <li><a class="dropdown-item" href="#">Reservations</a></li>
   </ul>
 </div>

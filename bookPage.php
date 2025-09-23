@@ -45,7 +45,13 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="col-md-6">
                 <label class="form-label">Category:</label>
-                <input type="text" name="category" class="form-control">
+                <select name="category" id="">
+                    <option value="Science">Science</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="History">History</option>
+                    <option value="Literature">Literature</option>
+                    <option value="Business">Business</option>
+                </select>
             </div>
 
             <div class="col-md-6">
@@ -56,6 +62,10 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="col-md-6">
                 <label class="form-label">Year:</label>
                 <input type="number" name="year" class="form-control">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Available Quantity:</label>
+                <input type="number" name="quantity" class="form-control">
             </div>
             <div class="col-md-6">
                 <label class="form-label">Book Cover:</label>

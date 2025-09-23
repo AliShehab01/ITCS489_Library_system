@@ -33,6 +33,12 @@ session_start();
             $found = true;
             $first_name = $rows[$i]['firstName'];
             $_SESSION["first_name"] = $first_name;
+            $_SESSION["user_id"] = $rows[$i]['id'];
+            if($_SESSION['role'] != 'Student'){
+                $_SESSION['BorrowLimit'] = 5;
+            }else{
+                $_SESSION['BorrowLimit'] = 3;
+            }
 
             if ($rows[$i]['role'] == 'Admin') {
                 $_SESSION['role'] = 'admin';

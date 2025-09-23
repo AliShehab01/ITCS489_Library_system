@@ -22,7 +22,7 @@ require 'checkifadmin.php';
     <?php
     include 'navbar.php';
 
-    echo "<a href='ManagingUsers.php'> Managing users </a>"
+    
     ?>
     <div class="container my-5">
         <h1 class="mb-4">Admin Control Panel</h1>
@@ -34,7 +34,7 @@ require 'checkifadmin.php';
                     <div class="card-body">
                         <h5 class="card-title">User Management</h5>
                         <p class="card-text">Add, edit, or remove users, assign roles, manage borrowing limits.</p>
-                        <a href="#" class="btn btn-primary">Manage Users</a>
+                        <a href="Managingusers.php" class="btn btn-primary">Manage Users</a>
                     </div>
                 </div>
             </div>

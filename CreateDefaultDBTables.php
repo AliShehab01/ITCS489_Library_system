@@ -14,7 +14,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         
       
 
-        $createUsersTable = "CREATE TABLE IF NOT EXISTS users (
+$createUsersTable = "CREATE TABLE IF NOT EXISTS users (
 id INT AUTO_INCREMENT PRIMARY KEY,
 username VARCHAR(50) NOT NULL UNIQUE,
 password VARCHAR(255) NOT NULL,
@@ -22,17 +22,29 @@ firstName VARCHAR(50) NOT NULL,
 lastName VARCHAR(50) NOT NULL,
 email VARCHAR(100),
 phoneNumber VARCHAR(30),
+currentNumOfBorrows INT NOT NULL,
 role VARCHAR(20) NOT NULL
+)";
+
+$createBorrowsTable = "CREATE TABLE IF NOT EXISTS borrows (
+borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+bookId INT NOT NULL,
+quantity INT NOT NULL,
+user_id INT NOT NULL
 )";
 
 if(mysqli_query($conn, $createUsersTable)){
 
 }
 
-$insertDefaultAdmin = "INSERT IGNORE INTO users (username,password,firstName,lastName,role) values ('admin', 'admin','Admin','Admin', 'Admin')";
-$insertDefaultStaff = "INSERT IGNORE INTO users (username,password,firstName,lastName,role) values ('staff', 'staff','Staff','Staff' ,'Staff')";
-$insertDefaultVIPStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,role) values ('vipstudent', 'vipstudent','VIPStudent', 'VIPStudent', 'VIPStudent')";
-$insertDefaultStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,role) values ('student', 'student','Student','Student', 'Student')";
+mysqli_query($conn, $createBorrowsTable);
+
+
+
+$insertDefaultAdmin = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role) values ('admin', 'admin','Admin','Admin',0, 'Admin')";
+$insertDefaultStaff = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role) values ('staff', 'staff','Staff','Staff' ,0,'Staff')";
+$insertDefaultVIPStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role) values ('vipstudent', 'vipstudent','VIPStudent',0,'VIPStudent', 'VIPStudent')";
+$insertDefaultStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role) values ('student', 'student','Student','Student',0, 'Student')";
 
 
 

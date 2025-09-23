@@ -28,8 +28,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // 2️⃣ Prepare insert with bindParam
-        $stmt = $conn->prepare("INSERT INTO books (title, author, isbn, category, publisher, year, image_path)
-                                VALUES (:title, :author, :isbn, :category, :publisher, :year, :image_path)");
+        $stmt = $conn->prepare("INSERT INTO books (title, author, isbn, category, publisher, year,quantity, image_path)
+                                VALUES (:title, :author, :isbn, :category, :publisher, :year, :quantity, :image_path)");
 
         $stmt->bindParam(':title', $title, PDO::PARAM_STR);
         $stmt->bindParam(':author', $author, PDO::PARAM_STR);
@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':category', $category, PDO::PARAM_STR);
         $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
         $stmt->bindParam(':year', $year, PDO::PARAM_INT);
+        $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
         $stmt->bindParam(':image_path', $imagePath, PDO::PARAM_STR);
 
         // Assign values
@@ -46,6 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $category = $_POST['category'] ?? null;
         $publisher = $_POST['publisher'] ?? null;
         $year = $_POST['year'] ?? null;
+        $quantity = $_POST['quantity'] ?? null;
 
         $stmt->execute();
 
@@ -63,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
 
     try {
         $stmt = $conn->prepare("UPDATE books SET title=:title, author=:author, 
-                                category=:category, publisher=:publisher, year=:year
+                                category=:category, publisher=:publisher, year=:year, quantity=:quantity
                                 WHERE isbn=:isbn");
 
         $stmt->bindParam(':title', $title, PDO::PARAM_STR);
@@ -72,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
         $stmt->bindParam(':year', $year, PDO::PARAM_INT);
         $stmt->bindParam(':isbn', $isbn, PDO::PARAM_STR);
+        $stmt->bindParam(':quantity', $quantity, PDO::PARAM_STR);
 
         // Assign values
         $title = $data['title'];
@@ -80,6 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         $publisher = $data['publisher'] ?? null;
         $year = $data['year'] ?? null;
         $isbn = $data['isbn'];
+        $quantity = $data['quantity'];
 
         $stmt->execute();
 
@@ -92,3 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         echo json_encode(["error" => $e->getMessage()]);
     }
 }
+
+
+
+?>
