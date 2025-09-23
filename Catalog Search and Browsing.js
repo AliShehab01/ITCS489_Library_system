@@ -2,7 +2,7 @@ let books = [];
 let currentPage = 1;
 const perPage = 9;
 
-
+let borrowedBookId = null; 
 const searchInput = document.getElementById('search');
 const sortSelect  = document.getElementById('sort');
 const availSel    = document.getElementById('availability');
@@ -190,6 +190,11 @@ function render() {
   });
 }
 
+;
+
+
+
+
 // Card template
 function bookCard(b) {
   const title  = escapeHtml(b.title || (i18n ? i18n.untitled : 'Untitled'));
@@ -205,17 +210,22 @@ function bookCard(b) {
     dateLine(b)
   ].join('<br/>');
 
-  return `
-    <div class="col-12 col-sm-6 col-lg-4">
-      <div class="bookCard">
-        <div class="bookHead">
-          <strong class="bookTitle">${title}</strong>
-          ${badge}
-        </div>
-        <div class="bookMeta">${metaLines}</div>
+ return `
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="bookCard" data-book-id="${b.id}">
+      <div class="bookHead">
+        <strong class="bookTitle">${title}</strong>
+        ${badge}
       </div>
+      <div class="bookMeta">${metaLines}</div>
+      <a href="BorrowBook.php?id=${b.id}" class="btn btn-outline-primary btn-sm">
+        ${pageLang.startsWith('ar') ? 'استعارة' : 'Borrow'}
+      </a>
     </div>
-  `;
+  </div>
+`;
+
+
 }
 
 function makeBadge(av) {
@@ -282,6 +292,8 @@ if (searchInput) {
 if (sortSelect) sortSelect.addEventListener('change', () => { currentPage = 1; render(); });
 if (availSel)   availSel.addEventListener('change', () => { currentPage = 1; render(); });
 if (catSel)     catSel.addEventListener('change', () => { currentPage = 1; render(); });
+
+
 
 // Init
 fetchBooks();
