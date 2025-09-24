@@ -209,6 +209,8 @@ function bookCard(b) {
     `${i18n ? i18n.isbn : 'ISBN'}: ${isbn}`,
     dateLine(b)
   ].join('<br/>');
+  
+if(b.availability && String(b.availability).toLowerCase() === 'available' ) {
 
  return `
   <div class="col-12 col-sm-6 col-lg-4">
@@ -223,7 +225,22 @@ function bookCard(b) {
       </a>
     </div>
   </div>
+
+`;}
+
+return `
+  <div class="col-12 col-sm-6 col-lg-4">
+    <div class="bookCard" data-book-id="${b.id}">
+      <div class="bookHead">
+        <strong class="bookTitle">${title}</strong>
+        ${badge}
+      </div>
+      <div class="bookMeta">${metaLines}</div>
+      
+    </div>
+  </div>
 `;
+
 
 
 }
