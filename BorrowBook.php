@@ -36,7 +36,12 @@ session_start();
 
     if($row['quantity'] > 0){
 
-        if($row = $resultNumOfBorrows->fetch_assoc()){
+        $currentDate = date("Y-m-d");
+
+        $difference = strtotime($currentDate) - strtotime($dueDate);
+
+        if($difference < 0){
+if($row = $resultNumOfBorrows->fetch_assoc()){
             if($row['currentNumOfBorrows'] >= $borrowLimit || $row['currentNumOfBorrows'] + $quantityWanted > $borrowLimit || $quantityWanted > $borrowLimit){
  echo "Enter a valid number according to your role";
             }else{
@@ -70,6 +75,11 @@ session_start();
         }else{
 
         }
+        }else{
+            echo "Date should be in the future";
+        }
+
+        
 
        
 
