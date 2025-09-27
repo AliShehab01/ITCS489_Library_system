@@ -2,23 +2,29 @@ let books = [];
 let currentPage = 1;
 const perPage = 9;
 
-let borrowedBookId = null; 
-const searchInput = document.getElementById('search');
-const sortSelect  = document.getElementById('sort');
-const availSel    = document.getElementById('availability');
-const catSel      = document.getElementById('category');
-const resultsEl   = document.getElementById('results');
+let borrowedBookId = null;
+const searchInput = document.getElementById("search");
+const sortSelect = document.getElementById("sort");
+const availSel = document.getElementById("availability");
+const catSel = document.getElementById("category");
+const resultsEl = document.getElementById("results");
 
 // Ensure "Unavailable" option exists in availability filter
 if (availSel) {
   const opts = Array.from(availSel.options || []);
-  const hasUnavail = opts.some(o => String(o.value).toLowerCase() === 'unavailable');
+  const hasUnavail = opts.some(
+    (o) => String(o.value).toLowerCase() === "unavailable"
+  );
   if (!hasUnavail) {
-    const opt = document.createElement('option');
-    opt.value = 'unavailable';
-    const lang = (document.documentElement.getAttribute('lang') || '').toLowerCase();
-    opt.textContent = lang.startsWith('ar') ? 'غير متاح' : 'Unavailable';
-    const idxAvailable = opts.findIndex(o => String(o.value).toLowerCase() === 'available');
+    const opt = document.createElement("option");
+    opt.value = "unavailable";
+    const lang = (
+      document.documentElement.getAttribute("lang") || ""
+    ).toLowerCase();
+    opt.textContent = lang.startsWith("ar") ? "غير متاح" : "Unavailable";
+    const idxAvailable = opts.findIndex(
+      (o) => String(o.value).toLowerCase() === "available"
+    );
     if (idxAvailable >= 0 && idxAvailable < availSel.options.length) {
       availSel.add(opt, idxAvailable + 1);
     } else {
@@ -28,48 +34,57 @@ if (availSel) {
 }
 
 // API URL (relative)
-const API_URL = './Catalog Search and Browsing.php';
+const API_URL = "./Catalog Search and Browsing.php";
 
 // Detect page language
-const pageLang = (document.documentElement.getAttribute('lang') || 'en').toLowerCase();
+const pageLang = (
+  document.documentElement.getAttribute("lang") || "en"
+).toLowerCase();
 
 // Arabic labels (minimal)
-const i18n = pageLang.startsWith('ar') ? {
-  author: 'المؤلف', category: 'التصنيف', isbn: 'ISBN', publication: 'نشر', added: 'أضيفت', untitled: 'بدون عنوان', unknown: 'غير معروف'
-} : null;
+const i18n = pageLang.startsWith("ar")
+  ? {
+      author: "المؤلف",
+      category: "التصنيف",
+      isbn: "ISBN",
+      publication: "نشر",
+      added: "أضيفت",
+      untitled: "بدون عنوان",
+      unknown: "غير معروف",
+    }
+  : null;
 
 // Category labels (AR)
-const categoryMap = pageLang.startsWith('ar') ? {
-   'Science': 'علوم',
-  'Engineering': 'هندسة',
-  'History': 'تاريخ',
-  'Literature': 'أدب',
-  'Business': 'أعمال',
-  'Other': 'أخرى'
-} : {};
+const categoryMap = pageLang.startsWith("ar")
+  ? {
+      Science: "علوم",
+      Engineering: "هندسة",
+      History: "تاريخ",
+      Literature: "أدب",
+      Business: "أعمال",
+      Other: "أخرى",
+    }
+  : {};
 
 // Fetch books
 
 async function fetchBooks() {
-
   try {
-    const res = await fetch(API_URL, { method: 'GET', cache: 'no-store' });
+    const res = await fetch(API_URL, { method: "GET", cache: "no-store" });
 
     if (!res.ok) {
       // include response text for debugging
-      const txt = await res.text().catch(() => '');
+      const txt = await res.text().catch(() => "");
       throw new Error(`API responded ${res.status} ${res.statusText} - ${txt}`);
     }
 
     const response = await res.json();
-    books = Array.isArray(response) ? response : (response.data || []);
+    books = Array.isArray(response) ? response : response.data || [];
 
     render();
- } 
-  
-  catch (err) {
-    console.error('Failed to fetch books:', err);
-    
+  } catch (err) {
+    console.error("Failed to fetch books:", err);
+
     resultsEl.innerHTML = `
       <div class="col-12">
         <div class="bookCard">
@@ -86,47 +101,63 @@ function applyFilters(list) {
   let out = list;
 
   // Search (title/author/ISBN)
-  const q = (searchInput?.value || '').trim().toLowerCase();
+  const q = (searchInput?.value || "").trim().toLowerCase();
   if (q) {
-    out = out.filter(b =>
-      (String(b.title  || '').toLowerCase().includes(q)) ||
-      (String(b.author || '').toLowerCase().includes(q)) ||
-      (String(b.isbn   || '').toLowerCase().includes(q))
+    out = out.filter(
+      (b) =>
+        String(b.title || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(b.author || "")
+          .toLowerCase()
+          .includes(q) ||
+        String(b.isbn || "")
+          .toLowerCase()
+          .includes(q)
     );
   }
 
   // Availability — strict match
   if (availSel && availSel.value) {
     const wanted = String(availSel.value).trim().toLowerCase(); // available | issued | reserved | unavailable
-    out = out.filter(b => String(b.availability || '').trim().toLowerCase() === wanted);
+    out = out.filter(
+      (b) =>
+        String(b.availability || "")
+          .trim()
+          .toLowerCase() === wanted
+    );
   }
 
   // Category (exact value as in <option value="...">)
   if (catSel && catSel.value) {
-    out = out.filter(b => String(b.category || '') === catSel.value);
+    out = out.filter((b) => String(b.category || "") === catSel.value);
   }
 
   return out;
 }
 
-
 // Sorting
 function applySort(list) {
+  const idVal = (b) => (typeof b.id === "number" ? b.id : Number(b.id) || 0);
 
-  const idVal = (b) => (typeof b.id === 'number' ? b.id : (Number(b.id) || 0));
-
-  const v = sortSelect?.value || '';
+  const v = sortSelect?.value || "";
 
   // Title comparators
-  const byTitleAsc = (a, b) => (String(a.title || '')).localeCompare(String(b.title || ''), pageLang, { sensitivity: 'base' });
-  const byTitleDesc = (a, b) => (String(b.title || '')).localeCompare(String(a.title || ''), pageLang, { sensitivity: 'base' });
+  const byTitleAsc = (a, b) =>
+    String(a.title || "").localeCompare(String(b.title || ""), pageLang, {
+      sensitivity: "base",
+    });
+  const byTitleDesc = (a, b) =>
+    String(b.title || "").localeCompare(String(a.title || ""), pageLang, {
+      sensitivity: "base",
+    });
 
-  if (v === 'added-asc')  return [...list].sort((a,b) => idVal(a) - idVal(b));   // الأقدم أولاً (by id)
-  if (v === 'added-desc') return [...list].sort((a,b) => idVal(b) - idVal(a));   // الأحدث أولاً (by id)
+  if (v === "added-asc") return [...list].sort((a, b) => idVal(a) - idVal(b)); // الأقدم أولاً (by id)
+  if (v === "added-desc") return [...list].sort((a, b) => idVal(b) - idVal(a)); // الأحدث أولاً (by id)
 
   // get comparable value for publication date or added date
   const pubVal = (b) => {
-    if (typeof b.publication_year === 'number') return b.publication_year;
+    if (typeof b.publication_year === "number") return b.publication_year;
     // fallback: try parse if publication_year as string
     if (b.publication_year) {
       const n = Number(b.publication_year);
@@ -143,10 +174,10 @@ function applySort(list) {
     return -Infinity;
   };
 
-  if (v === 'title-asc')  return [...list].sort(byTitleAsc);
-  if (v === 'title-desc') return [...list].sort(byTitleDesc);
-  if (v === 'pub-asc')    return [...list].sort((a,b) => pubVal(a) - pubVal(b));
-  if (v === 'pub-desc')   return [...list].sort((a,b) => pubVal(b) - pubVal(a));
+  if (v === "title-asc") return [...list].sort(byTitleAsc);
+  if (v === "title-desc") return [...list].sort(byTitleDesc);
+  if (v === "pub-asc") return [...list].sort((a, b) => pubVal(a) - pubVal(b));
+  if (v === "pub-desc") return [...list].sort((a, b) => pubVal(b) - pubVal(a));
   // (added-asc/desc handled above with created_at fallback to id)
 
   return list;
@@ -160,9 +191,11 @@ function paginate(list, page, per) {
 
 function renderPager(total) {
   const pageCount = Math.ceil(total / perPage) || 1;
-  let html = '';
+  let html = "";
   for (let i = 1; i <= pageCount; i++) {
-    html += `<button class="btn btn-sm ${i===currentPage?'btn-primary':'btn-outline-primary'} me-1 mb-2" data-page="${i}">${i}</button>`;
+    html += `<button class="btn btn-sm ${
+      i === currentPage ? "btn-primary" : "btn-outline-primary"
+    } me-1 mb-2" data-page="${i}">${i}</button>`;
   }
   return `<div class="col-12 d-flex flex-wrap align-items-center mt-2">${html}</div>`;
 }
@@ -170,11 +203,11 @@ function renderPager(total) {
 // Render
 function render() {
   const filtered = applyFilters(books);
-  const sorted   = applySort(filtered);
+  const sorted = applySort(filtered);
   const pageData = paginate(sorted, currentPage, perPage);
 
   // Book cards
-  const cards = pageData.map(b => bookCard(b)).join('');
+  const cards = pageData.map((b) => bookCard(b)).join("");
 
   // Pager
   const pager = renderPager(sorted.length);
@@ -182,37 +215,34 @@ function render() {
   resultsEl.innerHTML = cards + pager;
 
   // Wire pager buttons
-  resultsEl.querySelectorAll('button[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentPage = parseInt(btn.getAttribute('data-page'), 10);
+  resultsEl.querySelectorAll("button[data-page]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentPage = parseInt(btn.getAttribute("data-page"), 10);
       render();
     });
   });
 }
 
-;
-
-
-
-
 // Card template
 function bookCard(b) {
-  const title  = escapeHtml(b.title || (i18n ? i18n.untitled : 'Untitled'));
-  const author = escapeHtml(b.author || (i18n ? i18n.unknown : 'Unknown'));
-  const catRaw  = b.category || '';
-  const cat     = escapeHtml((categoryMap && categoryMap[catRaw]) ? categoryMap[catRaw] : (catRaw || '—'));
-  const isbn   = escapeHtml(b.isbn || '—');
-  const badge  = makeBadge(b.availability);
+  const title = escapeHtml(b.title || (i18n ? i18n.untitled : "Untitled"));
+  const author = escapeHtml(b.author || (i18n ? i18n.unknown : "Unknown"));
+  const catRaw = b.category || "";
+  const cat = escapeHtml(
+    categoryMap && categoryMap[catRaw] ? categoryMap[catRaw] : catRaw || "—"
+  );
+  const isbn = escapeHtml(b.isbn || "—");
+  const badge = makeBadge(b.availability);
   const metaLines = [
-    `${i18n ? i18n.author : 'Author'}: ${author}`,
-    `${i18n ? i18n.category : 'Category'}: ${cat}`,
-    `${i18n ? i18n.isbn : 'ISBN'}: ${isbn}`,
-    dateLine(b)
-  ].join('<br/>');
-  
-if(b.availability && String(b.availability).toLowerCase() === 'available' ) {
+    `${i18n ? i18n.author : "Author"}: ${author}`,
+    `${i18n ? i18n.category : "Category"}: ${cat}`,
+    `${i18n ? i18n.isbn : "ISBN"}: ${isbn}`,
+    dateLine(b),
+  ].join("<br/>");
 
- return `
+  if (b.availability && String(b.availability).toLowerCase() === "available") {
+    return (
+      `
   <div class="col-12 col-sm-6 col-lg-4">
     <div class="bookCard" data-book-id="${b.id}">
       <div class="bookHead">
@@ -220,15 +250,25 @@ if(b.availability && String(b.availability).toLowerCase() === 'available' ) {
         ${badge}
       </div>
       <div class="bookMeta">${metaLines}</div>
-      <a href="BorrowBook.php?id=${b.id}" class="btn btn-outline-primary btn-sm">
-        ${pageLang.startsWith('ar') ? 'استعارة' : 'Borrow'}
-      </a>
+      
+      <form action="BorrowBook.php?bookid=` +
+      b.id +
+      `" method="post">
+
+       <label for="">Quantity:</label>
+       <input type="number" name="QuantityWanted" min=1, max=5> <br>
+       <label for="">Due date:</label>
+       <input type="date" name="dueDate"><br>
+      <input type="submit" value="Borrow">
+       </form>
     </div>
   </div>
 
-`;}
+`
+    );
+  }
 
-return `
+  return `
   <div class="col-12 col-sm-6 col-lg-4">
     <div class="bookCard" data-book-id="${b.id}">
       <div class="bookHead">
@@ -240,9 +280,6 @@ return `
     </div>
   </div>
 `;
-
-
-
 }
 
 function makeBadge(av) {
@@ -253,23 +290,23 @@ function makeBadge(av) {
   const normalized = String(av).toLowerCase();
 
   const classes = {
-    available: 'success',
-    issued: 'secondary',
-    reserved: 'warning',
-    unavailable: 'danger'
+    available: "success",
+    issued: "secondary",
+    reserved: "warning",
+    unavailable: "danger",
   };
 
   const labelsAr = {
-    available: 'متاح',
-    issued: 'مستعار',
-    reserved: 'محجوز',
-    unavailable: 'غير متاح'
+    available: "متاح",
+    issued: "مستعار",
+    reserved: "محجوز",
+    unavailable: "غير متاح",
   };
 
-  const cls = classes[normalized] || 'light';
+  const cls = classes[normalized] || "light";
 
   let label;
-  if (pageLang.startsWith('ar')) {
+  if (pageLang.startsWith("ar")) {
     label = labelsAr[normalized] || av;
   } else {
     label = av.charAt(0).toUpperCase() + av.slice(1);
@@ -278,11 +315,13 @@ function makeBadge(av) {
   return `<span class="badge bg-${cls}">${label}</span>`;
 }
 
-
 function dateLine(b) {
-  const pubLabel = i18n ? i18n.publication : 'Publication';
-  const addedLabel = i18n ? i18n.added : 'Added';
-  if (typeof b.publication_year === 'number' || (b.publication_year && !Number.isNaN(Number(b.publication_year)))) {
+  const pubLabel = i18n ? i18n.publication : "Publication";
+  const addedLabel = i18n ? i18n.added : "Added";
+  if (
+    typeof b.publication_year === "number" ||
+    (b.publication_year && !Number.isNaN(Number(b.publication_year)))
+  ) {
     return `${pubLabel}: ${b.publication_year}`;
   }
   if (b.created_at) {
@@ -293,25 +332,45 @@ function dateLine(b) {
 }
 
 function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[m]));
+  return String(s).replace(
+    /[&<>"']/g,
+    (m) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      }[m])
+  );
 }
 
 // Events
 if (searchInput) {
   let t;
-  searchInput.addEventListener('input', () => {
+  searchInput.addEventListener("input", () => {
     clearTimeout(t);
-    t = setTimeout(() => { currentPage = 1; render(); }, 150);
+    t = setTimeout(() => {
+      currentPage = 1;
+      render();
+    }, 150);
   });
 }
-if (sortSelect) sortSelect.addEventListener('change', () => { currentPage = 1; render(); });
-if (availSel)   availSel.addEventListener('change', () => { currentPage = 1; render(); });
-if (catSel)     catSel.addEventListener('change', () => { currentPage = 1; render(); });
-
-
+if (sortSelect)
+  sortSelect.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
+if (availSel)
+  availSel.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
+if (catSel)
+  catSel.addEventListener("change", () => {
+    currentPage = 1;
+    render();
+  });
 
 // Init
 fetchBooks();
-

@@ -30,6 +30,9 @@ $createBorrowsTable = "CREATE TABLE IF NOT EXISTS borrows (
 borrow_id INT AUTO_INCREMENT PRIMARY KEY,
 bookId INT NOT NULL,
 quantity INT NOT NULL,
+price INT NOT NULL,
+dueDate DATE NOT NULL,
+isReturned ENUM('false','true') DEFAULT 'false' NOT NULL,
 user_id INT NOT NULL
 )";
 

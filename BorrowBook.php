@@ -22,7 +22,9 @@ session_start();
     $bookid = $_GET['bookid'];
     $userid = $_SESSION['user_id'];
     $borrowLimit = $_SESSION['BorrowLimit'];
-    
+    $dueDate = $_POST['dueDate'];
+
+    $priceInBD = $quantityWanted * 1;
 
     $checkQuantitySql = "SELECT quantity FROM books WHERE id = " . $bookid;
     $checkNumOfBorrows = "SELECT currentNumOfBorrows FROM users WHERE id = " . $userid;
@@ -42,12 +44,24 @@ session_start();
 
         $stmt->execute();
 
+        $stmt = 'SELECT quantity FROM books WHERE id = ' . $bookid;
+
+        $result = mysqli_query($conn,$stmt);
+
+        if($row = $result->fetch_assoc()){
+            if($row['quantity'] == 0){
+                $stmt = $conn->prepare('UPDATE books SET availability = "issued" WHERE id = ' . $bookid);
+                $stmt->execute();
+            }
+        }
+
         $stmt = $conn->prepare('UPDATE users SET currentNumOfBorrows = currentNumOfBorrows + ' . $quantityWanted .  ' WHERE id = ' . $userid);
 
         $stmt->execute();
         
-        $stmt = $conn->prepare('INSERT INTO borrows (bookId,quantity,user_id) VALUES (' . $bookid . ',' . $quantityWanted . ',' . $userid . ')');
+        $stmt = $conn->prepare('INSERT INTO borrows (bookId,quantity,price,user_id,dueDate) VALUES (?,?,?,?,?)');
 
+        $stmt->bind_param("iiiis", $bookid, $quantityWanted,$priceInBD, $userid, $dueDate);
 
         $stmt->execute();
             }
