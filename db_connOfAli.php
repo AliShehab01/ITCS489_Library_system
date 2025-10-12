@@ -1,11 +1,14 @@
 <?php
-$dns = "mysql:host=localhost;dbname=489";
+// ✅ connect to your real database
+$dns = "mysql:host=localhost;dbname=library_system";
 $user = "root";
 $pass = "";
-$conn = new PDO($dns, $user, $pass);
 
+// create PDO connection
+$conn = new PDO($dns, $user, $pass);
 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+// ✅ optional: create the books table if it doesn’t exist
 $query = "CREATE TABLE IF NOT EXISTS books (
     id INT AUTO_INCREMENT PRIMARY KEY,
     image_path VARCHAR(255) NOT NULL, 
@@ -15,9 +18,9 @@ $query = "CREATE TABLE IF NOT EXISTS books (
     category ENUM('Science','Engineering','History','Literature','Business','Other') DEFAULT 'Other',
     publisher VARCHAR(255),
     year INT(9),
-     availability ENUM('available','reserved','issued','unavailable') DEFAULT 'available',
+    quantity INT NOT NULL DEFAULT 0,
+    availability ENUM('available','reserved','issued','unavailable') DEFAULT 'available',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
-$stmt = $conn->prepare($query);
-$stmt->execute();
 
+?>

@@ -1,87 +1,103 @@
-<?php
+<<?php
+// bookReturnAndRenew.php
+require 'dbconnect.php';
+require_once 'reservations_lib.php';
 
-session_start();
 
-?>
+// Handle a return
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['return'])) {
+    $borrowId = filter_input(INPUT_POST, 'borrow_id', FILTER_VALIDATE_INT);
+    $bookId   = filter_input(INPUT_POST, 'book_id', FILTER_VALIDATE_INT);
+    $qty      = filter_input(INPUT_POST, 'qty', FILTER_VALIDATE_INT);
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+    if ($borrowId && $bookId && $qty) {
+        // Mark as returned
+        $stmt = $conn->prepare("UPDATE borrows SET isReturned = 'true' WHERE borrow_id = ?");
+        $stmt->bind_param("i", $borrowId);
+        $stmt->execute();
 
-    <?php
+        // Notify the next user waiting for this book
+        notify_next_in_queue($conn, (int)$bookId);
 
-    include "navbar.php";
-    require "dbconnect.php";
 
-    $quantity;
-    $bookId = $_POST["book_id"];
-    $user_id;
+        // Restore stock
+        $stmt = $conn->prepare("UPDATE books SET quantity = quantity + ? WHERE id = ?");
+        $stmt->bind_param("ii", $qty, $bookId);
+        $stmt->execute();
 
-    $borrow_id = $_POST['borrow_id'];
-
-    $stmt = "SELECT * FROM borrows WHERE borrow_id = " . $borrow_id;
-
-    $result = mysqli_query($conn,$stmt);
-
-    if($_POST['RenewReturnAction'] == "Return book"){
-
-    if($row = $result->fetch_assoc()){
-
-        $quantity = $row['quantity'];
-        $bookId = $row['bookId'];
-        $user_id = $row['user_id'];
-
-        $decreaseUserBorrows = "UPDATE users SET currentNumOfBorrows = currentNumOfBorrows - " . $quantity . " WHERE id = " . $user_id;
-        $checkReturnStatus = "UPDATE borrows SET isReturned = 'true' WHERE borrow_id = " . $borrow_id;
-        $increaseBookQuantity = "UPDATE books SET quantity = quantity + " . $quantity . " WHERE id = " . $bookId;
-
-        mysqli_query($conn, $decreaseUserBorrows);
-        mysqli_query($conn, $checkReturnStatus);
-        mysqli_query($conn, $increaseBookQuantity);
-
-        $checkAvailability = "SELECT availability FROM books WHERE id = " . $bookId;
-        
-        $result = mysqli_query($conn,$checkAvailability);
-
-        if($row = $result->fetch_assoc()){
-            if($row["availability"] == "issued"){
-                $changeStatusToAvailable = "UPDATE books SET availability = 'available' WHERE id = " . $bookId;
-                mysqli_query($conn, $changeStatusToAvailable);
-            }
-        }
-
+        $success = "Borrow #{$borrowId} returned and stock updated.";
+    } else {
+        $error = "Missing return fields.";
     }
-}else{
-
-    $newDueDate = $_POST['newDueDate'];
-
-    $checkIfReserved = "SELECT availability FROM books WHERE id = " . $bookId;
-
-    $result = mysqli_query($conn,$checkIfReserved);
-    
-    if($row = $result->fetch_assoc()){
-        if($row["availability"] != "reserved"){
-        $updateDBDueDate = $conn->prepare("UPDATE borrows SET dueDate = ? WHERE borrow_id = ?");
-        $updateDBDueDate->bind_param("si",$newDueDate,$borrow_id);
-
-        $updateDBDueDate->execute();
-        }else{
-
-            echo "Book is already reserved by other users";
-
-        }
-    }
-
-    
-
 }
 
-    ?>
+// List active borrows
+$sql = "
+  SELECT b.borrow_id, b.bookId, b.quantity, b.dueDate, u.username, bk.title
+  FROM borrows b
+  JOIN users u ON u.id = b.user_id
+  JOIN books bk ON bk.id = b.bookId
+  WHERE b.isReturned = 'false'
+  ORDER BY b.dueDate ASC
+";
+$active = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+?>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Return / Renew</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h2 class="mb-3">Return / Renew</h2>
 
+  <?php if (!empty($error)): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+  <?php elseif (!empty($success)): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+  <?php endif; ?>
+
+  <?php if (!$active): ?>
+    <div class="alert alert-info">No active borrows.</div>
+  <?php else: ?>
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Book</th>
+            <th>User</th>
+            <th>Qty</th>
+            <th>Due</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($active as $row): ?>
+          <tr>
+            <td><?= (int)$row['borrow_id'] ?></td>
+            <td><?= htmlspecialchars($row['title']) ?></td>
+            <td><?= htmlspecialchars($row['username']) ?></td>
+            <td><?= (int)$row['quantity'] ?></td>
+            <td><?= htmlspecialchars($row['dueDate']) ?></td>
+            <td>
+              <form method="POST" class="d-inline">
+                <input type="hidden" name="borrow_id" value="<?= (int)$row['borrow_id'] ?>">
+                <input type="hidden" name="book_id"   value="<?= (int)$row['bookId'] ?>">
+                <input type="hidden" name="qty"       value="<?= (int)$row['quantity'] ?>">
+                <button class="btn btn-sm btn-success" name="return" value="1">Return</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php endif; ?>
+
+  <a href="AdminArea.php" class="btn btn-outline-secondary mt-3">Back</a>
+</div>
 </body>
 </html>
