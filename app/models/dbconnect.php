@@ -1,4 +1,10 @@
 <?php
+/*
+   THIS MUST BE DELETED TO USE ONLY "db489.php"
+
+*/
+
+
 $servername = "localhost";   // XAMPP local server
 $username   = "root";        // default MySQL username
 $password   = "";            // default MySQL password (empty)
@@ -11,4 +17,3 @@ if (!$conn) {
 }
 
 mysqli_set_charset($conn, "utf8mb4");
-?>

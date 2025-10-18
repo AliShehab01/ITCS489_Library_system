@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../../public/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+  <title>نظام المكتبة</title>
+</head>
+
+<body>
+  <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
+    <a href="HomePage-AR.html"> <img src="imgs\tlp-logo.svg" /></a>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" href="HomePage-AR.html">الرئيسية</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          القائمة
+        </a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="Catalog Search and Browsing-AR.html">الفهرس</a></li>
+          <li><a class="dropdown-item" href="#">حسابي</a></li>
+          <li><a class="dropdown-item" href="#">المستعار</a></li>
+          <li><a class="dropdown-item" href="#">الحجوزات</a></li>
+        </ul>
+      </li>
+    </ul>
+    <button type="button" class="btn btn-primary">
+      الإشعارات <span class="badge bg-secondary">0</span>
+    </button>
+  </header>
+
+  <div class="dropdown" id="leftlang">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      اللغة
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <li><a class="dropdown-item" href="HomePage-EN.html">الإنجليزية</a></li>
+      <li><a class="dropdown-item" href="HomePage-AR.html">العربية</a></li>
+    </ul>
+  </div>
+  <!-- الإعلانات -->
+  <section class="announcements">
+    <div class="container">
+      <h1 class="sectionTitle">الإعلانات</h1>
+      <div class="list-group shadow-custom">
+        <!-- أمثلة؛ استبدلها بمحتوى ديناميكي لاحقًا -->
+        <div class="list-group-item d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-semibold">تحديث ساعات العمل للاختبارات النصفية</div>
+            <small class="text-muted">المكتبة مفتوحة من 8:00 إلى 22:00 هذا الأسبوع.</small>
+          </div>
+          <span class="badge bg-primary rounded-pill">جديد</span>
+        </div>
+        <div class="list-group-item">
+          <div class="fw-semibold">صيانة النظام</div>
+          <small class="text-muted">قد يكون البحث في الفهرس بطيئًا يوم الجمعة من 9 إلى 10 مساءً.</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- نظرة عامة على الموقع -->
+  <section class="overview">
+    <div class="container">
+      <h2 class="sectionTitle">استكشف الموقع</h2>
+      <div class="row g-3">
+        <!-- الفهرس -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">البحث والتصفح في الفهرس</h5>
+              <p class="card-text">
+                ابحث حسب العنوان أو المؤلف أو رقم الكتاب أو التصنيف. صفِّ حسب التوفر ورتب حسب تاريخ النشر أو الإضافة.
+              </p>
+              <a class="btn btn-primary btn-sm" href="catalog.html">اذهب إلى الفهرس</a>
+            </div>
+          </div>
+        </div>
+        <!-- حسابي -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">حسابي</h5>
+              <p class="card-text">
+                اعرض وحدث ملفك الشخصي ومعلومات الاتصال وحدود الاستعارة حسب نوع عضويتك.
+              </p>
+              <a class="btn btn-outline-primary btn-sm" href="account.html">إدارة الحساب</a>
+            </div>
+          </div>
+        </div>
+        <!-- المعار والإرجاع -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">المعار والإرجاع</h5>
+              <p class="card-text">
+                تتبع تواريخ الاستحقاق، وجدد المواد المؤهلة، وراجع الغرامات أو التأخيرات إن وجدت.
+              </p>
+              <a class="btn btn-outline-primary btn-sm" href="borrowed.html">عرض المعار</a>
+            </div>
+          </div>
+        </div>
+        <!-- الحجوزات -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">الحجوزات</h5>
+              <p class="card-text">
+                احجز الكتب المعارة وتلقَّ إشعارًا عند توفرها.
+              </p>
+              <a class="btn btn-outline-primary btn-sm" href="reservations.html">إدارة الحجوزات</a>
+            </div>
+          </div>
+        </div>
+        <!-- الإشعارات -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">الإشعارات</h5>
+              <p class="card-text">
+                تذكيرات الاستحقاق، تنبيهات الحجوزات، وأهم تحديثات المكتبة في مكان واحد.
+              </p>
+              <a class="btn btn-outline-primary btn-sm" href="notifications.html">عرض الإشعارات</a>
+            </div>
+          </div>
+        </div>
+        <!-- سجل القراءة -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card shadow-custom h-100">
+            <div class="card-body">
+              <h5 class="card-title">سجل القراءة</h5>
+              <p class="card-text">
+                تصفح سجل استعاراتك السابقة وأكثر التصنيفات قراءة.
+              </p>
+              <a class="btn btn-outline-primary btn-sm" href="history.html">عرض السجل</a>
+            </div>
+          </div>
+        </div>
+
+  </section>
+
+  <footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container text-center text-md-start">
+      <div class="row text-center text-md-start">
+        © ٢٠٢٥ XXXXXX. جميع الحقوق محفوظة.
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

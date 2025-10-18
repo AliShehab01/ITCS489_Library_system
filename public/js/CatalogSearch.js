@@ -34,7 +34,8 @@ if (availSel) {
 }
 
 // API URL (relative)
-const API_URL = "./Catalog Search and Browsing.php";
+const API_URL = "../app/view/Catalog Search and Browsing.php";
+
 
 // Detect page language
 const pageLang = (
@@ -44,26 +45,26 @@ const pageLang = (
 // Arabic labels (minimal)
 const i18n = pageLang.startsWith("ar")
   ? {
-      author: "المؤلف",
-      category: "التصنيف",
-      isbn: "ISBN",
-      publication: "نشر",
-      added: "أضيفت",
-      untitled: "بدون عنوان",
-      unknown: "غير معروف",
-    }
+    author: "المؤلف",
+    category: "التصنيف",
+    isbn: "ISBN",
+    publication: "نشر",
+    added: "أضيفت",
+    untitled: "بدون عنوان",
+    unknown: "غير معروف",
+  }
   : null;
 
 // Category labels (AR)
 const categoryMap = pageLang.startsWith("ar")
   ? {
-      Science: "علوم",
-      Engineering: "هندسة",
-      History: "تاريخ",
-      Literature: "أدب",
-      Business: "أعمال",
-      Other: "أخرى",
-    }
+    Science: "علوم",
+    Engineering: "هندسة",
+    History: "تاريخ",
+    Literature: "أدب",
+    Business: "أعمال",
+    Other: "أخرى",
+  }
   : {};
 
 // Fetch books
@@ -193,9 +194,8 @@ function renderPager(total) {
   const pageCount = Math.ceil(total / perPage) || 1;
   let html = "";
   for (let i = 1; i <= pageCount; i++) {
-    html += `<button class="btn btn-sm ${
-      i === currentPage ? "btn-primary" : "btn-outline-primary"
-    } me-1 mb-2" data-page="${i}">${i}</button>`;
+    html += `<button class="btn btn-sm ${i === currentPage ? "btn-primary" : "btn-outline-primary"
+      } me-1 mb-2" data-page="${i}">${i}</button>`;
   }
   return `<div class="col-12 d-flex flex-wrap align-items-center mt-2">${html}</div>`;
 }
@@ -335,13 +335,13 @@ function escapeHtml(s) {
   return String(s).replace(
     /[&<>"']/g,
     (m) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[m])
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    }[m])
   );
 }
 
