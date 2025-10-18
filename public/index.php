@@ -90,4 +90,12 @@
     </script>
 </body>
 
+<?php
+require_once __DIR__ . '/../app/models/db489.php';
+$db = new Database();
+$conn = $db->conn; // $conn is your PDO object
+
+
+?>
+
 </html>

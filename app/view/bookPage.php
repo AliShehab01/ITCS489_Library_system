@@ -8,7 +8,10 @@
 
 
 
-require_once "db_connOfAli.php";
+require_once __DIR__ . '/../models/db489.php';
+$db = new Database();
+$conn = $db->conn; // $conn is your PDO object
+
 include "navbar.php";
 //session_start();
 if (!isset($_SESSION['username'])) {

@@ -4,7 +4,10 @@ header("Content-Type: application/json");
 
 $data = json_decode(file_get_contents('php://input'), true); // Parse JSON input
 
-require_once "db_connOfAli.php";  //PDO
+require_once __DIR__ . '/../models/db489.php';
+$db = new Database();
+$conn = $db->conn; // $conn is your PDO object
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!isset($_POST['title'], $_POST['author'], $_POST['isbn'])) {
@@ -96,7 +99,3 @@ if ($_SERVER["REQUEST_METHOD"] == "PUT") {
         echo json_encode(["error" => $e->getMessage()]);
     }
 }
-
-
-
-?>

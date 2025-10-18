@@ -2,7 +2,10 @@
 header("Content-Type: application/json");
 
 // Include DB connection
-require_once "db_connOfAli.php";
+require_once __DIR__ . '/../models/db489.php';
+$db = new Database();
+$conn = $db->conn; // $conn is your PDO object
+
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (!isset($data['isbn']) || !isset($data['status'])) {

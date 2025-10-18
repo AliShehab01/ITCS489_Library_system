@@ -1,6 +1,9 @@
 <?php
 
-require_once "db_connOfAli.php";
+require_once __DIR__ . '/../models/db489.php';
+$db = new Database();
+$conn = $db->conn; // $conn is your PDO object
+
 header("Content-Type: application/json");
 
 $data = json_decode(file_get_contents('php://input'), true); // Parse JSON input
