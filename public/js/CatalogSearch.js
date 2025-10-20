@@ -34,7 +34,7 @@ if (availSel) {
 }
 
 // API URL (relative)
-const API_URL = "../app/view/Catalog Search and Browsing.php";
+const API_URL = "http://localhost/app/view/Catalog Search and Browsing.php";
 
 
 // Detect page language
