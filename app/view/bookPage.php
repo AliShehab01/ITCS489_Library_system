@@ -2,20 +2,20 @@
 
 
 /*
-  This file need to divided to controller and view parts
+  This file need to divided to controller and view parts which is how mvc do
 
 */
 
 
 
-require_once __DIR__ . '/../models/db489.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 $db = new Database();
 $conn = $db->conn; // $conn is your PDO object
 
-include "navbar.php";
+include "../view/navbar.php";
 //session_start();
 if (!isset($_SESSION['username'])) {
-    header("Location: index.php");
+    header("Location: ../../public.php");
 }
 
 
@@ -146,29 +146,29 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
     <p id="delRes" class="mt-3"></p>
     <script>
-    resmsg = document.getElementById('delRes');
-    document.getElementById('deleteBtn').addEventListener('click', function() {
-        const isbn = document.getElementById('isbnToDelete').value.trim();
-        if (!isbn) {
-            res.textContent = "Please enter an ISBN.";
-            return;
-        }
+        resmsg = document.getElementById('delRes');
+        document.getElementById('deleteBtn').addEventListener('click', function() {
+            const isbn = document.getElementById('isbnToDelete').value.trim();
+            if (!isbn) {
+                res.textContent = "Please enter an ISBN.";
+                return;
+            }
 
 
-        fetch('deleterecord.php', {
-            method: 'Post',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                isbn: isbn
-            })
-        }).then(res => res.json()).then(data => {
-            resmsg.textContent = data.success || data.error;
-        }).catch(err => {
-            resmsg.textContent = "Error: " + err;
+            fetch('../controller/deleterecord.php', {
+                method: 'Post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    isbn: isbn
+                })
+            }).then(res => res.json()).then(data => {
+                resmsg.textContent = data.success || data.error;
+            }).catch(err => {
+                resmsg.textContent = "Error: " + err;
+            });
         });
-    });
     </script>
 
 
@@ -201,32 +201,32 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </form>
     <script>
-    const res = document.getElementById("status_res");
+        const res = document.getElementById("status_res");
 
 
-    document.getElementById("b1").addEventListener("click", function(e) {
-        e.preventDefault();
-        const status = document.getElementById("options").value;
-        const isbn = document.getElementById("isbn").value.trim();
-        if (!isbn || !status) {
-            alert("Please fill in all fields");
-        }
+        document.getElementById("b1").addEventListener("click", function(e) {
+            e.preventDefault();
+            const status = document.getElementById("options").value;
+            const isbn = document.getElementById("isbn").value.trim();
+            if (!isbn || !status) {
+                alert("Please fill in all fields");
+            }
 
-        fetch("changestatus.php", {
-            method: "PUT",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                isbn: isbn,
-                status: status
-            })
-        }).then(res => res.json()).then(data => {
-            res.textContent = data.message || data.error;
-        }).catch(err => {
-            document.getElementById("status_res").textContent = "Error: " + err;
+            fetch("../controller/changestatus.php", {
+                method: "PUT",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    isbn: isbn,
+                    status: status
+                })
+            }).then(res => res.json()).then(data => {
+                res.textContent = data.message || data.error;
+            }).catch(err => {
+                document.getElementById("status_res").textContent = "Error: " + err;
+            });
         });
-    });
     </script>
 
 
@@ -243,57 +243,58 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container mt-5">
         <div class="row">
             <?php foreach ($books as $book): ?>
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                    <img src="<?= $book['image_path'] ?? 'placeholder.jpg' ?>" class="card-img-top"
-                        alt="<?= htmlspecialchars($book['title']) ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= htmlspecialchars($book['title']) ?></h5>
-                        <p class="card-text"><?= htmlspecialchars($book['author']) ?></p>
-                        <a href="bookDetails.php?id=<?= $book['id'] ?>" class="btn btn-primary">View Details</a>
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <img src="<?= $book['image_path'] ?? 'placeholder.jpg' ?>" class="card-img-top"
+                            alt="<?= htmlspecialchars($book['title']) ?>">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= htmlspecialchars($book['title']) ?></h5>
+                            <p class="card-text"><?= htmlspecialchars($book['author']) ?></p>
+                            <a href="bookDetails.php?id=<?= $book['id'] ?>" class="btn btn-primary">View Details</a>
+                        </div>
+                        <!--maybe up a path problem-->
                     </div>
                 </div>
-            </div>
             <?php endforeach; ?>
         </div>
     </div>
 
     <script>
-    document.getElementById("updateBookForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const formdata = new FormData(this);
-        const book = {}
+        document.getElementById("updateBookForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formdata = new FormData(this);
+            const book = {}
 
-        formdata.forEach((value, key) => {
-            book[key] = value;
-        });
+            formdata.forEach((value, key) => {
+                book[key] = value;
+            });
 
-        fetch("BookApi.php", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(book)
-        }).then(res => res.json()).then(data => {
-            document.getElementById("updateMessage").textContent = data.message || data.error;
+            fetch("../controller/BookApi.php", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(book)
+            }).then(res => res.json()).then(data => {
+                document.getElementById("updateMessage").textContent = data.message || data.error;
+            })
         })
-    })
     </script>
 
     <script>
-    document.getElementById("bookForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
+        document.getElementById("bookForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
 
-        fetch("BookApi.php", {
-                method: "POST",
-                body: formData // no headers needed for FormData
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("message").textContent = data.message || data.error;
-            });
-    });
+            fetch("../controller/BookApi.php", {
+                    method: "POST",
+                    body: formData // no headers needed for FormData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("message").textContent = data.message || data.error;
+                });
+        });
     </script>
 </body>
 

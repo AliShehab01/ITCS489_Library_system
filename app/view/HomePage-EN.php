@@ -1,8 +1,10 @@
 <?php
-// require_once "db_connOfAli.php";
-include "navbar.php";
+session_start();
+require_once __DIR__ . '/../../config.php';
+
+include "../view/navbar.php";
 if (!isset($_SESSION['username'])) {
-  header("Location: login.php");
+    header("Location: login.php");
 }
 
 ?>
@@ -56,7 +58,7 @@ if (!isset($_SESSION['username'])) {
                                 Search by title, author, ISBN, or category. Filter by availability and sort by
                                 publication year or date added.
                             </p>
-                            <a class="btn btn-primary btn-sm" href="catalog.html">Go to Catalog</a>
+                            <a class="btn btn-primary btn-sm" href="CatalogSearch_Browsing-EN.php">Go to Catalog</a>
                         </div>
                     </div>
                 </div>

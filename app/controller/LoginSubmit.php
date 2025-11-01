@@ -7,41 +7,49 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login Submit</title>
 </head>
 
 <body>
 
     <?php
-    require 'dbconnect.php';
-    include 'navbar.php';
-    require 'CreateDefaultDBTables.php';
+require '../models/dbconnect.php'; // your PDO Database class
+include '../view/navbar.php';
+require '../models/CreateDefaultDBTables.php';
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $first_name = null;
+$username = $_POST['username'] ?? '';
+$password = $_POST['password'] ?? '';
+$first_name = null;
 
+$found = false;
 
-    $result = mysqli_query($conn, "SELECT * FROM users");
+try {
+    $db = new Database();
+    $pdo = $db->conn;
 
-    $found = false;
+    // Fetch all users
+    $stmt = $pdo->query("SELECT * FROM users");
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $rows = mysqli_fetch_all($result, MYSQLI_ASSOC);
-
-    for ($i = 0; $i < count($rows); $i++) {
-        if ($rows[$i]['username'] == $username && $rows[$i]['password'] == $password) {
+    foreach ($rows as $row) {
+        if ($row['username'] === $username && $row['password'] === $password) {
             $found = true;
-            $first_name = $rows[$i]['firstName'];
-            $_SESSION["first_name"] = $first_name;
-            $_SESSION["user_id"] = $rows[$i]['id'];
-            if($_SESSION['role'] != 'Student'){
+            $first_name = $row['firstName'];
+            $_SESSION['first_name'] = $first_name;
+            $_SESSION['user_id'] = $row['id'];
+
+            // Set borrow limit
+            if ($row['role'] !== 'Student') {
                 $_SESSION['BorrowLimit'] = 5;
-            }else{
+            } else {
                 $_SESSION['BorrowLimit'] = 3;
             }
 
-            if ($rows[$i]['role'] == 'Admin') {
+            // Set role
+            if ($row['role'] === 'Admin') {
                 $_SESSION['role'] = 'admin';
+            } else {
+                $_SESSION['role'] = 'Student';
             }
 
             break;
@@ -49,22 +57,25 @@ session_start();
     }
 
     if ($found) {
-        $_SESSION["username"] = $username;
-
-
+        $_SESSION['username'] = $username;
         echo "Login successful";
 
-        if ($_SESSION['username'] == 'admin') {
-            $_SESSION['role'] = 'admin';
+        // Redirect based on role
+        if ($_SESSION['role'] === 'admin') {
+            header("Location: ../view/AdminArea.php");
+            exit;
+        } else {
+            header("Location: ../view/HomePage-EN.php");
+            exit;
         }
-
-        header("Location: HomePage-EN.php");
     } else {
-        echo "Invalid username or password";
+        echo "<div class='alert alert-danger'>Invalid username or password</div>";
     }
 
-    mysqli_close($conn);
-    ?>
+} catch (PDOException $e) {
+    echo "<div class='alert alert-danger'>Database error: " . htmlspecialchars($e->getMessage()) . "</div>";
+}
+?>
 
 </body>
 

@@ -1,13 +1,14 @@
 <?php
 // reservations_lib.php
-require_once 'dbconnect.php';
+require_once '../models/dbconnect.php';
 
 /**
  * Return the oldest ACTIVE reservation for a book (FIFO), or null if none.
  * Expected table: reservations(reservation_id, user_id, book_id, status, reserved_at)
  * status: 'active' | 'notified' | 'fulfilled' | 'cancelled'
  */
-function get_first_active_reservation(mysqli $conn, int $bookId): ?array {
+function get_first_active_reservation(mysqli $conn, int $bookId): ?array
+{
     $sql = "SELECT reservation_id, user_id, reserved_at
             FROM reservations
             WHERE book_id = ? AND status = 'active'
@@ -23,7 +24,8 @@ function get_first_active_reservation(mysqli $conn, int $bookId): ?array {
 /**
  * True if there is any ACTIVE reservation for this book.
  */
-function has_active_queue(mysqli $conn, int $bookId): bool {
+function has_active_queue(mysqli $conn, int $bookId): bool
+{
     $sql = "SELECT 1
             FROM reservations
             WHERE book_id = ? AND status = 'active'
@@ -40,7 +42,8 @@ function has_active_queue(mysqli $conn, int $bookId): bool {
  * - If there is NO queue → anyone can borrow (return true)
  * - If there IS a queue → only the FIRST user in the queue may borrow (return true only for them)
  */
-function borrower_is_first_in_queue(mysqli $conn, int $bookId, int $userId): bool {
+function borrower_is_first_in_queue(mysqli $conn, int $bookId, int $userId): bool
+{
     $first = get_first_active_reservation($conn, $bookId);
     if (!$first) return true; // no queue → allow
     return (int)$first['user_id'] === $userId;
@@ -50,7 +53,8 @@ function borrower_is_first_in_queue(mysqli $conn, int $bookId, int $userId): boo
  * When a user with a reservation successfully borrows the book,
  * mark their reservation as fulfilled so the queue advances fairly.
  */
-function fulfill_user_reservation(mysqli $conn, int $bookId, int $userId): void {
+function fulfill_user_reservation(mysqli $conn, int $bookId, int $userId): void
+{
     // find that user's earliest active/notified reservation for this book
     $sql = "SELECT reservation_id
             FROM reservations
@@ -76,7 +80,8 @@ function fulfill_user_reservation(mysqli $conn, int $bookId, int $userId): void 
  * It inserts a row into `notifications` and marks their reservation as 'notified'.
  * Expected table: notifications(id, user_id, book_id, message, is_read, created_at)
  */
-function notify_next_in_queue(mysqli $conn, int $bookId): void {
+function notify_next_in_queue(mysqli $conn, int $bookId): void
+{
     $first = get_first_active_reservation($conn, $bookId);
     if (!$first) return; // nobody waiting
 

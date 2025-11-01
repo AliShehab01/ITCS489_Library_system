@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <?php
-    session_start();
-    session_unset();
-    session_destroy();
-    include 'navbar.php';
-    header("Location: login.php");
-    ?>
-</body>
-</html>
+<?php
+session_start();
+session_unset();
+session_destroy();
+
+// Redirect to login page
+header("Location: ../view/login.php");
+exit;

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../models/db489.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 $db = new Database();
 $conn = $db->conn; // $conn is your PDO object
 

@@ -1,16 +1,16 @@
-<?php 
+<?php
 header("Content-Type: application/json");
 
 $host = '127.0.0.1';
 $user = 'root';
 $pass = '';
-$db   = '489'; 
+$db   = 'library_system';
 
 $conn = @new mysqli($host, $user, $pass, $db);
 
 if ($conn->connect_errno) {
   http_response_code(500);
-  die(json_encode(["status"=>"error","message"=>"DB connect failed: ".$conn->connect_error]));
+  die(json_encode(["status" => "error", "message" => "DB connect failed: " . $conn->connect_error]));
 }
 
 $conn->set_charset('utf8mb4');
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
   if (!$r) {
     http_response_code(500);
-    echo json_encode(["status"=>"error","message"=>"Query failed: ".$conn->error]);
+    echo json_encode(["status" => "error", "message" => "Query failed: " . $conn->error]);
     exit;
   }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
       "publisher"  => $row["publisher"],
       "year"       => is_null($row["year"]) ? null : (int)$row["year"],
       "created_at" => $row["created_at"],
-      
+
     ];
   }
   echo json_encode($out);
@@ -47,4 +47,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 http_response_code(405);
-echo json_encode(["status"=>"error","message"=>"Method not allowed"]);
+echo json_encode(["status" => "error", "message" => "Method not allowed"]);

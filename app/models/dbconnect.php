@@ -1,19 +1,20 @@
 <?php
-/*
-   THIS MUST BE DELETED TO USE ONLY "db489.php"
+class Database
+{
+    private $user = "root";
+    private $host = "localhost";
+    private $pass = "";
+    private $dbname = "library_system";
+    public $conn;
 
-*/
-
-
-$servername = "localhost";   // XAMPP local server
-$username   = "root";        // default MySQL username
-$password   = "";            // default MySQL password (empty)
-$dbname     = "library_system"; // ✅ your real database name
-
-$conn = mysqli_connect($servername, $username, $password, $dbname);
-
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+    public function __construct()
+    {
+        try {
+            $this->conn = new PDO("mysql:host={$this->host};dbname={$this->dbname}", $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            //echo "good";
+        } catch (PDOException $e) {
+            die("Database Connection Failed: " . $e->getMessage());
+        }
+    }
 }
-
-mysqli_set_charset($conn, "utf8mb4");

@@ -11,45 +11,12 @@
 </head>
 
 <body>
-  <header class="d-flex justify-content-center navbar fixed-top navbar-light bg-light">
-    <a href="HomePage-EN.html"><img src="..\..\imgs\tlp-logo.svg" alt="Logo" /></a>
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a class="nav-link active" href="#">Catalog</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Menu
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="HomePage-EN.html">Home</a></li>
-          <li><a class="dropdown-item" href="#">My Account</a></li>
-          <li>
-            <a class="dropdown-item" href="borrowedDashboard.php">Borrowed</a>
-          </li>
-          <li><a class="dropdown-item" href="#">Reservations</a></li>
-        </ul>
-      </li>
-    </ul>
-    <button type="button" class="btn btn-primary">
-      Notifications <span class="badge bg-secondary">0</span>
-    </button>
-  </header>
 
-  <div class="dropdown" id="leftlang">
-    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown"
-      aria-expanded="false">
-      Language
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-      <li>
-        <a class="dropdown-item" href="Catalog Search and Browsing-EN.html">English</a>
-      </li>
-      <li>
-        <a class="dropdown-item" href="Catalog Search and Browsing-AR.html">Arabic</a>
-      </li>
-    </ul>
-  </div>
+  <?php
+  include '../view/navbar.php'
+
+
+  ?>
 
   <!-- Search bar -->
 
