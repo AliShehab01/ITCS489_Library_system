@@ -107,7 +107,7 @@ if (!isset($_SESSION['username'])) {
                             <p class="card-text">
                                 Due-date reminders, reservation alerts, and key library updates in one place.
                             </p>
-                            <a class="btn btn-outline-primary btn-sm" href="notifications.html">Open Notifications</a>
+                            <a class="btn btn-outline-primary btn-sm" href="userNotifications.php">Open Notifications</a>
                         </div>
                     </div>
                 </div>

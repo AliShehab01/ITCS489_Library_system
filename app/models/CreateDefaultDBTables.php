@@ -50,12 +50,39 @@ $createBooksTable = "CREATE TABLE IF NOT EXISTS books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
+// RESERVATIONS
+$createReservationsTable = "CREATE TABLE IF NOT EXISTS reservations (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    book_id INT NOT NULL,
+    status ENUM('active','notified','fulfilled','cancelled') DEFAULT 'active',
+    reserved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
+// NOTIFICATIONS
+$createNotificationsTable = "CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    book_id INT NULL,
+    type ENUM('due','overdue','reservation','announcement') NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    due_date DATE DEFAULT NULL,
+    is_read TINYINT(1) NOT NULL DEFAULT 0,
+    context_type VARCHAR(40) DEFAULT NULL,
+    context_id INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL,
+    KEY idx_notifications_user (user_id),
+    KEY idx_notifications_type (type)
+)";
 
 try {
-    // Execute all table creation queries
     $conn->exec($createUsersTable);
     $conn->exec($createBorrowsTable);
-    $conn->exec($createBooksTable); // ⭐️ Added Books table here
+    $conn->exec($createBooksTable);
+    $conn->exec($createReservationsTable);
+    $conn->exec($createNotificationsTable);
 
     echo "<h3>✅ All tables created successfully!</h3>";
 

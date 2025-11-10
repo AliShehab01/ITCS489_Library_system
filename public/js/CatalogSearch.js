@@ -120,15 +120,10 @@ function applyFilters(list) {
     );
   }
 
-  // Availability — strict match
+  // Availability — strict match (supports either `status` or legacy `availability`)
   if (availSel && availSel.value) {
     const wanted = String(availSel.value).trim().toLowerCase(); // available | issued | reserved | unavailable
-    out = out.filter(
-      (b) =>
-        String(b.availability || "")
-          .trim()
-          .toLowerCase() === wanted
-    );
+    out = out.filter((b) => getAvailability(b) === wanted);
   }
 
   // Category (exact value as in <option value="...">)
@@ -234,7 +229,6 @@ function bookCard(b) {
     categoryMap && categoryMap[catRaw] ? categoryMap[catRaw] : catRaw || "—"
   );
   const isbn = escapeHtml(b.isbn || "—");
-  const badge = makeBadge(b.availability);
   const metaLines = [
     `${i18n ? i18n.author : "Author"}: ${author}`,
     `${i18n ? i18n.category : "Category"}: ${cat}`,
@@ -242,7 +236,10 @@ function bookCard(b) {
     dateLine(b),
   ].join("<br/>");
 
-  if (b.availability && String(b.availability).toLowerCase() === "available") {
+  const avail = getAvailability(b);
+  const badge = makeBadge(avail);
+
+  if (avail === "available") {
     return (
       `
   <div class="col-12 col-sm-6 col-lg-4">
@@ -254,8 +251,8 @@ function bookCard(b) {
       <div class="bookMeta">${metaLines}</div>
       
       <form action="BorrowBook.php?bookid=` +
-      b.id +
-      `" method="post">
+        b.id +
+        `" method="post">
 
        <label for="">Quantity:</label>
        <input type="number" name="QuantityWanted" min=1, max=5> <br>
@@ -315,6 +312,18 @@ function makeBadge(av) {
   }
 
   return `<span class="badge bg-${cls}">${label}</span>`;
+}
+
+// Helper: normalize availability/status from backend
+function getAvailability(b) {
+  if (!b) return '';
+  if (b.status && String(b.status).trim() !== '') return String(b.status).trim().toLowerCase();
+  if (typeof b.quantity === 'number') return b.quantity > 0 ? 'available' : 'unavailable';
+  if (b.quantity) {
+    const n = Number(b.quantity);
+    if (!Number.isNaN(n)) return n > 0 ? 'available' : 'unavailable';
+  }
+  return '';
 }
 
 function dateLine(b) {

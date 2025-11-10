@@ -5,6 +5,24 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Path to config
 require_once __DIR__ . '/../../config.php';
+
+// Compute unread notification count for logged-in user (non-blocking)
+$unreadCount = 0;
+if (isset($_SESSION['user_id'])) {
+    // Use the PDO-based Database helper used elsewhere in the app
+    // Wrap in try/catch to avoid breaking pages if DB is unavailable
+    try {
+        require_once __DIR__ . '/../models/dbconnect.php';
+        $db = new Database();
+        $pdo = $db->conn;
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :uid AND is_read = 0");
+        $stmt->execute([':uid' => (int)$_SESSION['user_id']]);
+        $unreadCount = (int)$stmt->fetchColumn();
+    } catch (Exception $e) {
+        // silently ignore DB errors in navbar
+        $unreadCount = 0;
+    }
+}
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
@@ -24,7 +42,7 @@ require_once __DIR__ . '/../../config.php';
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="<?= BASE_URL ?>public/index.php">Home</a>
+                    <a class="nav-link active" href="HomePage-EN.php">Home</a>
                 </li>
 
                 <!-- Dropdown Menu -->
@@ -32,13 +50,12 @@ require_once __DIR__ . '/../../config.php';
                     <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
                     <ul class="dropdown-menu" aria-labelledby="menuDropdown">
-                        <li><a class="dropdown-item"
-                                href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php">Catalog</a></li>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/account.php">My Account</a></li>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/BorrowedDashboard.php">Borrowed</a>
-                        </li>
-                        <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/reservations.php">Reservations</a>
-                        </li>
+            <li><a class="dropdown-item" href="CatalogSearch_Browsing-EN.php">Catalog</a></li>
+            <li><a class="dropdown-item" href="editUserProfile.php">My Account</a></li>
+            <li><a class="dropdown-item" href="borrowedDashboard.php">Borrowed</a>
+            </li>
+            <li><a class="dropdown-item" href="reservations.php">Reservations</a>
+            </li>
                     </ul>
                 </li>
             </ul>
@@ -50,9 +67,15 @@ require_once __DIR__ . '/../../config.php';
                     <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-danger btn-sm">Admin Area</a>
                 <?php endif; ?>
 
-                <button type="button" class="btn btn-primary btn-sm" id="notific">
-                    Notifications <span class="badge bg-secondary">0</span>
-                </button>
+                <a href="userNotifications.php" class="btn btn-primary btn-sm position-relative">
+                    Notifications
+                    <?php if (!empty($unreadCount)): ?>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <?= (int)$unreadCount ?>
+                            <span class="visually-hidden">unread notifications</span>
+                        </span>
+                    <?php endif; ?>
+                </a>
 
                 <!-- Google Translate -->
                 <div id="google_translate_element" class="ms-2"></div>
