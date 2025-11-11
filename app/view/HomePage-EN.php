@@ -1,10 +1,52 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
 include "../view/navbar.php";
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
+}
+
+// Fetch announcements from database
+$db = new Database();
+$conn = $db->conn;
+$announcements = [];
+$debugInfo = '';
+
+try {
+    $userId = $_SESSION['user_id'] ?? null;
+    
+    if (!$userId) {
+        $debugInfo = "Error: user_id not found in session";
+    } else {
+        // fetch latest 3 announcements for this user, include is_read so we can show the badge once
+        $announcementsStmt = $conn->prepare("
+            SELECT n.id, n.title, n.message, n.created_at, n.is_read
+            FROM notifications n
+            WHERE n.type = 'announcement' AND n.user_id = :user_id
+            ORDER BY n.created_at DESC
+            LIMIT 3
+        ");
+
+        $announcementsStmt->execute([':user_id' => (int)$userId]);
+        $announcements = $announcementsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$announcements) {
+            $debugInfo = "No announcements found for user ID: " . $userId;
+        } else {
+            // collect unread announcement ids so we can mark them read after showing
+            $unreadIds = array_map(function($a){ return (int)$a['id']; }, array_filter($announcements, function($a){ return empty($a['is_read']) || $a['is_read'] == 0; }));
+            if (!empty($unreadIds)) {
+                // build placeholders for prepared statement
+                $placeholders = implode(',', array_fill(0, count($unreadIds), '?'));
+                $upd = $conn->prepare("UPDATE notifications SET is_read = 1, updated_at = NOW() WHERE id IN ($placeholders)");
+                $upd->execute($unreadIds);
+            }
+        }
+    }
+} catch (Exception $e) {
+    $debugInfo = "Database error: " . $e->getMessage();
 }
 
 ?>
@@ -27,19 +69,31 @@ if (!isset($_SESSION['username'])) {
     <section class="announcements">
         <div class="container">
             <h1 class="sectionTitle">Announcements</h1>
+            <?php if ($debugInfo): ?>
+                <div class="alert alert-warning mb-3">Debug: <?= htmlspecialchars($debugInfo) ?></div>
+            <?php endif; ?>
             <div class="list-group shadow-custom">
-                <!-- Examples; replace later with dynamic content -->
-                <div class="list-group-item d-flex justify-content-between align-items-start">
-                    <div>
-                        <div class="fw-semibold">Midterm Hours Update</div>
-                        <small class="text-muted">Library open 8:00 to 22:00 this week.</small>
+                <?php if (empty($announcements)): ?>
+                    <div class="list-group-item text-muted">
+                        <p>No announcements at this time.</p>
                     </div>
-                    <span class="badge bg-primary rounded-pill">New</span>
-                </div>
-                <div class="list-group-item">
-                    <div class="fw-semibold">System Maintenance</div>
-                    <small class="text-muted">Catalog search may be slow on Friday from 9 to 10 PM.</small>
-                </div>
+                <?php else: ?>
+                    <?php foreach ($announcements as $announcement): ?>
+                        <div class="list-group-item d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="fw-semibold"><?= htmlspecialchars($announcement['title']) ?></div>
+                                <small class="text-muted"><?= htmlspecialchars($announcement['message']) ?></small>
+                                <br>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    <?= date('M d, Y g:i A', strtotime($announcement['created_at'])) ?>
+                                </small>
+                            </div>
+                            <?php if (!$announcement['is_read']): ?>
+                                <span class="badge bg-primary rounded-pill">New</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </section>
