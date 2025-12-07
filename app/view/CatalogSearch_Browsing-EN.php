@@ -43,6 +43,33 @@ $userRole = $_SESSION['role'] ?? '';
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
+    .bookCoverWrap {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .book-cover-img {
+      width: 100%;
+      max-width: 120px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-cover-placeholder {
+      width: 120px;
+      height: 160px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      color: white;
+      font-size: 3rem;
+      margin: 0 auto;
+    }
+
     .bookHead {
       display: flex;
       justify-content: space-between;
@@ -58,10 +85,10 @@ $userRole = $_SESSION['role'] ?? '';
     }
 
     .bookMeta {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #6c757d;
       margin-bottom: 10px;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .borrowForm {
@@ -180,179 +207,11 @@ $userRole = $_SESSION['role'] ?? '';
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Inline catalog script to avoid path issues -->
   <script>
     window.userLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     window.userRole = '<?= htmlspecialchars($userRole) ?>';
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const resultsEl = document.getElementById("results");
-      const searchInput = document.getElementById("search");
-      const sortSelect = document.getElementById("sort");
-      const availSel = document.getElementById("availability");
-      const catSel = document.getElementById("category");
-
-      let books = [];
-      let currentPage = 1;
-      const perPage = 9;
-      const isLoggedIn = window.userLoggedIn;
-
-      // API URL - relative to current page
-      const API_URL = './CatalogSearch_Browsingbackend.php';
-
-      async function fetchBooks() {
-        console.log('Fetching from:', API_URL);
-        try {
-          const res = await fetch(API_URL);
-          console.log('Response status:', res.status);
-
-          if (!res.ok) throw new Error('HTTP ' + res.status);
-
-          const text = await res.text();
-          console.log('Response:', text.substring(0, 300));
-
-          const json = JSON.parse(text);
-          books = Array.isArray(json) ? json : (json.data || []);
-          console.log('Books loaded:', books.length);
-
-          if (books.length === 0) {
-            resultsEl.innerHTML = '<div class="col-12"><div class="alert alert-info">No books in catalog. ' +
-              (isLoggedIn ? '<a href="bookPage.php">Add books</a>' : '<a href="login.php">Login</a>') + '</div></div>';
-            return;
-          }
-          render();
-        } catch (err) {
-          console.error('Fetch error:', err);
-          resultsEl.innerHTML = '<div class="col-12"><div class="alert alert-danger">Error: ' + err.message +
-            '<br><button onclick="location.reload()" class="btn btn-sm btn-primary mt-2">Retry</button></div></div>';
-        }
-      }
-
-      function render() {
-        let filtered = books;
-        const q = (searchInput?.value || '').toLowerCase().trim();
-        if (q) {
-          filtered = filtered.filter(b =>
-            (b.title || '').toLowerCase().includes(q) ||
-            (b.author || '').toLowerCase().includes(q) ||
-            (b.isbn || '').toLowerCase().includes(q)
-          );
-        }
-        if (availSel?.value) {
-          const wanted = availSel.value.toLowerCase();
-          filtered = filtered.filter(b => {
-            const status = (b.status || '').toLowerCase();
-            const qty = parseInt(b.quantity) || 0;
-            if (wanted === 'available') return status === 'available' || qty > 0;
-            if (wanted === 'unavailable') return status === 'unavailable' || qty === 0;
-            return true;
-          });
-        }
-        if (catSel?.value) {
-          filtered = filtered.filter(b => b.category === catSel.value);
-        }
-
-        // Sort
-        const sortVal = sortSelect?.value || '';
-        if (sortVal === 'title-asc') filtered.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-        if (sortVal === 'title-desc') filtered.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
-        if (sortVal === 'added-desc') filtered.sort((a, b) => (b.id || 0) - (a.id || 0));
-
-        // Paginate
-        const start = (currentPage - 1) * perPage;
-        const pageData = filtered.slice(start, start + perPage);
-
-        // Render cards
-        let html = pageData.map(b => {
-          const qty = parseInt(b.quantity) || 0;
-          const avail = qty > 0 ? 'available' : 'unavailable';
-          const badge = avail === 'available' ?
-            '<span class="badge bg-success">Available</span>' :
-            '<span class="badge bg-danger">Unavailable</span>';
-
-          let actionHtml = '';
-          if (isLoggedIn && avail === 'available') {
-            const today = new Date().toISOString().split('T')[0];
-            const due = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            actionHtml = `
-              <form action="BorrowBook.php?bookid=${b.id}" method="post" class="borrowForm">
-                <div class="borrowFormRow"><label>Qty:</label><input type="number" name="QuantityWanted" min="1" max="${Math.min(5,qty)}" value="1" class="borrowInput"></div>
-                <div class="borrowFormRow"><label>Due:</label><input type="date" name="dueDate" min="${today}" value="${due}" class="borrowInput"></div>
-                <button type="submit" class="btn btn-primary btn-sm w-100">Borrow</button>
-              </form>`;
-          } else if (!isLoggedIn && avail === 'available') {
-            actionHtml = '<a href="login.php" class="btn btn-outline-primary btn-sm w-100 mt-2">Login to Borrow</a>';
-          } else if (isLoggedIn && avail === 'unavailable') {
-            actionHtml = `<a href="reservations.php?book_id=${b.id}" class="btn btn-outline-warning btn-sm w-100 mt-2">Reserve</a>`;
-          }
-
-          return `
-            <div class="col-12 col-sm-6 col-lg-4">
-              <div class="bookCard">
-                <div class="bookHead"><strong class="bookTitle">${escapeHtml(b.title||'Untitled')}</strong>${badge}</div>
-                <div class="bookMeta">
-                  Author: ${escapeHtml(b.author||'Unknown')}<br>
-                  Category: ${escapeHtml(b.category||'—')}<br>
-                  ISBN: ${escapeHtml(b.isbn||'—')}<br>
-                  Available: ${qty} copies
-                </div>
-                ${actionHtml}
-              </div>
-            </div>`;
-        }).join('');
-
-        // Pager
-        const pageCount = Math.ceil(filtered.length / perPage) || 1;
-        let pagerHtml = '<div class="col-12 mt-3">';
-        for (let i = 1; i <= pageCount; i++) {
-          pagerHtml += `<button class="btn btn-sm ${i===currentPage?'btn-primary':'btn-outline-primary'} me-1 mb-1" data-page="${i}">${i}</button>`;
-        }
-        pagerHtml += '</div>';
-
-        resultsEl.innerHTML = html + pagerHtml;
-
-        // Wire pager
-        resultsEl.querySelectorAll('[data-page]').forEach(btn => {
-          btn.onclick = () => {
-            currentPage = parseInt(btn.dataset.page);
-            render();
-          };
-        });
-      }
-
-      function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, m => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        } [m]));
-      }
-
-      // Events
-      searchInput?.addEventListener('input', () => {
-        currentPage = 1;
-        render();
-      });
-      sortSelect?.addEventListener('change', () => {
-        currentPage = 1;
-        render();
-      });
-      availSel?.addEventListener('change', () => {
-        currentPage = 1;
-        render();
-      });
-      catSel?.addEventListener('change', () => {
-        currentPage = 1;
-        render();
-      });
-
-      // Start
-      fetchBooks();
-    });
   </script>
+  <script src="/public/js/CatalogSearch.js"></script>
 </body>
 
 </html>

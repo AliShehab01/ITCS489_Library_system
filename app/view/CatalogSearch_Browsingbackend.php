@@ -37,7 +37,7 @@ try {
   }
 
   // Get all books
-  $sql = "SELECT id, title, author, isbn, category, status, quantity, publisher, year, created_at FROM books ORDER BY id DESC";
+  $sql = "SELECT id, title, author, isbn, category, status, quantity, publisher, year, image_path, created_at FROM books ORDER BY id DESC";
   $result = $conn->query($sql);
 
   if (!$result) {
@@ -56,6 +56,7 @@ try {
       "quantity" => (int)($row["quantity"] ?? 0),
       "publisher" => $row["publisher"] ?? '',
       "publication_year" => $row["year"] ? (int)$row["year"] : null,
+      "image_path" => $row["image_path"] ?? null,
       "created_at" => $row["created_at"] ?? null,
     ];
   }

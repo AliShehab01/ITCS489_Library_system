@@ -280,13 +280,22 @@ document.addEventListener('DOMContentLoaded', function () {
     );
     const isbn = escapeHtml(b.isbn || "—");
     const qty = typeof b.quantity === 'number' ? b.quantity : (parseInt(b.quantity) || 0);
+
+    // Book cover image
+    const imagePath = b.image_path ? '/' + escapeHtml(b.image_path) : null;
+    const coverHtml = imagePath
+      ? `<img src="${imagePath}" class="book-cover-img" alt="${title}">`
+      : `<div class="book-cover-placeholder">📕</div>`;
+
+    // Build meta lines, filtering out empty ones
+    const dateInfo = dateLine(b);
     const metaLines = [
       `${i18n ? i18n.author : "Author"}: ${author}`,
       `${i18n ? i18n.category : "Category"}: ${cat}`,
       `${i18n ? i18n.isbn : "ISBN"}: ${isbn}`,
       `Available: ${qty} copies`,
-      dateLine(b),
-    ].join("<br/>");
+      dateInfo
+    ].filter(line => line && line.trim() !== '').join("<br/>");
 
     const avail = getAvailability(b);
     const badge = makeBadge(avail);
@@ -302,6 +311,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return `
   <div class="col-12 col-sm-6 col-lg-4">
     <div class="bookCard" data-book-id="${b.id}">
+      <div class="bookCoverWrap">${coverHtml}</div>
       <div class="bookHead">
         <strong class="bookTitle">${title}</strong>
         ${badge}
@@ -329,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return `
   <div class="col-12 col-sm-6 col-lg-4">
     <div class="bookCard" data-book-id="${b.id}">
+      <div class="bookCoverWrap">${coverHtml}</div>
       <div class="bookHead">
         <strong class="bookTitle">${title}</strong>
         ${badge}
@@ -348,6 +359,7 @@ document.addEventListener('DOMContentLoaded', function () {
     return `
   <div class="col-12 col-sm-6 col-lg-4">
     <div class="bookCard" data-book-id="${b.id}">
+      <div class="bookCoverWrap">${coverHtml}</div>
       <div class="bookHead">
         <strong class="bookTitle">${title}</strong>
         ${badge}
@@ -405,19 +417,27 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function dateLine(b) {
-    const pubLabel = i18n ? i18n.publication : "Publication";
+    const pubLabel = i18n ? i18n.publication : "Year";
     const addedLabel = i18n ? i18n.added : "Added";
-    if (
-      typeof b.publication_year === "number" ||
-      (b.publication_year && !Number.isNaN(Number(b.publication_year)))
-    ) {
-      return `${pubLabel}: ${b.publication_year}`;
+
+    // Check publication_year
+    if (b.publication_year !== null && b.publication_year !== undefined) {
+      const year = Number(b.publication_year);
+      if (!Number.isNaN(year) && year > 0) {
+        return `${pubLabel}: ${year}`;
+      }
     }
+
+    // Fallback to created_at
     if (b.created_at) {
       const d = new Date(b.created_at);
-      return `${addedLabel}: ${isNaN(d) ? b.created_at : d.toLocaleDateString()}`;
+      if (!isNaN(d.getTime())) {
+        return `${addedLabel}: ${d.toLocaleDateString()}`;
+      }
     }
-    return `${pubLabel}: —`;
+
+    // Don't show anything if no date info
+    return '';
   }
 
   function escapeHtml(s) {
@@ -442,9 +462,9 @@ document.addEventListener('DOMContentLoaded', function () {
       t = setTimeout(() => { currentPage = 1; render(); }, 150);
     });
   }
-  if (sortSelect) sortSelect.addEventListener("change", () => { currentPage = 1; render(); });
-  if (availSel) availSel.addEventListener("change", () => { currentPage = 1; render(); });
-  if (catSel) catSel.addEventListener("change", () => { currentPage = 1; render(); });
+
+
+  if (availSel) availSel.addEventListener("change", () => { currentPage = 1; render(); }); if (sortSelect) sortSelect.addEventListener("change", () => { currentPage = 1; render(); }); if (catSel) catSel.addEventListener("change", () => { currentPage = 1; render(); });
 
   // Init - fetch books
   fetchBooks();
