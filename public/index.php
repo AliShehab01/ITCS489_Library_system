@@ -20,17 +20,17 @@ $isLoggedIn = isset($_SESSION['username']);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Library System</title>
     <style>
-        body {
-            padding-top: 70px;
-        }
+    body {
+        padding-top: 70px;
+    }
 
-        .hero-section {
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-        }
+    .hero-section {
+        background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    }
 
-        .cta-section {
-            background: linear-gradient(135deg, #059669, #10b981);
-        }
+    .cta-section {
+        background: linear-gradient(135deg, #059669, #10b981);
+    }
     </style>
 </head>
 
@@ -41,12 +41,12 @@ $isLoggedIn = isset($_SESSION['username']);
             <h1 class="display-4 fw-bold">Welcome to the University Library</h1>
             <p class="lead mb-4">Discover thousands of books, manage your borrowings, and explore knowledge.</p>
             <?php if (!$isLoggedIn): ?>
-                <div class="d-flex gap-3 justify-content-center">
-                    <a href="/app/view/login.php" class="btn btn-light btn-lg">Login</a>
-                    <a href="/app/view/signup.php" class="btn btn-outline-light btn-lg">Sign Up</a>
-                </div>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="/app/view/login.php" class="btn btn-light btn-lg">Login</a>
+                <a href="/app/view/signup.php" class="btn btn-outline-light btn-lg">Sign Up</a>
+            </div>
             <?php else: ?>
-                <a href="/app/view/HomePage-EN.php" class="btn btn-light btn-lg">Go to Dashboard</a>
+            <a href="/app/view/HomePage-EN.php" class="btn btn-light btn-lg">Go to Dashboard</a>
             <?php endif; ?>
         </div>
     </section>
@@ -62,7 +62,8 @@ $isLoggedIn = isset($_SESSION['username']);
                             <div class="display-4 mb-3">📚</div>
                             <h5 class="card-title">Browse Catalog</h5>
                             <p class="card-text">Search thousands of books by title, author, ISBN, or category.</p>
-                            <a href="/app/view/CatalogSearch_Browsing-EN.php" class="btn btn-outline-primary btn-sm">Browse Now</a>
+                            <a href="/app/view/CatalogSearch_Browsing-EN.php"
+                                class="btn btn-outline-primary btn-sm">Browse Now</a>
                         </div>
                     </div>
                 </div>
@@ -80,7 +81,8 @@ $isLoggedIn = isset($_SESSION['username']);
                         <div class="card-body">
                             <div class="display-4 mb-3">🔔</div>
                             <h5 class="card-title">Notifications</h5>
-                            <p class="card-text">Get reminders for due dates and alerts when reserved books are available.</p>
+                            <p class="card-text">Get reminders for due dates and alerts when reserved books are
+                                available.</p>
                         </div>
                     </div>
                 </div>
@@ -101,11 +103,12 @@ $isLoggedIn = isset($_SESSION['username']);
     <section class="cta-section py-5 text-white text-center">
         <div class="container">
             <h2 class="display-5 fw-bold mb-3">Join Our Library Today!</h2>
-            <p class="lead mb-4">Explore over 20,000 books and start your reading journey now!</p>
+            <p class="lead mb-4">Explore the best books and start your reading journey now!</p>
             <?php if (!$isLoggedIn): ?>
-                <a href="/app/view/signup.php" class="btn btn-lg btn-warning fw-bold text-dark">Sign Up Now →</a>
+            <a href="/app/view/signup.php" class="btn btn-lg btn-warning fw-bold text-dark">Sign Up Now →</a>
             <?php else: ?>
-                <a href="/app/view/CatalogSearch_Browsing-EN.php" class="btn btn-lg btn-warning fw-bold text-dark">Browse Catalog →</a>
+            <a href="/app/view/CatalogSearch_Browsing-EN.php" class="btn btn-lg btn-warning fw-bold text-dark">Browse
+                Catalog →</a>
             <?php endif; ?>
         </div>
     </section>
