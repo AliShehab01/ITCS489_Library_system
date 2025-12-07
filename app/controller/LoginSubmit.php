@@ -1,5 +1,8 @@
 <?php
-session_start();
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,7 +17,6 @@ session_start();
 
     <?php
 require '../models/dbconnect.php'; // your PDO Database class
-include '../view/navbar.php';
 require '../models/CreateDefaultDBTables.php';
 
 $username = $_POST['username'] ?? '';
@@ -62,6 +64,7 @@ try {
 
         // Redirect based on role
         if ($_SESSION['role'] === 'admin') {
+            
             header("Location: ../view/AdminArea.php");
             exit;
         } else {

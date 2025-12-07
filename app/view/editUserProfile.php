@@ -1,9 +1,10 @@
 <?php
 
 session_start();
+require_once __DIR__ . '/../../config.php';
+require '../controller/checkifadmin.php';
+require_once '../models/dbconnect.php';
 
-require 'checkifadmin.php';
-require 'dbconnect.php';
 
 if(!isset($_GET["username"])){
     echo "no username specified.";
@@ -12,6 +13,9 @@ if(!isset($_GET["username"])){
 
 $user_name = $_GET['username'];
 
+$db = new Database();
+$pdo = $db->getPdo();
+
 ?>
 
 <!DOCTYPE html>
@@ -19,23 +23,23 @@ $user_name = $_GET['username'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <title>Document</title>
+    <link rel="stylesheet" href="../../public/css/style.css">
 </head>
 <body>
 
 <?php
 
-include 'navbar.php';
+include "../view/navbar.php";
 
-$stmt = $conn->prepare("SELECT username, role FROM users WHERE username=?");
-$stmt->bind_param('s', $user_name);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
+$stmt = $pdo->prepare("SELECT username, role FROM users WHERE username = :username");
+$stmt->execute([':username' => $user_name]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 ?>
-
+<div class="container mt-5">
 <form action="UserProfileUpdatedSubmit.php" method="post">
      <input type='hidden' name='username' value="<?php echo htmlspecialchars($row['username']);?>">
     <h4>username: <?php echo $_GET['username'] ?></h4>
@@ -61,9 +65,11 @@ $row = $result->fetch_assoc();
         <label for="">phone number</label> <br>
         <input type="number" name="new_phone_number"><br>
     <br>
-    <button type="submit">Update</button>
+            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+
     
 </form>
-
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -5,6 +5,20 @@ error_reporting(E_ALL);
 
 require_once 'dbconnect.php';
 
+$user = "root";
+$host = "localhost";
+$pass = "";
+$dbname = "library_system";
+
+$pdo = new PDO("mysql:host={$host}", $user, $pass);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+ $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
+
+ $pdo = new PDO("mysql:host={$host};dbname={$dbname}", $user, $pass);
+
+            $pdo->exec("USE `$dbname`");
+
 // connect using your PDO class
 $db = new Database();
 $conn = $db->conn;
@@ -84,7 +98,7 @@ try {
     $conn->exec($createReservationsTable);
     $conn->exec($createNotificationsTable);
 
-    echo "<h3>✅ All tables created successfully!</h3>";
+    //echo "<h3>✅ All tables created successfully!</h3>";
 
     // --- 2. Insert default users ---
     // Note: In a real application, you must hash the passwords (e.g., using password_hash()).
@@ -102,7 +116,7 @@ try {
     $conn->exec($insertDefaultVIPStudent);
     $conn->exec($insertDefaultStudent);
 
-    echo "<h3>✅ Default users created/verified.</h3>";
+    //echo "<h3>✅ Default users created/verified.</h3>";
 } catch (PDOException $e) {
     echo "<h3>❌ Error creating tables or inserting data:</h3> " . $e->getMessage();
 }

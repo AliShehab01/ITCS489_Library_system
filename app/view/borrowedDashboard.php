@@ -2,8 +2,8 @@
 session_start();
 
 include '../view/navbar.php';
-require '../models/dbconnect.php';
-require '../models/CreateDefaultDBTables.php';
+require_once '../models/dbconnect.php';
+require_once '../models/CreateDefaultDBTables.php';
 
 $userid = $_SESSION['user_id'] ?? null;
 
@@ -28,6 +28,8 @@ $borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borrowed Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <style>
     .borrowsInfo {
         margin-bottom: 20px;

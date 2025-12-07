@@ -38,10 +38,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_res'])) {
 
 // Lists
 $unavailableBooks = $conn->query("
-  SELECT id, title, availability, quantity FROM books
-  WHERE quantity = 0 OR availability IN ('issued','unavailable','reserved')
+  SELECT id, title, status, quantity FROM books
+  WHERE quantity = 0 OR status IN ('issued','unavailable','reserved')
   ORDER BY title
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+
 
 $users = $conn->query("SELECT id, username FROM users ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 

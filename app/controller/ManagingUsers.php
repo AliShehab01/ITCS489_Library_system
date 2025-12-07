@@ -7,7 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require 'checkifadmin.php';
-require 'dbconnect.php';
+require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 ?>
 
@@ -26,29 +27,32 @@ require 'dbconnect.php';
 
     include '../view/navbar.php';
 
+    $db = new Database();
+    $conn = $db->getPdo();
+
     $sql = "SELECT id,username,role FROM users";
-    $result = mysqli_query($conn, $sql);
 
-    if (mysqli_num_rows($result) > 0) {
-        echo "<table style='margin: 0 auto'>";
-        echo "<tr><th>ID</th><th>Username</th><th>Role</th></tr>";
+    $stmt = $conn->query($sql); 
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        while ($row = mysqli_fetch_assoc($result)) {
+if ($users) {
+    echo "<table style='margin: 0 auto'>";
+    echo "<tr><th>ID</th><th>Username</th><th>Role</th><th>Actions</th></tr>";
 
-            echo "<tr>";
-            echo "<td>" . $row['id'] . "</td>";
-            echo "<td>" . $row['username'] . "</td>";
-            echo "<td>" . $row['role'] . "</td>";
-            echo "<td> <a href='editUserProfile.php?username=" . urlencode($row['username']) . "' style='margin-left: 30px'> Edit </a> </td>";
-            echo "</tr>";
-        }
-
-        echo "</table>";
-    } else {
-        echo "No users found";
+    foreach ($users as $row) {
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['username']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['role']) . "</td>";
+        echo "<td><a href='editUserProfile.php?username=" . urlencode($row['username']) . "' style='margin-left: 30px'>Edit</a></td>";
+        echo "</tr>";
     }
 
-    ?>
+    echo "</table>";
+} else {
+    echo "No users found";
+}
+?>
 
 </body>
 

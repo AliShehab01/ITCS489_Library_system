@@ -1,4 +1,5 @@
 <?php
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -25,7 +26,11 @@ if (isset($_SESSION['user_id'])) {
 }
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+<head>
+        <link rel="stylesheet" href="../../public/css/style.css" />
+</head>
+
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="<?= BASE_URL ?>app/view/HomePage-EN.php">
@@ -98,10 +103,58 @@ if (isset($_SESSION['user_id'])) {
 </nav>
 
 <style>
-    /* Add padding to prevent navbar overlap */
+
     body {
         padding-top: 80px;
     }
+    :root {
+        --admin-primary: #3b82f6;
+        --admin-primary-dark: #2563eb;
+        --navbar-bg: #111827; 
+    }
+
+    .navbar {
+        background-color: var(--navbar-bg) !important;
+        border-bottom: 3px solid var(--admin-primary);
+    }
+
+    .navbar .nav-link,
+    .navbar .navbar-brand {
+        color: #f3f4f6 !important;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link.active {
+        color: var(--admin-primary) !important;
+    }
+
+    .btn-primary {
+        background-color: var(--admin-primary);
+        border-color: var(--admin-primary);
+        transition: background-color 0.2s;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--admin-primary-dark);
+        border-color: var(--admin-primary-dark);
+    }
+
+    .btn-outline-secondary {
+        color: #f3f4f6;
+        border-color: #f3f4f6;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f3f4f6;
+        color: #111827;
+    }
+
+    body {
+        padding-top: 80px; 
+    }
+</style>
+
 </style>
 
 <!-- Bootstrap JS -->

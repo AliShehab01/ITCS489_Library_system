@@ -2,6 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 include "../view/navbar.php";
 if (!isset($_SESSION['username'])) {
@@ -112,7 +113,7 @@ try {
                                 Search by title, author, ISBN, or category. Filter by availability and sort by
                                 publication year or date added.
                             </p>
-                            <a class="btn btn-primary btn-sm" href="CatalogSearch_Browsing-EN.php">Go to Catalog</a>
+                            <a class="btn btn-primary btn-sm" href="<?php BASE_URL ?>CatalogSearch_Browsing-EN.php">Go to Catalog</a>
                         </div>
                     </div>
                 </div>
@@ -125,7 +126,7 @@ try {
                                 View and update your profile and contact info, and check borrowing limits based on
                                 membership type.
                             </p>
-                            <a class="btn btn-outline-primary btn-sm" href="account.html">Manage Account</a>
+                            <a class="btn btn-outline-primary btn-sm" href="<?php BASE_URL ?>editUserProfile.php?username=" . <?php $_SESSION["username"] ?>>Manage Account</a>
                         </div>
                     </div>
                 </div>
@@ -137,7 +138,7 @@ try {
                             <p class="card-text">
                                 Track due dates, renew eligible items, and review fines or overdues if any.
                             </p>
-                            <a class="btn btn-outline-primary btn-sm" href="borrowed.html">View Borrowed</a>
+                            <a class="btn btn-outline-primary btn-sm" href=<?php BASE_URL ?>borrowedDashboard.php>View Borrowed</a>
                         </div>
                     </div>
                 </div>
@@ -149,7 +150,7 @@ try {
                             <p class="card-text">
                                 Reserve checked-out books and get notified when they become available.
                             </p>
-                            <a class="btn btn-outline-primary btn-sm" href="reservations.html">Manage Reservations</a>
+                            <a class="btn btn-outline-primary btn-sm" href=<?php BASE_URL ?>reservations.php>Manage Reservations</a>
                         </div>
                     </div>
                 </div>

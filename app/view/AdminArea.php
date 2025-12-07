@@ -106,7 +106,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Add, edit, or remove users, assign roles, manage borrowing
                             limits.</p>
-                        <a href="Managingusers.php" class="btn btn-primary mt-auto">Manage Users</a>
+                        <a href="../controller/ManagingUsers.php" class="btn btn-primary mt-auto">Manage Users</a>
                     </div>
                 </div>
             </div>
