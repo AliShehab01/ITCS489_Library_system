@@ -1,6 +1,4 @@
 <?php
-
-
 session_start();
 
 // Include config.php (in htdocs/)
@@ -9,17 +7,7 @@ require_once __DIR__ . '/../config.php';
 // Include navbar.php (in app/view/)
 include __DIR__ . '/../app/view/navbar.php';
 
-
-
-
-
-/* 
-         note:  public dir and index.php as a file 
-         in mvc patterns, this should be only file accessable by 
-         the browser
-
-*/
-
+$isLoggedIn = isset($_SESSION['username']);
 ?>
 
 <!DOCTYPE html>
@@ -28,125 +16,105 @@ include __DIR__ . '/../app/view/navbar.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../public/css/style.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="/public/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Library System</title>
-    <script defer src="scripe.js"></script>
+    <style>
+        body {
+            padding-top: 70px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+    </style>
 </head>
 
-
 <body>
-
-
-
-    <div class="row row-cols-1 row-cols-sm-2 g-3">
-        <div class="col">
-            <div class="card">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body" style="text-align: center;">
-                    <h5 class="card-title">Ease Book Formatting</h5>
-                    <p class="card-text">No need to navigate between websites for changing the format to AZW3 for your
-                        kindle or
-                        device, quick start for reading!</p>
+    <!-- Hero Section -->
+    <section class="hero-section py-5 text-white">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold">Welcome to the University Library</h1>
+            <p class="lead mb-4">Discover thousands of books, manage your borrowings, and explore knowledge.</p>
+            <?php if (!$isLoggedIn): ?>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="/app/view/login.php" class="btn btn-light btn-lg">Login</a>
+                    <a href="/app/view/signup.php" class="btn btn-outline-light btn-lg">Sign Up</a>
                 </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/adding.png" id="imgrid2" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">Upload book(s)</h5>
-                    <p class="card-text">Easy steps contribute and make our family grows by adding book(s) to our
-                        database </p>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">This div need idea!!!</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">This div need idea!!!</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--checking the config-->
-
-
-
-    <section class="cta-section py-5 bg-primary text-white text-center">
-        <div class="container">
-            <h2 class="display-5 fw-bold mb-3">Join Our Library Today!</h2>
-            <p class="lead mb-4">
-                Explore over 20,000 books, access exclusive resources, and start your reading journey now!
-            </p>
-            <a href="../app/view/signup.php" class="btn btn-lg btn-warning fw-bold text-dark">
-                Sign Up Now &rarr;
-            </a>
-            <p class="mt-3 fst-italic">Hurry! Don’t miss out on our latest arrivals and special collections.</p>
+            <?php else: ?>
+                <a href="/app/view/HomePage-EN.php" class="btn btn-light btn-lg">Go to Dashboard</a>
+            <?php endif; ?>
         </div>
     </section>
 
-    <style>
-        .cta-section {
-            background: linear-gradient(135deg, #007bff, #00d4ff);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .cta-section .btn-warning:hover {
-            transform: scale(1.05);
-            transition: 0.3s ease-in-out;
-        }
-    </style>
-
-
-
-
-
-
-
-
-    <footer class="bg-dark text-white pt-5 pb-4">
-        <div class="container text-center text-md-start">
-            <div class="row text-center text-md-start">
-                © 2025 University Library. All Rights Reserved.
-
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">What We Offer</h2>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm">
+                        <div class="card-body">
+                            <div class="display-4 mb-3">📚</div>
+                            <h5 class="card-title">Browse Catalog</h5>
+                            <p class="card-text">Search thousands of books by title, author, ISBN, or category.</p>
+                            <a href="/app/view/CatalogSearch_Browsing-EN.php" class="btn btn-outline-primary btn-sm">Browse Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm">
+                        <div class="card-body">
+                            <div class="display-4 mb-3">📖</div>
+                            <h5 class="card-title">Easy Borrowing</h5>
+                            <p class="card-text">Borrow books with just a few clicks and track your due dates.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm">
+                        <div class="card-body">
+                            <div class="display-4 mb-3">🔔</div>
+                            <h5 class="card-title">Notifications</h5>
+                            <p class="card-text">Get reminders for due dates and alerts when reserved books are available.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 text-center shadow-sm">
+                        <div class="card-body">
+                            <div class="display-4 mb-3">🔖</div>
+                            <h5 class="card-title">Reservations</h5>
+                            <p class="card-text">Reserve books that are currently checked out and get in queue.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section py-5 text-white text-center">
+        <div class="container">
+            <h2 class="display-5 fw-bold mb-3">Join Our Library Today!</h2>
+            <p class="lead mb-4">Explore over 20,000 books and start your reading journey now!</p>
+            <?php if (!$isLoggedIn): ?>
+                <a href="/app/view/signup.php" class="btn btn-lg btn-warning fw-bold text-dark">Sign Up Now →</a>
+            <?php else: ?>
+                <a href="/app/view/CatalogSearch_Browsing-EN.php" class="btn btn-lg btn-warning fw-bold text-dark">Browse Catalog →</a>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white pt-4 pb-3">
+        <div class="container text-center">© 2025 University Library. All Rights Reserved.</div>
     </footer>
 
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
-
-
-
-
-
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
-<?php
-require_once __DIR__ . '/../app/models/dbconnect.php';
-$db = new Database();
-$conn = $db->conn; // $conn is your PDO object
-
-
-?>
 
 </html>

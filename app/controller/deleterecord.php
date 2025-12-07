@@ -1,27 +1,28 @@
 <?php
 
+header('Content-Type: application/json');
 require_once __DIR__ . '/../models/dbconnect.php';
+
+$input = json_decode(file_get_contents('php://input'), true);
+$isbn = $input['isbn'] ?? '';
+
+if (empty($isbn)) {
+    echo json_encode(['error' => 'ISBN is required']);
+    exit;
+}
+
 $db = new Database();
-$conn = $db->conn; // $conn is your PDO object
-
-header("Content-Type: application/json");
-
-$data = json_decode(file_get_contents('php://input'), true); // Parse JSON input
-
-$isbn = $data['isbn'] ?? null;
+$conn = $db->conn;
 
 try {
-    $query = "DELETE FROM books where isbn= :isbn";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':isbn', $isbn);
-
-    $stmt->execute();
+    $stmt = $conn->prepare("DELETE FROM books WHERE isbn = :isbn");
+    $stmt->execute([':isbn' => $isbn]);
 
     if ($stmt->rowCount() > 0) {
-        echo json_encode(["success" => "Book deleted successfully"]);
+        echo json_encode(['success' => 'Book deleted successfully']);
     } else {
-        echo json_encode(["error" => "No book found with this ISBN"]);
+        echo json_encode(['error' => 'Book not found']);
     }
 } catch (PDOException $e) {
-    echo json_encode(["error" => $e->getMessage()]);
+    echo json_encode(['error' => 'Failed to delete book']);
 }

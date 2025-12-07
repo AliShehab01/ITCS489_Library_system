@@ -1,41 +1,33 @@
 <?php
-header("Content-Type: application/json");
-
-// Include DB connection
+header('Content-Type: application/json');
 require_once __DIR__ . '/../models/dbconnect.php';
+
+$input = json_decode(file_get_contents('php://input'), true);
+$isbn = $input['isbn'] ?? '';
+$status = $input['status'] ?? '';
+
+if (empty($isbn) || empty($status)) {
+    echo json_encode(['error' => 'ISBN and status are required']);
+    exit;
+}
+
+if (!in_array($status, ['available', 'unavailable', 'reserved'])) {
+    echo json_encode(['error' => 'Invalid status']);
+    exit;
+}
+
 $db = new Database();
-$conn = $db->conn; // $conn is your PDO object
-
-$data = json_decode(file_get_contents("php://input"), true);
-
-if (!isset($data['isbn']) || !isset($data['status'])) {
-    http_response_code(400);
-    echo json_encode(["error" => "ISBN and status are required"]);
-    exit;
-}
-$isbn = trim($data['isbn']);
-$status = trim($data['status']);
-
-$allowedStatuses = ['available', 'unavailable'];
-
-if (!in_array($status, $allowedStatuses)) {
-    http_response_code(400);
-    echo json_encode(["error" => "Invalid status value"]);
-    exit;
-}
+$conn = $db->conn;
 
 try {
-    $query = "UPDATE books SET status= :status where isbn= :isbn";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':status', $status);
-    $stmt->bindParam(':isbn', $isbn);
-    $stmt->execute();
+    $stmt = $conn->prepare("UPDATE books SET status = :status WHERE isbn = :isbn");
+    $stmt->execute([':status' => $status, ':isbn' => $isbn]);
+
     if ($stmt->rowCount() > 0) {
-        echo json_encode(['message' => "Book status updated successfully"]);
+        echo json_encode(['message' => 'Status updated successfully']);
     } else {
-        echo json_encode(["error" => "Book not found or status unchanged"]);
+        echo json_encode(['error' => 'Book not found']);
     }
 } catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    echo json_encode(['error' => 'Failed to update status']);
 }

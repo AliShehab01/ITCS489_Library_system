@@ -1,104 +1,78 @@
 <?php
-// Make API robust: suppress HTML error output and capture any stray output so JSON stays valid
+// Prevent any output before JSON
 ob_start();
-ini_set('display_errors', '0');
-error_reporting(0);
-mysqli_report(MYSQLI_REPORT_OFF);
 
+// Disable error display in output
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
+// Set JSON header immediately
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-cache, must-revalidate');
 
 $host = '127.0.0.1';
 $user = 'root';
 $pass = '';
-$db   = 'library_system';
+$dbname = 'library_system';
 
-$conn = new mysqli($host, $user, $pass, $db);
+// Clear any buffered output
+ob_clean();
 
-if ($conn->connect_errno) {
-  // clear any buffered output
-  ob_end_clean();
-  http_response_code(500);
-  echo json_encode(["status" => "error", "message" => "DB connect failed: " . $conn->connect_error]);
-  exit;
-}
+try {
+  // Create connection
+  $conn = @new mysqli($host, $user, $pass, $dbname);
 
-$conn->set_charset('utf8mb4');
-
-// Serve GET requests
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-  // First check if publication_year column exists
-  $checkColumn = $conn->query("SHOW COLUMNS FROM books LIKE 'publication_year'");
-  $hasPublicationYear = $checkColumn && $checkColumn->num_rows > 0;
-
-  // Build query based on available columns
-  $columns = "id, image_path, title, author, isbn, category, status, quantity, publisher";
-  if ($hasPublicationYear) {
-    $columns .= ", publication_year";
-  } else {
-    $columns .= ", `year`";  // fallback to year column
+  if ($conn->connect_errno) {
+    throw new Exception("Database connection failed: " . $conn->connect_error);
   }
-  $columns .= ", created_at";
-  
-  $q = "SELECT $columns FROM books";
-  $r = $conn->query($q);
 
-  if (!$r) {
-    ob_end_clean();
-    http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "Query failed: " . $conn->error]);
+  $conn->set_charset('utf8mb4');
+
+  // Check if books table exists
+  $tableCheck = $conn->query("SHOW TABLES LIKE 'books'");
+  if (!$tableCheck || $tableCheck->num_rows === 0) {
+    // Return empty array if table doesn't exist
+    echo json_encode(["data" => [], "message" => "No books table found"]);
     exit;
   }
 
-  $out = [];
-  while ($row = $r->fetch_assoc()) {
-    // support both publication_year and year column names if present
-    $pubYear = null;
-    if (array_key_exists('publication_year', $row) && $row['publication_year'] !== null) {
-      $pubYear = is_numeric($row['publication_year']) ? (int)$row['publication_year'] : null;
-    } elseif (array_key_exists('year', $row) && $row['year'] !== null) {
-      $pubYear = is_numeric($row['year']) ? (int)$row['year'] : null;
-    }
+  // Get all books
+  $sql = "SELECT id, title, author, isbn, category, status, quantity, publisher, year, created_at FROM books ORDER BY id DESC";
+  $result = $conn->query($sql);
 
-    // Determine availability for backward compatibility
-    $availabilityVal = null;
-    if (array_key_exists('availability', $row) && $row['availability'] !== null && $row['availability'] !== '') {
-      $availabilityVal = $row['availability'];
-    } elseif (array_key_exists('status', $row) && $row['status'] !== null && $row['status'] !== '') {
-      $availabilityVal = $row['status'];
-    } elseif (array_key_exists('quantity', $row)) {
-      $availabilityVal = ((int)$row['quantity'] > 0) ? 'available' : 'unavailable';
-    } else {
-      $availabilityVal = null;
-    }
+  if (!$result) {
+    throw new Exception("Query failed: " . $conn->error);
+  }
 
-    $out[] = [
-      "id"               => (int)$row["id"],
-      "image_path"       => $row["image_path"],
-      "title"            => $row["title"],
-      "author"           => $row["author"],
-      "isbn"             => $row["isbn"],
-      "category"         => $row["category"],
-      // include both 'status' (new) and 'availability' (legacy)
-      "status"           => $row["status"],
-      "availability"     => $availabilityVal,
-      "quantity"         => array_key_exists('quantity', $row) ? (int)$row['quantity'] : null,
-      "publisher"        => $row["publisher"],
-      "publication_year" => $pubYear,
-      "created_at"       => $row["created_at"],
+  $books = [];
+  while ($row = $result->fetch_assoc()) {
+    $books[] = [
+      "id" => (int)$row["id"],
+      "title" => $row["title"] ?? '',
+      "author" => $row["author"] ?? '',
+      "isbn" => $row["isbn"] ?? '',
+      "category" => $row["category"] ?? '',
+      "status" => $row["status"] ?? 'available',
+      "quantity" => (int)($row["quantity"] ?? 0),
+      "publisher" => $row["publisher"] ?? '',
+      "publication_year" => $row["year"] ? (int)$row["year"] : null,
+      "created_at" => $row["created_at"] ?? null,
     ];
   }
 
-  // If any stray output (HTML/errors) was produced, include it in a debug field but still return JSON
-  $extra = trim((string)ob_get_clean());
-  $resp = ["data" => $out];
-  if ($extra !== '') {
-    $resp["debug_output"] = $extra;
-  }
+  $conn->close();
 
-  echo json_encode($resp);
-  exit;
+  // Output JSON
+  echo json_encode(["data" => $books]);
+} catch (Exception $e) {
+  // Return error as JSON
+  http_response_code(500);
+  echo json_encode([
+    "status" => "error",
+    "message" => $e->getMessage(),
+    "data" => []
+  ]);
 }
 
-ob_end_clean();
-http_response_code(405);
-echo json_encode(["status" => "error", "message" => "Method not allowed"]);
+ob_end_flush();
+exit;

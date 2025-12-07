@@ -1,4 +1,13 @@
 <?php
-// Base URL from the web root
-define('BASE_URL', '/itcs489_library_system/'); // If your project is in localhost root
-// OR if your project folder is called 'app_project', use '/app_project'
+// Base URL configuration
+// Your structure:
+// htdocs/
+//   ├── app/        (controllers, models, views)
+//   ├── public/     (css, js, images, index.php)
+//   └── config.php
+
+// Since app is at /app/ from web root
+define('BASE_URL', '/app/');
+
+// Public assets URL (for css, js, images)
+define('PUBLIC_URL', '/public/');

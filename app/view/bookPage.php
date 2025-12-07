@@ -1,23 +1,21 @@
 <?php
-
-
 /*
   This file need to divided to controller and view parts which is how mvc do
-
 */
 
-
-
+session_start();
+require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
+
 $db = new Database();
 $conn = $db->conn; // $conn is your PDO object
 
-include "../view/navbar.php";
-//session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: ../../public.php");
-}
+include __DIR__ . "/navbar.php";
 
+if (!isset($_SESSION['username'])) {
+    header("Location: " . BASE_URL . "view/login.php");
+    exit;
+}
 
 $stmt = $conn->query("SELECT * FROM books");
 $books = $stmt->fetchAll(PDO::FETCH_ASSOC);

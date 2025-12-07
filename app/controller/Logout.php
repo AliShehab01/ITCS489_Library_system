@@ -1,8 +1,11 @@
 <?php
 session_start();
-session_unset();
+require_once __DIR__ . '/../../config.php';
+
+// Destroy all session data
+$_SESSION = [];
 session_destroy();
 
 // Redirect to login page
-header("Location: ../view/login.php");
+header("Location: " . BASE_URL . "view/login.php");
 exit;

@@ -1,101 +1,108 @@
 <?php
 
-header("Content-Type: application/json");
-
-$data = json_decode(file_get_contents('php://input'), true); // Parse JSON input
-
+header('Content-Type: application/json');
 require_once __DIR__ . '/../models/dbconnect.php';
+
 $db = new Database();
-$conn = $db->conn; // $conn is your PDO object
+$conn = $db->conn;
 
+$method = $_SERVER['REQUEST_METHOD'];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!isset($_POST['title'], $_POST['author'], $_POST['isbn'])) {
-        echo json_encode(["error" => "Missing required fields"]);
-        exit;
-    }
+switch ($method) {
+    case 'POST':
+        // Add new book
+        $title = trim($_POST['title'] ?? '');
+        $author = trim($_POST['author'] ?? '');
+        $isbn = trim($_POST['isbn'] ?? '');
+        $category = $_POST['category'] ?? null;
+        $publisher = trim($_POST['publisher'] ?? '');
+        $year = (int)($_POST['year'] ?? 0);
+        $quantity = (int)($_POST['quantity'] ?? 1);
 
-    try {
-        // 1️⃣ Handle image upload
+        if (empty($title) || empty($author) || empty($isbn)) {
+            echo json_encode(['error' => 'Title, author, and ISBN are required']);
+            exit;
+        }
+
+        // Handle image upload
         $imagePath = 'placeholder.jpg';
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = "uploads/";
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0777, true);
-
-            $filename = time() . "_" . basename($_FILES['image']['name']);
-            $targetPath = $uploadDir . $filename;
-
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-                $imagePath = $targetPath;
+            $uploadDir = __DIR__ . '/../../public/uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $filename = uniqid() . '_' . basename($_FILES['image']['name']);
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $filename)) {
+                $imagePath = 'public/uploads/' . $filename;
             }
         }
 
-        // 2️⃣ Prepare insert with bindParam
-        $stmt = $conn->prepare("INSERT INTO books (title, author, isbn, category, publisher, year,quantity, image_path)
-                                VALUES (:title, :author, :isbn, :category, :publisher, :year, :quantity, :image_path)");
-
-        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
-        $stmt->bindParam(':author', $author, PDO::PARAM_STR);
-        $stmt->bindParam(':isbn', $isbn, PDO::PARAM_STR);
-        $stmt->bindParam(':category', $category, PDO::PARAM_STR);
-        $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
-        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
-        $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
-        $stmt->bindParam(':image_path', $imagePath, PDO::PARAM_STR);
-
-        // Assign values
-        $title = $_POST['title'];
-        $author = $_POST['author'];
-        $isbn = $_POST['isbn'];
-        $category = $_POST['category'] ?? null;
-        $publisher = $_POST['publisher'] ?? null;
-        $year = $_POST['year'] ?? null;
-        $quantity = $_POST['quantity'] ?? null;
-
-        $stmt->execute();
-
-        echo json_encode(["success" => true, "message" => "Book added successfully"]);
-    } catch (PDOException $e) {
-        echo json_encode(["error" => $e->getMessage()]);
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "PUT") {
-    if (!isset($data['title'], $data['author'], $data['isbn'])) {
-        echo json_encode(["error" => "Missing required fields"]);
-        exit;
-    }
-
-    try {
-        $stmt = $conn->prepare("UPDATE books SET title=:title, author=:author, 
-                                category=:category, publisher=:publisher, year=:year, quantity=:quantity
-                                WHERE isbn=:isbn");
-
-        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
-        $stmt->bindParam(':author', $author, PDO::PARAM_STR);
-        $stmt->bindParam(':category', $category, PDO::PARAM_STR);
-        $stmt->bindParam(':publisher', $publisher, PDO::PARAM_STR);
-        $stmt->bindParam(':year', $year, PDO::PARAM_INT);
-        $stmt->bindParam(':isbn', $isbn, PDO::PARAM_STR);
-        $stmt->bindParam(':quantity', $quantity, PDO::PARAM_STR);
-
-        // Assign values
-        $title = $data['title'];
-        $author = $data['author'];
-        $category = $data['category'] ?? null;
-        $publisher = $data['publisher'] ?? null;
-        $year = $data['year'] ?? null;
-        $isbn = $data['isbn'];
-        $quantity = $data['quantity'];
-
-        $stmt->execute();
-
-        if ($stmt->rowCount() > 0) {
-            echo json_encode(["success" => true, "message" => "Book updated successfully"]);
-        } else {
-            echo json_encode(["error" => "No book found with this ISBN or no changes made"]);
+        try {
+            $stmt = $conn->prepare("INSERT INTO books (image_path, title, author, isbn, category, publisher, year, quantity, status) VALUES (:img, :title, :author, :isbn, :cat, :pub, :year, :qty, 'available')");
+            $stmt->execute([
+                ':img' => $imagePath,
+                ':title' => $title,
+                ':author' => $author,
+                ':isbn' => $isbn,
+                ':cat' => $category,
+                ':pub' => $publisher,
+                ':year' => $year,
+                ':qty' => $quantity
+            ]);
+            echo json_encode(['message' => 'Book added successfully', 'id' => $conn->lastInsertId()]);
+        } catch (PDOException $e) {
+            echo json_encode(['error' => 'Failed to add book: ' . $e->getMessage()]);
         }
-    } catch (PDOException $e) {
-        echo json_encode(["error" => $e->getMessage()]);
-    }
+        break;
+
+    case 'PUT':
+        $input = json_decode(file_get_contents('php://input'), true);
+        $isbn = $input['isbn'] ?? '';
+
+        if (empty($isbn)) {
+            echo json_encode(['error' => 'ISBN is required']);
+            exit;
+        }
+
+        $fields = [];
+        $params = [':isbn' => $isbn];
+
+        if (!empty($input['title'])) {
+            $fields[] = "title = :title";
+            $params[':title'] = $input['title'];
+        }
+        if (!empty($input['author'])) {
+            $fields[] = "author = :author";
+            $params[':author'] = $input['author'];
+        }
+        if (!empty($input['category'])) {
+            $fields[] = "category = :category";
+            $params[':category'] = $input['category'];
+        }
+        if (!empty($input['publisher'])) {
+            $fields[] = "publisher = :publisher";
+            $params[':publisher'] = $input['publisher'];
+        }
+        if (isset($input['year'])) {
+            $fields[] = "year = :year";
+            $params[':year'] = (int)$input['year'];
+        }
+
+        if (empty($fields)) {
+            echo json_encode(['error' => 'No fields to update']);
+            exit;
+        }
+
+        try {
+            $sql = "UPDATE books SET " . implode(', ', $fields) . " WHERE isbn = :isbn";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute($params);
+            echo json_encode(['message' => 'Book updated successfully']);
+        } catch (PDOException $e) {
+            echo json_encode(['error' => 'Failed to update book']);
+        }
+        break;
+
+    default:
+        echo json_encode(['error' => 'Method not allowed']);
 }

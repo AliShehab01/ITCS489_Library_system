@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../../config.php';
 require '../controller/checkifadmin.php';
 ?>
 <!DOCTYPE html>
@@ -12,84 +13,84 @@ require '../controller/checkifadmin.php';
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Custom Admin Style -->
-    <style>
-    :root {
-        --admin-dark-bg: #1f2937;
-        /* Dark Gray/Navy for professional feel */
-        --admin-card-bg: #ffffff;
-        /* White card */
-        --admin-primary: #3b82f6;
-        /* Blue primary color */
-        --admin-primary-dark: #2563eb;
-    }
-
-    body {
-        padding-top: 100px;
-        background-color: var(--admin-dark-bg) !important;
-        color: #f3f4f6;
-        /* Light gray text for dark mode */
-    }
-
-    .navbar {
-        background-color: #111827 !important;
-        /* Even darker navbar */
-        border-bottom: 3px solid var(--admin-primary);
-    }
-
-    .card {
-        background-color: var(--admin-card-bg);
-        border-radius: 12px;
-        border: none;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .card-title {
-        color: var(--admin-primary-dark);
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    /* Ensure card body text inside a card is readable against the white background */
-    .card .card-body p,
-    .card .card-body h5 {
-        color: #1f2937;
-    }
-
-    .btn-primary {
-        background-color: var(--admin-primary);
-        border-color: var(--admin-primary);
-        transition: background-color 0.2s;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--admin-primary-dark);
-        border-color: var(--admin-primary-dark);
-    }
-
-    h1 {
-        color: #ffffff;
-        font-weight: 300;
-        letter-spacing: 1px;
-    }
-    </style>
     <!-- Lucide Icons CDN for professional icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Admin Style -->
+    <style>
+        :root {
+            --admin-dark-bg: #1f2937;
+            /* Dark Gray/Navy for professional feel */
+            --admin-card-bg: #ffffff;
+            /* White card */
+            --admin-primary: #3b82f6;
+            /* Blue primary color */
+            --admin-primary-dark: #2563eb;
+        }
+
+        body {
+            padding-top: 100px;
+            background-color: var(--admin-dark-bg) !important;
+            color: #f3f4f6;
+            /* Light gray text for dark mode */
+        }
+
+        .navbar {
+            background-color: #111827 !important;
+            /* Even darker navbar */
+            border-bottom: 3px solid var(--admin-primary);
+        }
+
+        .card {
+            background-color: var(--admin-card-bg);
+            border-radius: 12px;
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            color: var(--admin-primary-dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Ensure card body text inside a card is readable against the white background */
+        .card .card-body p,
+        .card .card-body h5 {
+            color: #1f2937;
+        }
+
+        .btn-primary {
+            background-color: var(--admin-primary);
+            border-color: var(--admin-primary);
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--admin-primary-dark);
+            border-color: var(--admin-primary-dark);
+        }
+
+        h1 {
+            color: #ffffff;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
 
     <!-- Navbar -->
-    <?php include 'navbar.php'; ?>
+    <?php include __DIR__ . '/navbar.php'; ?>
 
     <!-- Main container -->
     <div class="container my-4">
@@ -106,7 +107,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Add, edit, or remove users, assign roles, manage borrowing
                             limits.</p>
-                        <a href="../controller/ManagingUsers.php" class="btn btn-primary mt-auto">Manage Users</a>
+                        <a href="<?= BASE_URL ?>controller/ManagingUsers.php" class="btn btn-primary mt-auto">Manage Users</a>
                     </div>
                 </div>
             </div>
@@ -121,7 +122,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Add, update, remove books, track availability, categorize books
                             via database.</p>
-                        <a href="bookPage.php" class="btn btn-primary mt-auto">Manage Books</a>
+                        <a href="<?= BASE_URL ?>view/bookPage.php" class="btn btn-primary mt-auto">Manage Books</a>
                     </div>
                 </div>
             </div>
@@ -136,7 +137,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Search and browse books by title, author, category, or filters.
                         </p>
-                        <a href="CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">Search Catalog</a>
+                        <a href="<?= BASE_URL ?>view/CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">Search Catalog</a>
                     </div>
                 </div>
             </div>
@@ -151,8 +152,8 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Issue and return books, handle due dates, renewals, and fines.
                         </p>
-                        <a href="BorrowBook.php" class="btn btn-primary mt-auto">Manage Borrowing</a>
-                        <a href="bookReturnAndRenew.php" class="btn btn-outline-secondary mt-2">Return / Renew</a>
+                        <a href="<?= BASE_URL ?>view/BorrowBook.php" class="btn btn-primary mt-auto">Manage Borrowing</a>
+                        <a href="<?= BASE_URL ?>view/bookReturnAndRenew.php" class="btn btn-outline-secondary mt-2">Return / Renew</a>
                     </div>
                 </div>
             </div>
@@ -167,7 +168,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Allow users to reserve books currently on loan. Manage queues
                             and notifications.</p>
-                        <a href="reservations.php" class="btn btn-primary mt-auto">Manage Reservations</a>
+                        <a href="<?= BASE_URL ?>view/reservations.php" class="btn btn-primary mt-auto">Manage Reservations</a>
                     </div>
                 </div>
             </div>
@@ -182,7 +183,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">View and manage notifications sent to users when books become
                             available.</p>
-                        <a href="notifications.php" class="btn btn-primary mt-auto">Manage Notifications</a>
+                        <a href="<?= BASE_URL ?>view/notifications.php" class="btn btn-primary mt-auto">Manage Notifications</a>
                     </div>
                 </div>
             </div>
@@ -197,7 +198,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Generate reports on borrowed, overdue, and reserved books,
                             fines, and statistics.</p>
-                        <a href="reports.php" class="btn btn-primary mt-auto">View Reports</a>
+                        <a href="<?= BASE_URL ?>view/reports.php" class="btn btn-primary mt-auto">View Reports</a>
                     </div>
                 </div>
             </div>
@@ -212,7 +213,7 @@ require '../controller/checkifadmin.php';
                         </h5>
                         <p class="card-text flex-grow-1">Manage staff access, configure policies, backup data, and
                             monitor system usage.</p>
-                        <a href="adminSettings.php" class="btn btn-primary mt-auto">Admin Settings</a>
+                        <a href="<?= BASE_URL ?>view/adminSettings.php" class="btn btn-primary mt-auto">Admin Settings</a>
                     </div>
                 </div>
             </div>
@@ -226,7 +227,7 @@ require '../controller/checkifadmin.php';
     </script>
     <!-- Initialize Lucide Icons -->
     <script>
-    lucide.createIcons();
+        lucide.createIcons();
     </script>
 </body>
 

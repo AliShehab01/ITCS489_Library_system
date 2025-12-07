@@ -2,13 +2,10 @@
 
 session_start();
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require 'checkifadmin.php';
+require_once __DIR__ . '/checkifadmin.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
+require_once __DIR__ . '/../../config.php';
 
 ?>
 
@@ -18,42 +15,60 @@ require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Manage Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 
 <body>
+    <?php include __DIR__ . '/../view/navbar.php'; ?>
 
-    <?php
+    <div class="container mt-5">
+        <h1 class="mb-4">User Management</h1>
 
-    include '../view/navbar.php';
+        <?php
+        $db = new Database();
+        $conn = $db->getPdo();
 
-    $db = new Database();
-    $conn = $db->getPdo();
+        $stmt = $conn->query("SELECT id, username, firstName, lastName, email, role FROM users ORDER BY username");
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $sql = "SELECT id,username,role FROM users";
+        if ($users):
+        ?>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $row): ?>
+                            <tr>
+                                <td><?= (int)$row['id'] ?></td>
+                                <td><?= htmlspecialchars($row['username']) ?></td>
+                                <td><?= htmlspecialchars($row['firstName'] . ' ' . $row['lastName']) ?></td>
+                                <td><?= htmlspecialchars($row['email'] ?? '') ?></td>
+                                <td><span class="badge bg-secondary"><?= htmlspecialchars($row['role']) ?></span></td>
+                                <td>
+                                    <a href="<?= BASE_URL ?>view/editUserProfile.php?username=<?= urlencode($row['username']) ?>" class="btn btn-sm btn-primary">Edit</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info">No users found.</div>
+        <?php endif; ?>
+    </div>
 
-    $stmt = $conn->query($sql); 
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-if ($users) {
-    echo "<table style='margin: 0 auto'>";
-    echo "<tr><th>ID</th><th>Username</th><th>Role</th><th>Actions</th></tr>";
-
-    foreach ($users as $row) {
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['username']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['role']) . "</td>";
-        echo "<td><a href='editUserProfile.php?username=" . urlencode($row['username']) . "' style='margin-left: 30px'>Edit</a></td>";
-        echo "</tr>";
-    }
-
-    echo "</table>";
-} else {
-    echo "No users found";
-}
-?>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

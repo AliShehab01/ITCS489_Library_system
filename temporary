@@ -1,4 +1,9 @@
-- Navbar menu
-- History in home page
-- ManageBorrowing in admin area
-- Admin settings
+# BASE_URL should be a path prefix from web root.
+# Your folder is C:\xampp\htdocs\app so set BASE_URL to '/app/'.
+
+BASE_URL = "/app/"
+
+- Navbar menu               # Ensure links use BASE_URL.
+- History in home page      # Verify route exists; use BASE_URL in hrefs.
+- ManageBorrowing in admin area # Confirm BorrowBook.php under BASE_URL.
+- Admin settings            # AdminArea cards link via BASE_URL.

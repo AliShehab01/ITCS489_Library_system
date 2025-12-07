@@ -1,85 +1,54 @@
 <?php
+session_start();
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: " . BASE_URL . "view/login.php");
+    exit;
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Submit</title>
-</head>
-
-<body>
-
-    <?php
-require '../models/dbconnect.php'; // your PDO Database class
-require '../models/CreateDefaultDBTables.php';
-
-$username = $_POST['username'] ?? '';
+$username = trim($_POST['username'] ?? '');
 $password = $_POST['password'] ?? '';
-$first_name = null;
 
-$found = false;
+if (empty($username) || empty($password)) {
+    $_SESSION['error'] = "Please enter username and password.";
+    header("Location: " . BASE_URL . "view/login.php");
+    exit;
+}
 
 try {
     $db = new Database();
-    $pdo = $db->conn;
+    $conn = $db->conn;
 
-    // Fetch all users
-    $stmt = $pdo->query("SELECT * FROM users");
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = :username");
+    $stmt->execute([':username' => $username]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    foreach ($rows as $row) {
-        if ($row['username'] === $username && $row['password'] === $password) {
-            $found = true;
-            $first_name = $row['firstName'];
-            $_SESSION['first_name'] = $first_name;
-            $_SESSION['user_id'] = $row['id'];
+    // Simple password check (in production, use password_verify with hashed passwords)
+    if ($user && $user['password'] === $password) {
+        // Set all session variables
+        $_SESSION['user_id'] = (int)$user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['first_name'] = $user['firstName'];
+        $_SESSION['last_name'] = $user['lastName'];
+        $_SESSION['role'] = $user['role']; // Keep original case from DB
+        $_SESSION['email'] = $user['email'] ?? '';
+        $_SESSION['BorrowLimit'] = match (strtolower($user['role'])) {
+            'admin', 'staff' => 10,
+            'vipstudent' => 7,
+            default => 3
+        };
 
-            // Set borrow limit
-            if ($row['role'] !== 'Student') {
-                $_SESSION['BorrowLimit'] = 5;
-            } else {
-                $_SESSION['BorrowLimit'] = 3;
-            }
-
-            // Set role
-            if ($row['role'] === 'Admin') {
-                $_SESSION['role'] = 'admin';
-            } else {
-                $_SESSION['role'] = 'Student';
-            }
-
-            break;
-        }
-    }
-
-    if ($found) {
-        $_SESSION['username'] = $username;
-        echo "Login successful";
-
-        // Redirect based on role
-        if ($_SESSION['role'] === 'admin') {
-            
-            header("Location: ../view/AdminArea.php");
-            exit;
-        } else {
-            header("Location: ../view/HomePage-EN.php");
-            exit;
-        }
+        header("Location: " . BASE_URL . "view/HomePage-EN.php");
+        exit;
     } else {
-        echo "<div class='alert alert-danger'>Invalid username or password</div>";
+        $_SESSION['error'] = "Invalid username or password.";
+        header("Location: " . BASE_URL . "view/login.php");
+        exit;
     }
-
 } catch (PDOException $e) {
-    echo "<div class='alert alert-danger'>Database error: " . htmlspecialchars($e->getMessage()) . "</div>";
+    $_SESSION['error'] = "Login failed. Please try again.";
+    header("Location: " . BASE_URL . "view/login.php");
+    exit;
 }
-?>
-
-</body>
-
-</html>

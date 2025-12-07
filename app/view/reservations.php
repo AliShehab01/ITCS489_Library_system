@@ -1,142 +1,175 @@
 <?php
-require '../models/dbconnect.php';
+session_start();
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../models/dbconnect.php';
+
+include __DIR__ . '/navbar.php';
+
+if (!isset($_SESSION['username'])) {
+  header("Location: " . BASE_URL . "view/login.php");
+  exit;
+}
 
 $db = new Database();
 $conn = $db->conn;
-$msg = "";
 
-// Create reservation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_res'])) {
-  $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
-  $bookId = filter_input(INPUT_POST, 'book_id', FILTER_VALIDATE_INT);
+$userId = $_SESSION['user_id'] ?? null;
+$reservations = [];
+$message = '';
 
-  if ($userId && $bookId) {
-    $chk = $conn->prepare("SELECT 1 FROM reservations WHERE user_id = :user_id AND book_id = :book_id AND status IN ('active','notified')");
-    $chk->execute([':user_id' => $userId, ':book_id' => $bookId]);
+// Handle new reservation from catalog
+$bookIdToReserve = $_GET['book_id'] ?? null;
+$bookToReserve = null;
 
-    if ($chk->fetch()) {
-      $msg = "User already has an active reservation for this book.";
+if ($bookIdToReserve) {
+  $stmt = $conn->prepare("SELECT * FROM books WHERE id = :id");
+  $stmt->execute([':id' => (int)$bookIdToReserve]);
+  $bookToReserve = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Handle reservation submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  if (isset($_POST['cancel_id'])) {
+    $cancelId = (int)$_POST['cancel_id'];
+    $stmt = $conn->prepare("UPDATE reservations SET status = 'cancelled' WHERE reservation_id = :id AND user_id = :uid");
+    $stmt->execute([':id' => $cancelId, ':uid' => $userId]);
+    $message = '<div class="alert alert-success">Reservation cancelled.</div>';
+  } elseif (isset($_POST['reserve_book_id'])) {
+    $bookId = (int)$_POST['reserve_book_id'];
+
+    // Check if already has active reservation for this book
+    $checkStmt = $conn->prepare("SELECT reservation_id FROM reservations WHERE user_id = :uid AND book_id = :bid AND status IN ('active', 'notified')");
+    $checkStmt->execute([':uid' => $userId, ':bid' => $bookId]);
+
+    if ($checkStmt->fetch()) {
+      $message = '<div class="alert alert-warning">You already have an active reservation for this book.</div>';
     } else {
-      $ins = $conn->prepare("INSERT INTO reservations (user_id, book_id) VALUES (:user_id, :book_id)");
-      $ins->execute([':user_id' => $userId, ':book_id' => $bookId]);
-      $msg = "Reservation added successfully.";
+      $insertStmt = $conn->prepare("INSERT INTO reservations (user_id, book_id, status) VALUES (:uid, :bid, 'active')");
+      $insertStmt->execute([':uid' => $userId, ':bid' => $bookId]);
+      $message = '<div class="alert alert-success">Reservation placed successfully! You will be notified when the book is available.</div>';
+      $bookToReserve = null; // Clear the form
     }
-  } else {
-    $msg = "Please select both user and book.";
   }
 }
 
-// Cancel reservation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_res'])) {
-  $resId = filter_input(INPUT_POST, 'reservation_id', FILTER_VALIDATE_INT);
-  if ($resId) {
-    $upd = $conn->prepare("UPDATE reservations SET status = 'cancelled' WHERE reservation_id = :res_id");
-    $upd->execute([':res_id' => $resId]);
-    $msg = "Reservation cancelled.";
-  }
+// Fetch user's reservations
+if ($userId) {
+  $stmt = $conn->prepare("
+        SELECT r.reservation_id, r.status, r.reserved_at, b.id as book_id, b.title, b.author, b.isbn, b.quantity
+        FROM reservations r
+        JOIN books b ON b.id = r.book_id
+        WHERE r.user_id = :uid
+        ORDER BY r.reserved_at DESC
+    ");
+  $stmt->execute([':uid' => $userId]);
+  $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-// Lists
-$unavailableBooks = $conn->query("
-  SELECT id, title, status, quantity FROM books
-  WHERE quantity = 0 OR status IN ('issued','unavailable','reserved')
-  ORDER BY title
-")->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-$users = $conn->query("SELECT id, username FROM users ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
-
-$queues = $conn->query("
-  SELECT r.reservation_id, r.status, r.reserved_at, u.username, b.title
-  FROM reservations r
-  JOIN users u ON u.id = r.user_id
-  JOIN books b ON b.id = r.book_id
-  WHERE r.status IN ('active','notified')
-  ORDER BY b.title, r.reserved_at
-")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>Reservations</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Reservations</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 
-<body class="bg-light">
-    <div class="container py-4">
-        <h2 class="mb-3">Reservation Management</h2>
-        <?php if (!empty($msg)): ?>
-        <div class="alert alert-info"><?= htmlspecialchars($msg) ?></div>
-        <?php endif; ?>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">My Reservations</h1>
 
-        <form method="POST" class="row g-3 mb-4">
-            <div class="col-md-5">
-                <label class="form-label">User</label>
-                <select name="user_id" class="form-select" required>
-                    <option value="">Select user…</option>
-                    <?php foreach ($users as $u): ?>
-                    <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label">Book (currently on loan/unavailable)</label>
-                <select name="book_id" class="form-select" required>
-                    <option value="">Select book…</option>
-                    <?php foreach ($unavailableBooks as $b): ?>
-                    <option value="<?= (int)$b['id'] ?>">
-                        <?= htmlspecialchars($b['title']) ?> (<?= htmlspecialchars($b['availability']) ?>, qty:
-                        <?= (int)$b['quantity'] ?>)
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-2 d-grid align-items-end">
-                <button class="btn btn-primary" name="create_res" value="1">Add Reservation</button>
-            </div>
-        </form>
+    <?= $message ?>
 
-        <h4>Reservation Queues</h4>
-        <?php if (!$queues): ?>
-        <div class="alert alert-secondary">No active reservations.</div>
-        <?php else: ?>
-        <div class="table-responsive">
-            <table class="table table-sm bg-white align-middle">
-                <thead>
-                    <tr>
-                        <th>Book</th>
-                        <th>User</th>
-                        <th>Status</th>
-                        <th>Reserved At</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($queues as $q): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($q['title']) ?></td>
-                        <td><?= htmlspecialchars($q['username']) ?></td>
-                        <td><?= htmlspecialchars($q['status']) ?></td>
-                        <td><?= htmlspecialchars($q['reserved_at']) ?></td>
-                        <td>
-                            <form method="POST" class="d-inline">
-                                <input type="hidden" name="reservation_id" value="<?= (int)$q['reservation_id'] ?>">
-                                <button class="btn btn-sm btn-outline-danger" name="cancel_res"
-                                    value="1">Cancel</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <?php if ($bookToReserve): ?>
+      <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+          Reserve a Book
         </div>
-        <?php endif; ?>
+        <div class="card-body">
+          <h5 class="card-title"><?= htmlspecialchars($bookToReserve['title']) ?></h5>
+          <p class="card-text">
+            <strong>Author:</strong> <?= htmlspecialchars($bookToReserve['author']) ?><br>
+            <strong>ISBN:</strong> <?= htmlspecialchars($bookToReserve['isbn']) ?><br>
+            <strong>Current Availability:</strong> <?= (int)$bookToReserve['quantity'] ?> copies
+          </p>
+          <form method="post">
+            <input type="hidden" name="reserve_book_id" value="<?= (int)$bookToReserve['id'] ?>">
+            <button type="submit" class="btn btn-primary">Confirm Reservation</button>
+            <a href="<?= BASE_URL ?>view/CatalogSearch_Browsing-EN.php" class="btn btn-outline-secondary">Cancel</a>
+          </form>
+        </div>
+      </div>
+    <?php endif; ?>
 
-        <a href="AdminArea.php" class="btn btn-outline-secondary mt-3">Back</a>
-    </div>
+    <h2 class="h5 mb-3">Your Reservations</h2>
+
+    <?php if (empty($reservations)): ?>
+      <div class="alert alert-info">
+        You have no reservations.
+        <a href="<?= BASE_URL ?>view/CatalogSearch_Browsing-EN.php">Browse the catalog</a> to find books to reserve.
+      </div>
+    <?php else: ?>
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Reserved On</th>
+              <th>Status</th>
+              <th>Available Now</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($reservations as $r): ?>
+              <tr>
+                <td><?= htmlspecialchars($r['title']) ?></td>
+                <td><?= htmlspecialchars($r['author']) ?></td>
+                <td><?= date('M d, Y', strtotime($r['reserved_at'])) ?></td>
+                <td>
+                  <?php
+                  $badgeClass = match ($r['status']) {
+                    'active' => 'bg-primary',
+                    'notified' => 'bg-success',
+                    'fulfilled' => 'bg-secondary',
+                    'cancelled' => 'bg-danger',
+                    default => 'bg-light text-dark'
+                  };
+                  ?>
+                  <span class="badge <?= $badgeClass ?>"><?= ucfirst($r['status']) ?></span>
+                </td>
+                <td>
+                  <?php if ((int)$r['quantity'] > 0): ?>
+                    <span class="badge bg-success">Yes (<?= (int)$r['quantity'] ?>)</span>
+                  <?php else: ?>
+                    <span class="badge bg-warning text-dark">No</span>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <?php if ($r['status'] === 'active'): ?>
+                    <form method="post" style="display:inline">
+                      <input type="hidden" name="cancel_id" value="<?= (int)$r['reservation_id'] ?>">
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                    </form>
+                  <?php elseif ($r['status'] === 'notified' && (int)$r['quantity'] > 0): ?>
+                    <a href="<?= BASE_URL ?>view/BorrowBook.php?bookid=<?= (int)$r['book_id'] ?>" class="btn btn-sm btn-success">Borrow Now</a>
+                  <?php else: ?>
+                    —
+                  <?php endif; ?>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    <?php endif; ?>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

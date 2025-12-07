@@ -1,23 +1,35 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+error_reporting(0);
 
 require_once 'dbconnect.php';
 
 $user = "root";
-$host = "localhost";
+$host = "127.0.0.1"; // use IP to avoid socket issues
 $pass = "";
 $dbname = "library_system";
 
-$pdo = new PDO("mysql:host={$host}", $user, $pass);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+// Try creating/connecting without breaking the page if MySQL is down
+try {
+    $pdo = new PDO("mysql:host={$host}", $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+} catch (PDOException $e) {
+    // MySQL service not available; skip initialization silently
+    return;
+}
 
- $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
-
- $pdo = new PDO("mysql:host={$host};dbname={$dbname}", $user, $pass);
-
-            $pdo->exec("USE `$dbname`");
+try {
+    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$dbname`");
+    $pdo = new PDO("mysql:host={$host};dbname={$dbname}", $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+    $pdo->exec("USE `$dbname`");
+} catch (PDOException $e) {
+    // Could not create/select DB; skip silently
+    return;
+}
 
 // connect using your PDO class
 $db = new Database();
@@ -98,25 +110,16 @@ try {
     $conn->exec($createReservationsTable);
     $conn->exec($createNotificationsTable);
 
-    //echo "<h3>✅ All tables created successfully!</h3>";
-
-    // --- 2. Insert default users ---
-    // Note: In a real application, you must hash the passwords (e.g., using password_hash()).
-    $insertDefaultAdmin = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
-        VALUES ('admin', 'admin','Admin','Admin',0,'Admin')";
-    $insertDefaultStaff = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
-        VALUES ('staff', 'staff','Staff','Staff',0,'Staff')";
-    $insertDefaultVIPStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
-        VALUES ('vipstudent', 'vipstudent','VIPStudent','VIPStudent',0,'VIPStudent')";
-    $insertDefaultStudent = "INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
-        VALUES ('student', 'student','Student','Student',0,'Student')";
-
-    $conn->exec($insertDefaultAdmin);
-    $conn->exec($insertDefaultStaff);
-    $conn->exec($insertDefaultVIPStudent);
-    $conn->exec($insertDefaultStudent);
-
-    //echo "<h3>✅ Default users created/verified.</h3>";
+    // Default users (silent)
+    $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
+        VALUES ('admin', 'admin','Admin','Admin',0,'Admin')");
+    $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
+        VALUES ('staff', 'staff','Staff','Staff',0,'Staff')");
+    $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
+        VALUES ('vipstudent', 'vipstudent','VIPStudent','VIPStudent',0,'VIPStudent')");
+    $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
+        VALUES ('student', 'student','Student','Student',0,'Student')");
 } catch (PDOException $e) {
-    echo "<h3>❌ Error creating tables or inserting data:</h3> " . $e->getMessage();
+    // swallow errors for page safety
+    return;
 }
