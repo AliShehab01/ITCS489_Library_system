@@ -26,7 +26,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
                     <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
-                    <h1 class="display-5 mb-3">Control Panel</h1>
+                    <h1 class="display-5 mb-2">Control Panel</h1>
                     <p class="lead mb-0">Manage users, catalog, reservations, and notifications with a consistent set of tools.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end d-flex d-lg-block gap-2">

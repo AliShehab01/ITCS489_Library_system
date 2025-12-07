@@ -74,11 +74,11 @@ try {
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
                     <p class="text-uppercase text-muted fw-semibold mb-2">Library system</p>
-                    <h1 class="display-5 mb-3">Welcome back<?= isset($_SESSION['first_name']) ? ', ' . htmlspecialchars($_SESSION['first_name']) : '' ?>.</h1>
-                    <p class="lead mb-0">Track your borrows, discover new titles, and keep up with announcements—all from one consistent dashboard.</p>
+                    <h1 class="display-5 mb-2">Welcome back<?= isset($_SESSION['first_name']) ? ', ' . htmlspecialchars($_SESSION['first_name']) : '' ?>.</h1>
+                    <p class="lead mb-0">Track your borrows, discover titles, and keep up with library updates in one place.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end d-flex d-lg-block gap-2">
-                    <a class="btn btn-primary me-2" href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php">Browse catalog</a>
+                    <a class="btn btn-primary me-lg-2" href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php">Browse catalog</a>
                     <a class="btn btn-outline-primary" href="<?= BASE_URL ?>app/view/borrowedDashboard.php">View borrowed</a>
                 </div>
             </div>

@@ -27,62 +27,56 @@ require_once __DIR__ . '/../config.php';
             <div class="row align-items-center g-4">
                 <div class="col-lg-8">
                     <p class="text-uppercase text-muted fw-semibold mb-2">Welcome to the library</p>
-                    <h1 class="display-5 mb-3">Borrow smarter. Discover faster.</h1>
+                    <h1 class="display-5 mb-2">Borrow smarter. Discover faster.</h1>
                     <p class="lead mb-0">Browse thousands of titles, manage your account, and receive updates with a consistent, modern experience.</p>
                 </div>
                 <div class="col-lg-4 text-lg-end d-flex d-lg-block gap-2">
-                    <a href="<?= BASE_URL ?>app/view/login.php" class="btn btn-primary me-2">Login</a>
+                    <a href="<?= BASE_URL ?>app/view/login.php" class="btn btn-primary me-lg-2">Login</a>
                     <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary">Create account</a>
                 </div>
             </div>
         </section>
 
-        <section class="mb-4">
-            <div class="section-title">
-                <span class="pill">★</span>
-                <span>Why readers choose us</span>
+        <section class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3 mb-4">
+            <div class="col">
+                <div class="card h-100">
+                    <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Digital ready">
+                    <div class="card-body">
+                        <h5 class="card-title">Ready for every device</h5>
+                        <p class="card-text">Download in the right format without extra steps—start reading right away.</p>
+                    </div>
+                </div>
             </div>
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Digital ready">
-                        <div class="card-body">
-                            <h5 class="card-title">Ready for every device</h5>
-                            <p class="card-text">Download in the right format without extra steps—start reading right away.</p>
-                        </div>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="<?= BASE_URL ?>imgs/adding.png" class="card-img-top" alt="Upload books">
+                    <div class="card-body">
+                        <h5 class="card-title">Contribute easily</h5>
+                        <p class="card-text">Add new books with a guided flow so the catalog stays fresh and accurate.</p>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="<?= BASE_URL ?>imgs/adding.png" class="card-img-top" alt="Upload books">
-                        <div class="card-body">
-                            <h5 class="card-title">Contribute easily</h5>
-                            <p class="card-text">Add new books with a guided flow so the catalog stays fresh and accurate.</p>
-                        </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Faster search">
+                    <div class="card-body">
+                        <h5 class="card-title">Powerful search</h5>
+                        <p class="card-text">Find titles by author, category, ISBN, or availability with clean filters.</p>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Faster search">
-                        <div class="card-body">
-                            <h5 class="card-title">Powerful search</h5>
-                            <p class="card-text">Find titles by author, category, ISBN, or availability with clean filters.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="card h-100">
-                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Support">
-                        <div class="card-body">
-                            <h5 class="card-title">Stay informed</h5>
-                            <p class="card-text">Get timely reminders about reservations, dues, and new arrivals.</p>
-                        </div>
+            </div>
+            <div class="col">
+                <div class="card h-100">
+                    <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Support">
+                    <div class="card-body">
+                        <h5 class="card-title">Stay informed</h5>
+                        <p class="card-text">Get timely reminders about reservations, dues, and new arrivals.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="card shadow-custom border-0" style="background: linear-gradient(135deg, rgba(59,91,219,.12), rgba(245,158,11,.12));">
+        <section class="card shadow-custom border-0" style="background: linear-gradient(135deg, rgba(29,78,216,.10), rgba(245,158,11,.10));">
             <div class="card-body d-flex flex-column flex-lg-row align-items-center justify-content-between">
                 <div>
                     <h2 class="mb-2">Join our library community</h2>

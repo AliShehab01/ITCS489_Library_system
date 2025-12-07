@@ -1,15 +1,12 @@
 
 /* Catalog specific tweaks that respect the shared theme */
 :root{
-  --catalog-shadow: 0 14px 40px rgba(15, 23, 42, 0.14);
+  --catalog-shadow: 0 10px 26px rgba(15, 23, 42, 0.10);
   --catalog-radius: 14px;
   --transition: all .2s cubic-bezier(.4,0,.2,1);
 }
 
-body{
-  padding-top: var(--nav-h);
-}
-
+body{ padding-top: var(--nav-h); }
 .navbar .nav-link{ transition: var(--transition); }
 
 .searchBar{
@@ -32,9 +29,7 @@ body{
   border-radius: var(--catalog-radius);
   box-shadow: var(--catalog-shadow);
 }
-.filtersArea h2{
-  font-size: 1.15rem;
-}
+.filtersArea h2{ font-size: 1.1rem; }
 .sortWrap, .filtersWrap .filterBlock{ min-width: 180px; }
 .form-select{ border-color: var(--border); }
 

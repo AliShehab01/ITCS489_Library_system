@@ -31,11 +31,12 @@ if (isset($_SESSION['user_id'])) {
     <?php define('STYLE_LOADED', true); ?>
 <?php endif; ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
-        <a class="navbar-brand" href="<?= BASE_URL ?>app/view/HomePage-EN.php">
-            <img src="<?= BASE_URL ?>imgs/tlp-logo.svg" alt="Logo" height="50">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="<?= BASE_URL ?>app/view/HomePage-EN.php">
+            <img src="<?= BASE_URL ?>imgs/tlp-logo.svg" alt="Logo" height="44">
+            <span class="fw-bold">Library</span>
         </a>
 
         <!-- Hamburger for mobile -->
