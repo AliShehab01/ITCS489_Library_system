@@ -1,74 +1,62 @@
 
-/* Root vars */
-:root {
-  /* Neutral palette */
-  --shadow: 0 4px 6px -1px rgba(0,0,0,.06), 0 2px 4px -1px rgba(0,0,0,.04);
-  --radius: .5rem;
+/* Catalog specific tweaks that respect the shared theme */
+:root{
+  --catalog-shadow: 0 14px 40px rgba(15, 23, 42, 0.14);
+  --catalog-radius: 14px;
   --transition: all .2s cubic-bezier(.4,0,.2,1);
-  --navbar-height: 72px; /* align with index2 page navbar height */
 }
 
-/* Utility shadow class */
-.shadow-custom {
-  box-shadow: var(--shadow);
+body{
+  padding-top: var(--nav-h);
 }
 
-/* Language dropdown spacing */
-#leftlang{
-  display: block;
-  padding: .5rem 1rem;
-  margin: .75rem auto;
-  width: fit-content;
+.navbar .nav-link{ transition: var(--transition); }
+
+.searchBar{
+  padding: 20px 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--catalog-radius);
+  box-shadow: var(--catalog-shadow);
+}
+.searchBar .form-control{
+  height: 52px;
+  border-radius: 14px;
 }
 
-/* Page background */
-body{ background:#fff; }
+.filtersArea{
+  background: var(--card);
+  padding: 18px 0;
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--catalog-radius);
+  box-shadow: var(--catalog-shadow);
+}
+.filtersArea h2{
+  font-size: 1.15rem;
+}
+.sortWrap, .filtersWrap .filterBlock{ min-width: 180px; }
+.form-select{ border-color: var(--border); }
 
-/* Prevent content hiding behind navbar */
-body { padding-top: var(--navbar-height); }
-
-/* Header nav tweak */
-.navbar .nav-link{ transition:var(--transition); }
-
-
-/* Search bar */
-.searchBar{ padding:20px 0;  margin-top:0;  background:#fff; box-shadow:var(--shadow); border-radius:var(--radius); }
-.searchBar .form-control{ height:48px; }
-
-/* Filters & sort */
-.filtersArea{ background:#fff; padding:18px 0; margin-top:16px; }
-.filtersArea h2{ font-size:1.25rem; }
-.sortWrap, .filtersWrap .filterBlock{ min-width:180px; }
-.form-select{ border-color:var(--primary); }
-
-/* Catalog cards */
-.catalog{ padding:24px 0; }
-.bookCard{ background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; height:100%; display:flex; flex-direction:column; gap:10px; }
+.catalog{ padding: 24px 0; }
+.bookCard{
+  background: var(--card);
+  border-radius: var(--catalog-radius);
+  box-shadow: var(--catalog-shadow);
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--border);
+}
 .bookHead{ display:flex; justify-content:space-between; align-items:start; gap:8px; }
-.bookTitle{ font-size:1rem; }
-.bookMeta{ color:#555; line-height:1.5; }
+.bookTitle{ font-size:1rem; font-weight: 700; }
+.bookMeta{ color:var(--muted); line-height:1.5; }
 .bookActions{ display:flex; gap:8px; }
 
-/* responsive */
 @media (max-width:768px){
   .filtersArea .d-flex{ gap:12px; }
   .filtersWrap{ width:100%; }
 }
-
-/* Sticky footer: keep footer at bottom
-   Ensure main content is wrapped in `main` */
-:root { --footer-height: auto; }
-
-html, body { height: 100%; }
-
-/* Layout: column flex so footer is pushed down */
-body { display: flex; flex-direction: column; }
-
-/* Main content grows to fill space */
-main, .site-content, .content-wrapper { flex: 1 0 auto; }
-
-/* Footer (not fixed) */
-footer { flex-shrink: 0; background: #fff; box-shadow: var(--shadow); padding: 16px 20px; }
-
-/* Use --footer-height if reserving footer space */
 

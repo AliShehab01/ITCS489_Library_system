@@ -26,11 +26,12 @@ if (isset($_SESSION['user_id'])) {
 }
 ?>
 
-<head>
-        <link rel="stylesheet" href="../../public/css/style.css" />
-</head>
+<?php if (!defined('STYLE_LOADED')): ?>
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <?php define('STYLE_LOADED', true); ?>
+<?php endif; ?>
 
-<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="<?= BASE_URL ?>app/view/HomePage-EN.php">
@@ -47,19 +48,20 @@ if (isset($_SESSION['user_id'])) {
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="HomePage-EN.php">Home</a>
+                    <a class="nav-link active" href="<?= BASE_URL ?>app/view/HomePage-EN.php">Home</a>
                 </li>
 
                 <!-- Dropdown Menu -->
                 <li class="nav-item dropdown">
+                    <?php $profileUrl = BASE_URL . 'app/view/editUserProfile.php' . (isset($_SESSION['username']) ? '?username=' . urlencode($_SESSION['username']) : ''); ?>
                     <a class="nav-link dropdown-toggle" href="#" id="menuDropdown" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">Menu</a>
                     <ul class="dropdown-menu" aria-labelledby="menuDropdown">
-            <li><a class="dropdown-item" href="CatalogSearch_Browsing-EN.php">Catalog</a></li>
-            <li><a class="dropdown-item" href="editUserProfile.php">My Account</a></li>
-            <li><a class="dropdown-item" href="borrowedDashboard.php">Borrowed</a>
+            <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php">Catalog</a></li>
+            <li><a class="dropdown-item" href="<?= $profileUrl ?>">My Account</a></li>
+            <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/borrowedDashboard.php">Borrowed</a>
             </li>
-            <li><a class="dropdown-item" href="reservations.php">Reservations</a>
+            <li><a class="dropdown-item" href="<?= BASE_URL ?>app/view/reservations.php">Reservations</a>
             </li>
                     </ul>
                 </li>
@@ -72,7 +74,7 @@ if (isset($_SESSION['user_id'])) {
                     <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-danger btn-sm">Admin Area</a>
                 <?php endif; ?>
 
-                <a href="userNotifications.php" class="btn btn-primary btn-sm position-relative">
+                <a href="<?= BASE_URL ?>app/view/userNotifications.php" class="btn btn-primary btn-sm position-relative">
                     Notifications
                     <?php if (!empty($unreadCount)): ?>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -92,7 +94,7 @@ if (isset($_SESSION['user_id'])) {
                         <a href="<?= BASE_URL ?>app/controller/logout.php"
                             class="btn btn-outline-secondary btn-sm">Logout</a>
                     <?php else: ?>
-                        <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary btn-sm">Sign Up</a>
+                        <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary btn-sm">Sign up</a>
                         <a href="<?= BASE_URL ?>app/view/login.php" class="btn btn-primary btn-sm">Login</a>
                     <?php endif; ?>
                 </div>
@@ -101,65 +103,6 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 </nav>
-
-<style>
-
-    body {
-        padding-top: 80px;
-    }
-    :root {
-        --admin-primary: #3b82f6;
-        --admin-primary-dark: #2563eb;
-        --navbar-bg: #111827; 
-    }
-
-    .navbar {
-        background-color: var(--navbar-bg) !important;
-        border-bottom: 3px solid var(--admin-primary);
-    }
-
-    .navbar .nav-link,
-    .navbar .navbar-brand {
-        color: #f3f4f6 !important;
-    }
-
-    .navbar .nav-link:hover,
-    .navbar .nav-link.active {
-        color: var(--admin-primary) !important;
-    }
-
-    .btn-primary {
-        background-color: var(--admin-primary);
-        border-color: var(--admin-primary);
-        transition: background-color 0.2s;
-        color: #fff;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--admin-primary-dark);
-        border-color: var(--admin-primary-dark);
-    }
-
-    .btn-outline-secondary {
-        color: #f3f4f6;
-        border-color: #f3f4f6;
-    }
-
-    .btn-outline-secondary:hover {
-        background-color: #f3f4f6;
-        color: #111827;
-    }
-
-    body {
-        padding-top: 80px; 
-    }
-</style>
-
-</style>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
-</script>
 
 <!-- Google Translate Script -->
 <script type="text/javascript">
@@ -171,5 +114,4 @@ if (isset($_SESSION['user_id'])) {
         }, 'google_translate_element');
     }
 </script>
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
-</script>
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

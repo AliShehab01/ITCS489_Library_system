@@ -1,25 +1,8 @@
 <?php
-
-
 session_start();
 
 // Include config.php (in htdocs/)
 require_once __DIR__ . '/../config.php';
-
-// Include navbar.php (in app/view/)
-include __DIR__ . '/../app/view/navbar.php';
-
-
-
-
-
-/* 
-         note:  public dir and index.php as a file 
-         in mvc patterns, this should be only file accessable by 
-         the browser
-
-*/
-
 ?>
 
 <!DOCTYPE html>
@@ -28,125 +11,98 @@ include __DIR__ . '/../app/view/navbar.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <title>Library System</title>
-    <script defer src="scripe.js"></script>
 </head>
-
 
 <body>
 
+    <?php include __DIR__ . '/../app/view/navbar.php'; ?>
 
-
-    <div class="row row-cols-1 row-cols-sm-2 g-3">
-        <div class="col">
-            <div class="card">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body" style="text-align: center;">
-                    <h5 class="card-title">Ease Book Formatting</h5>
-                    <p class="card-text">No need to navigate between websites for changing the format to AZW3 for your
-                        kindle or
-                        device, quick start for reading!</p>
+    <main class="page-shell">
+        <section class="page-hero mb-4">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <p class="text-uppercase text-muted fw-semibold mb-2">Welcome to the library</p>
+                    <h1 class="display-5 mb-3">Borrow smarter. Discover faster.</h1>
+                    <p class="lead mb-0">Browse thousands of titles, manage your account, and receive updates with a consistent, modern experience.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end d-flex d-lg-block gap-2">
+                    <a href="<?= BASE_URL ?>app/view/login.php" class="btn btn-primary me-2">Login</a>
+                    <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary">Create account</a>
                 </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/adding.png" id="imgrid2" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">Upload book(s)</h5>
-                    <p class="card-text">Easy steps contribute and make our family grows by adding book(s) to our
-                        database </p>
+        </section>
+
+        <section class="mb-4">
+            <div class="section-title">
+                <span class="pill">★</span>
+                <span>Why readers choose us</span>
+            </div>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Digital ready">
+                        <div class="card-body">
+                            <h5 class="card-title">Ready for every device</h5>
+                            <p class="card-text">Download in the right format without extra steps—start reading right away.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="<?= BASE_URL ?>imgs/adding.png" class="card-img-top" alt="Upload books">
+                        <div class="card-body">
+                            <h5 class="card-title">Contribute easily</h5>
+                            <p class="card-text">Add new books with a guided flow so the catalog stays fresh and accurate.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Faster search">
+                        <div class="card-body">
+                            <h5 class="card-title">Powerful search</h5>
+                            <p class="card-text">Find titles by author, category, ISBN, or availability with clean filters.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="<?= BASE_URL ?>imgs/kindle.png" class="card-img-top" alt="Support">
+                        <div class="card-body">
+                            <h5 class="card-title">Stay informed</h5>
+                            <p class="card-text">Get timely reminders about reservations, dues, and new arrivals.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">This div need idea!!!</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content.</p>
+        </section>
+
+        <section class="card shadow-custom border-0" style="background: linear-gradient(135deg, rgba(59,91,219,.12), rgba(245,158,11,.12));">
+            <div class="card-body d-flex flex-column flex-lg-row align-items-center justify-content-between">
+                <div>
+                    <h2 class="mb-2">Join our library community</h2>
+                    <p class="mb-0 text-muted">Browse the catalog, reserve titles, and manage your account from one place.</p>
+                </div>
+                <div class="d-flex gap-2 mt-3 mt-lg-0">
+                    <a href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php" class="btn btn-primary">Start browsing</a>
+                    <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary">Create account</a>
                 </div>
             </div>
-        </div>
-        <div class="col">
-            <div class="card" style="text-align: center;">
-                <img src="../imgs/kindle.png" id="imgrid" class="card-img-top" alt="card-grid-image">
-                <div class="card-body">
-                    <h5 class="card-title">This div need idea!!!</h5>
-                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to
-                        additional content. This content is a little bit longer.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--checking the config-->
+        </section>
+    </main>
 
-
-
-    <section class="cta-section py-5 bg-primary text-white text-center">
-        <div class="container">
-            <h2 class="display-5 fw-bold mb-3">Join Our Library Today!</h2>
-            <p class="lead mb-4">
-                Explore over 20,000 books, access exclusive resources, and start your reading journey now!
-            </p>
-            <a href="../app/view/signup.php" class="btn btn-lg btn-warning fw-bold text-dark">
-                Sign Up Now &rarr;
-            </a>
-            <p class="mt-3 fst-italic">Hurry! Don’t miss out on our latest arrivals and special collections.</p>
-        </div>
-    </section>
-
-    <style>
-        .cta-section {
-            background: linear-gradient(135deg, #007bff, #00d4ff);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .cta-section .btn-warning:hover {
-            transform: scale(1.05);
-            transition: 0.3s ease-in-out;
-        }
-    </style>
-
-
-
-
-
-
-
-
-    <footer class="bg-dark text-white pt-5 pb-4">
-        <div class="container text-center text-md-start">
-            <div class="row text-center text-md-start">
-                © 2025 University Library. All Rights Reserved.
-
-            </div>
-        </div>
+    <footer class="app-footer text-center">
+        <small>© 2025 University Library. All rights reserved.</small>
     </footer>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
-
-
-
-
-
-
 </body>
-
-<?php
-require_once __DIR__ . '/../app/models/dbconnect.php';
-$db = new Database();
-$conn = $db->conn; // $conn is your PDO object
-
-
-?>
 
 </html>

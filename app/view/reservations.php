@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config.php';
 require '../models/dbconnect.php';
 
 $db = new Database();
@@ -43,8 +44,6 @@ $unavailableBooks = $conn->query("
   ORDER BY title
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-
-
 $users = $conn->query("SELECT id, username FROM users ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 $queues = $conn->query("
@@ -63,80 +62,103 @@ $queues = $conn->query("
     <meta charset="utf-8">
     <title>Reservations</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
-<body class="bg-light">
-    <div class="container py-4">
-        <h2 class="mb-3">Reservation Management</h2>
+<body>
+    <?php include __DIR__ . '/navbar.php'; ?>
+
+    <main class="page-shell">
+        <div class="section-title">
+            <span class="pill">⏳</span>
+            <span>Reservation management</span>
+        </div>
+
         <?php if (!empty($msg)): ?>
         <div class="alert alert-info"><?= htmlspecialchars($msg) ?></div>
         <?php endif; ?>
 
-        <form method="POST" class="row g-3 mb-4">
-            <div class="col-md-5">
-                <label class="form-label">User</label>
-                <select name="user_id" class="form-select" required>
-                    <option value="">Select user…</option>
-                    <?php foreach ($users as $u): ?>
-                    <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
-                    <?php endforeach; ?>
-                </select>
+        <div class="card shadow-custom mb-4">
+            <div class="card-body">
+                <form method="POST" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">User</label>
+                        <select name="user_id" class="form-select" required>
+                            <option value="">Select user…</option>
+                            <?php foreach ($users as $u): ?>
+                            <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Book (currently on loan/unavailable)</label>
+                        <select name="book_id" class="form-select" required>
+                            <option value="">Select book…</option>
+                            <?php foreach ($unavailableBooks as $b): ?>
+                            <option value="<?= (int)$b['id'] ?>">
+                                <?= htmlspecialchars($b['title']) ?> (<?= htmlspecialchars($b['status']) ?>, qty:
+                                <?= (int)$b['quantity'] ?>)
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-grid align-items-end">
+                        <button class="btn btn-primary" name="create_res" value="1">Add Reservation</button>
+                    </div>
+                </form>
             </div>
-            <div class="col-md-5">
-                <label class="form-label">Book (currently on loan/unavailable)</label>
-                <select name="book_id" class="form-select" required>
-                    <option value="">Select book…</option>
-                    <?php foreach ($unavailableBooks as $b): ?>
-                    <option value="<?= (int)$b['id'] ?>">
-                        <?= htmlspecialchars($b['title']) ?> (<?= htmlspecialchars($b['availability']) ?>, qty:
-                        <?= (int)$b['quantity'] ?>)
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="col-md-2 d-grid align-items-end">
-                <button class="btn btn-primary" name="create_res" value="1">Add Reservation</button>
-            </div>
-        </form>
-
-        <h4>Reservation Queues</h4>
-        <?php if (!$queues): ?>
-        <div class="alert alert-secondary">No active reservations.</div>
-        <?php else: ?>
-        <div class="table-responsive">
-            <table class="table table-sm bg-white align-middle">
-                <thead>
-                    <tr>
-                        <th>Book</th>
-                        <th>User</th>
-                        <th>Status</th>
-                        <th>Reserved At</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($queues as $q): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($q['title']) ?></td>
-                        <td><?= htmlspecialchars($q['username']) ?></td>
-                        <td><?= htmlspecialchars($q['status']) ?></td>
-                        <td><?= htmlspecialchars($q['reserved_at']) ?></td>
-                        <td>
-                            <form method="POST" class="d-inline">
-                                <input type="hidden" name="reservation_id" value="<?= (int)$q['reservation_id'] ?>">
-                                <button class="btn btn-sm btn-outline-danger" name="cancel_res"
-                                    value="1">Cancel</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
         </div>
-        <?php endif; ?>
 
-        <a href="AdminArea.php" class="btn btn-outline-secondary mt-3">Back</a>
-    </div>
+        <div class="card shadow-custom">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Reservation queues</h4>
+                    <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-primary btn-sm">Back to Admin</a>
+                </div>
+                <?php if (!$queues): ?>
+                <div class="alert alert-secondary mb-0">No active reservations.</div>
+                <?php else: ?>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Book</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Reserved At</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($queues as $q): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($q['title']) ?></td>
+                                <td><?= htmlspecialchars($q['username']) ?></td>
+                                <td><span class="badge bg-primary"><?= htmlspecialchars($q['status']) ?></span></td>
+                                <td><?= htmlspecialchars($q['reserved_at']) ?></td>
+                                <td class="text-end">
+                                    <form method="POST" class="d-inline">
+                                        <input type="hidden" name="reservation_id" value="<?= (int)$q['reservation_id'] ?>">
+                                        <button class="btn btn-sm btn-outline-danger" name="cancel_res"
+                                            value="1">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer text-center">
+        <small>© 2025 Library System.</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
