@@ -1,7 +1,7 @@
 <?php
 // BorrowBook.php
-require '../models/dbconnect.php';          // mysqli $conn to database `library_system`
-require_once '../controller/reservations_lib.php'; // <-- queue helpers (fairness + fulfill)
+require_once __DIR__ . '/../models/dbconnect.php';          // mysqli $conn to database `library_system`
+require_once __DIR__ . '/../controller/reservations_lib.php'; // <-- queue helpers (fairness + fulfill)
 
 /* -------------------------
    Handle form submit

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../config.php';
-require '../models/dbconnect.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
 $db = new Database();
 $conn = $db->conn;
@@ -55,7 +55,7 @@ $queues = $conn->query("
   ORDER BY b.title, r.reserved_at
 ")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>

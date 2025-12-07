@@ -2,8 +2,8 @@
 
 session_start();
 require_once __DIR__ . '/../../config.php';
-require '../controller/checkifadmin.php';
-require_once '../models/dbconnect.php';
+require_once __DIR__ . '/../controller/checkifadmin.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
 
 if(!isset($_GET["username"])){
@@ -33,7 +33,7 @@ $pdo = $db->getPdo();
 
 <?php
 
-include "../view/navbar.php";
+include __DIR__ . '/navbar.php';
 
 $stmt = $pdo->prepare("SELECT username, role FROM users WHERE username = :username");
 $stmt->execute([':username' => $user_name]);

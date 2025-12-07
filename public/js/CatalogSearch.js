@@ -36,7 +36,7 @@ if (availSel) {
 // Get the current script path to determine the project root
 const scriptPath = document.currentScript.src;
 const projectRoot = scriptPath.substring(0, scriptPath.indexOf('/public/js/'));
-const API_URL = projectRoot + "/app/view/CatalogSearch_Browsingbackend.php";
+const API_URL = projectRoot + "/app/controller/CatalogSearch_API.php";
 
 
 // Detect page language

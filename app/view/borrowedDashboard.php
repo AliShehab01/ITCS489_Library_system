@@ -2,8 +2,8 @@
 session_start();
 
 require_once __DIR__ . '/../../config.php';
-require_once '../models/dbconnect.php';
-require_once '../models/CreateDefaultDBTables.php';
+require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 $userid = $_SESSION['user_id'] ?? null;
 
@@ -13,6 +13,8 @@ if (!$userid) {
 }
 
 // Prepare the PDO statement
+$db = new Database();
+$conn = $db->conn;
 $stmt = $conn->prepare('SELECT * FROM borrows WHERE user_id = :userid');
 $stmt->bindParam(':userid', $userid, PDO::PARAM_INT);
 $stmt->execute();

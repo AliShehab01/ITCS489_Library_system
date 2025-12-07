@@ -15,8 +15,8 @@ session_start();
 <body>
 
     <?php
-    include "../view/navbar.php";
-    require "../models/dbconnect.php";
+    include __DIR__ . '/../view/navbar.php';
+    require_once __DIR__ . '/../models/dbconnect.php';
 
     $bookID = $_GET["bookid"];
     $borrowLimit = $_SESSION['BorrowLimit'];

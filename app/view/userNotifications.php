@@ -95,7 +95,7 @@ function typeBadge(string $type): string
     }
 }
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>

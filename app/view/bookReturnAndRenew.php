@@ -1,7 +1,8 @@
 <<?php
   // bookReturnAndRenew.php
-  require '../models/dbconnect.php';
-  require_once '../controller/reservations_lib.php';
+  require_once __DIR__ . '/../../config.php';
+  require_once __DIR__ . '/../models/dbconnect.php';
+  require_once __DIR__ . '/../controller/reservations_lib.php';
 
 
   // Handle a return
@@ -41,7 +42,7 @@
   ORDER BY b.dueDate ASC
 ";
   $active = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-  ?> <!doctype html>
+<!DOCTYPE html>
   <html lang="en">
 
   <head>

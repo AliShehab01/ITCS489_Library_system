@@ -1,8 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config.php';
-require_once '../models/dbconnect.php';
-require_once '../models/CreateDefaultDBTables.php';
+require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 ?>
 
 <!DOCTYPE html>

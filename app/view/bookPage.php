@@ -12,7 +12,7 @@ require_once __DIR__ . '/../models/dbconnect.php';
 $db = new Database();
 $conn = $db->conn; // $conn is your PDO object
 
-include "../view/navbar.php";
+include __DIR__ . '/navbar.php';
 //session_start();
 if (!isset($_SESSION['username'])) {
     header("Location: ../../public.php");

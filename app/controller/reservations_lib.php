@@ -1,6 +1,6 @@
 <?php
 // reservations_lib.php
-require_once '../models/dbconnect.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
 /**
  * Return the oldest ACTIVE reservation for a book (FIFO), or null if none.

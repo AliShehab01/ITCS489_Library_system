@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../config.php';
-require '../controller/checkifadmin.php';
+require_once __DIR__ . '/../controller/checkifadmin.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

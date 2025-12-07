@@ -3,7 +3,7 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 session_start();
 
-require '../models/CreateDefaultDBTables.php';
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 $username = trim($_POST["username"]);
 $password = trim($_POST["password"]);

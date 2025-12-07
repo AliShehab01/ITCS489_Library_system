@@ -3,16 +3,14 @@
 ob_start();
 ini_set('display_errors', '0');
 error_reporting(0);
-mysqli_report(MYSQLI_REPORT_OFF);
 
 header('Content-Type: application/json; charset=utf-8');
 
-$host = '127.0.0.1';
-$user = 'root';
-$pass = '';
-$db   = 'library_system';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
-$conn = new mysqli($host, $user, $pass, $db);
+$db = new Database();
+$conn = $db->conn;
 
 if ($conn->connect_errno) {
   // clear any buffered output

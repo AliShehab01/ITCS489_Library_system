@@ -13,7 +13,6 @@ require_once __DIR__ . '/../../config.php';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css" />
   <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
-  <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style_CatalogSearch.css" />
 </head>
 
 <body>

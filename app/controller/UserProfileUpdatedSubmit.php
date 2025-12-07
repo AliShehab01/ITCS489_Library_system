@@ -2,7 +2,7 @@
 
 session_start();
 
-require '../models/dbconnect.php';
+require_once __DIR__ . '/../models/dbconnect.php';
 
 ?>
 

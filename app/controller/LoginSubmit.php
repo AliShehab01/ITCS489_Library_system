@@ -16,8 +16,8 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
 
     <?php
-require '../models/dbconnect.php'; // your PDO Database class
-require '../models/CreateDefaultDBTables.php';
+require_once __DIR__ . '/../models/dbconnect.php'; // your PDO Database class
+require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';

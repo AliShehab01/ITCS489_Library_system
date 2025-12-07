@@ -25,7 +25,7 @@ require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
     <?php
 
-    include '../view/navbar.php';
+    include __DIR__ . '/../view/navbar.php';
 
     $db = new Database();
     $conn = $db->getPdo();

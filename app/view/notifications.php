@@ -115,7 +115,7 @@ $overdueUsers = fetchOverdueUsers($conn);
 $reservationQueue = fetchReservationQueue($conn);
 
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
