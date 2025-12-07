@@ -103,22 +103,27 @@ function typeBadge(string $type): string
     <title>My Notifications</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
-<body class="bg-light">
+<body>
     <?php include __DIR__ . '/navbar.php'; ?>
 
-    <div class="container py-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
-            <div>
-                <h1 class="h4 mb-1">Notifications & Alerts</h1>
-                <p class="text-muted mb-0">Due-date reminders, reservation updates, and library announcements.</p>
+    <main class="page-shell">
+        <section class="page-hero mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <p class="text-uppercase text-muted fw-semibold mb-2">My account</p>
+                    <h1 class="display-6 mb-1">Notifications &amp; alerts</h1>
+                    <p class="text-muted mb-0">Due-date reminders, reservation updates, and library announcements.</p>
+                </div>
+                <form method="POST">
+                    <button class="btn btn-outline-primary btn-sm" name="mark_all_read" value="1"
+                        <?= empty($counts['unread']) ? 'disabled' : '' ?>>Mark all as read</button>
+                </form>
             </div>
-            <form method="POST">
-                <button class="btn btn-outline-primary btn-sm" name="mark_all_read" value="1"
-                    <?= empty($counts['unread']) ? 'disabled' : '' ?>>Mark all as read</button>
-            </form>
-        </div>
+        </section>
 
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
@@ -211,7 +216,11 @@ function typeBadge(string $type): string
                 <?php endif; ?>
             </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="app-footer text-center">
+        <small>&copy; 2025 Library System. All rights reserved.</small>
+    </footer>
 </body>
 
 </html>

@@ -70,9 +70,22 @@ $queues = $conn->query("
     <?php include __DIR__ . '/navbar.php'; ?>
 
     <main class="page-shell">
+        <section class="page-hero mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
+                    <h1 class="display-6 mb-1">Reservation management</h1>
+                    <p class="text-muted mb-0">Add readers to queues and track availability with the same layout used across the app.</p>
+                </div>
+                <div class="text-end">
+                    <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-primary btn-sm">Back to Admin</a>
+                </div>
+            </div>
+        </section>
+
         <div class="section-title">
-            <span class="pill">⏳</span>
-            <span>Reservation management</span>
+            <span class="pill">&#128278;</span>
+            <span>Create a reservation</span>
         </div>
 
         <?php if (!empty($msg)): ?>
@@ -85,7 +98,7 @@ $queues = $conn->query("
                     <div class="col-md-5">
                         <label class="form-label">User</label>
                         <select name="user_id" class="form-select" required>
-                            <option value="">Select user…</option>
+                            <option value="">Select user</option>
                             <?php foreach ($users as $u): ?>
                             <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
                             <?php endforeach; ?>
@@ -94,7 +107,7 @@ $queues = $conn->query("
                     <div class="col-md-5">
                         <label class="form-label">Book (currently on loan/unavailable)</label>
                         <select name="book_id" class="form-select" required>
-                            <option value="">Select book…</option>
+                            <option value="">Select book</option>
                             <?php foreach ($unavailableBooks as $b): ?>
                             <option value="<?= (int)$b['id'] ?>">
                                 <?= htmlspecialchars($b['title']) ?> (<?= htmlspecialchars($b['status']) ?>, qty:
@@ -113,8 +126,10 @@ $queues = $conn->query("
         <div class="card shadow-custom">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">Reservation queues</h4>
-                    <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-primary btn-sm">Back to Admin</a>
+                    <div class="section-title mb-0">
+                        <span class="pill">&#128197;</span>
+                        <span>Reservation queues</span>
+                    </div>
                 </div>
                 <?php if (!$queues): ?>
                 <div class="alert alert-secondary mb-0">No active reservations.</div>
@@ -155,7 +170,7 @@ $queues = $conn->query("
     </main>
 
     <footer class="app-footer text-center">
-        <small>© 2025 Library System.</small>
+        <small>&copy; 2025 Library System. All rights reserved.</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

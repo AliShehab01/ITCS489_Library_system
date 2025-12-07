@@ -5,7 +5,6 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../controller/checkifadmin.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 
-
 if(!isset($_GET["username"])){
     echo "no username specified.";
     exit;
@@ -16,6 +15,10 @@ $user_name = $_GET['username'];
 $db = new Database();
 $pdo = $db->getPdo();
 
+$stmt = $pdo->prepare("SELECT username, role FROM users WHERE username = :username");
+$stmt->execute([':username' => $user_name]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -23,7 +26,7 @@ $pdo = $db->getPdo();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <title>Edit User</title>
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
@@ -31,20 +34,22 @@ $pdo = $db->getPdo();
 </head>
 <body>
 
-<?php
+<?php include __DIR__ . '/navbar.php'; ?>
 
-include __DIR__ . '/navbar.php';
-
-$stmt = $pdo->prepare("SELECT username, role FROM users WHERE username = :username");
-$stmt->execute([':username' => $user_name]);
-$row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-?>
 <main class="page-shell">
-    <div class="section-title">
-        <span class="pill">🧑</span>
-        <span>Edit user profile</span>
-    </div>
+    <section class="page-hero mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+            <div>
+                <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
+                <h1 class="display-6 mb-1">Edit user profile</h1>
+                <p class="text-muted mb-0">Update account details and roles with the same layout used elsewhere.</p>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-light text-dark border">Username: <?= htmlspecialchars($user_name) ?></span>
+            </div>
+        </div>
+    </section>
+
     <div class="form-shell">
         <form action="UserProfileUpdatedSubmit.php" method="post" class="row g-3">
             <input type='hidden' name='username' value="<?php echo htmlspecialchars($row['username']);?>">
@@ -90,7 +95,7 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
     </div>
 </main>
 <footer class="app-footer text-center">
-    <small>© 2025 Library System.</small>
+    <small>&copy; 2025 Library System. All rights reserved.</small>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

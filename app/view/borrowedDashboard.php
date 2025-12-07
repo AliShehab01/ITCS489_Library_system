@@ -20,6 +20,7 @@ $stmt->bindParam(':userid', $userid, PDO::PARAM_INT);
 $stmt->execute();
 
 $borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$borrowCount = count($borrows);
 
 ?>
 
@@ -30,7 +31,7 @@ $borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borrowed Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
     <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
@@ -40,8 +41,21 @@ $borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include __DIR__ . '/navbar.php'; ?>
 
     <main class="page-shell">
+        <section class="page-hero mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                    <p class="text-uppercase text-muted fw-semibold mb-2">My library</p>
+                    <h1 class="display-6 mb-1">Borrowed items</h1>
+                    <p class="text-muted mb-0">Review due dates, renew eligible titles, and return books in one place.</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-primary-subtle text-dark border">Total items: <?= (int)$borrowCount ?></span>
+                </div>
+            </div>
+        </section>
+
         <div class="section-title">
-            <span class="pill">📚</span>
+            <span class="pill">&#128218;</span>
             <span>Your borrowed items</span>
         </div>
 
@@ -112,7 +126,7 @@ $borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 
     <footer class="app-footer text-center">
-        <small>© 2025 Library System.</small>
+        <small>&copy; 2025 Library System. All rights reserved.</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

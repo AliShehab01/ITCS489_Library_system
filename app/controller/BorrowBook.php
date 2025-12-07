@@ -1,7 +1,14 @@
 <?php
 // BorrowBook.php
-require_once __DIR__ . '/../models/dbconnect.php';          // mysqli $conn to database `library_system`
+session_start();
+require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../controller/reservations_lib.php'; // <-- queue helpers (fairness + fulfill)
+
+// BorrowBook.php expects a mysqli connection for the reservation helpers
+$conn = new mysqli("localhost", "root", "", "library_system");
+if ($conn->connect_error) {
+  die("Database Connection Failed: " . $conn->connect_error);
+}
 
 /* -------------------------
    Handle form submit
@@ -69,12 +76,29 @@ $users = $conn->query("SELECT id, username FROM users ORDER BY username ASC")->f
 <head>
   <meta charset="utf-8">
   <title>Borrow Book</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+  <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+  <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
+  <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
-<body class="bg-light">
-  <div class="container py-4">
-    <h2 class="mb-3">Borrow a Book</h2>
+<body>
+  <?php include __DIR__ . '/../view/navbar.php'; ?>
+
+  <main class="page-shell">
+    <section class="page-hero mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+          <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
+          <h1 class="display-6 mb-1">Borrow a Book</h1>
+          <p class="text-muted mb-0">Create a borrow record, update stock, and respect existing reservation queues.</p>
+        </div>
+        <div class="text-end">
+          <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-primary">Back to Admin</a>
+        </div>
+      </div>
+    </section>
 
     <?php if (!empty($error)): ?>
       <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -82,58 +106,65 @@ $users = $conn->query("SELECT id, username FROM users ORDER BY username ASC")->f
       <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
     <?php endif; ?>
 
-    <form method="POST" class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label">Book</label>
-        <select name="bookid" class="form-select" required>
-          <option value="">Select a book…</option>
-          <?php foreach ($books as $b): ?>
-            <option value="<?= (int)$b['id'] ?>">
-              <?= htmlspecialchars($b['title']) ?> (in stock: <?= (int)$b['quantity'] ?>)
-            </option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+    <div class="form-shell">
+      <form method="POST" class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Book</label>
+          <select name="bookid" class="form-select" required>
+            <option value="">Select a book</option>
+            <?php foreach ($books as $b): ?>
+              <option value="<?= (int)$b['id'] ?>">
+                <?= htmlspecialchars($b['title']) ?> (in stock: <?= (int)$b['quantity'] ?>)
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
 
-      <div class="col-md-3">
-        <label class="form-label">Quantity</label>
-        <input type="number" name="QuantityWanted" min="1" value="1" class="form-control" required>
-      </div>
+        <div class="col-md-3">
+          <label class="form-label">Quantity</label>
+          <input type="number" name="QuantityWanted" min="1" value="1" class="form-control" required>
+        </div>
 
-      <div class="col-md-3">
-        <label class="form-label">Due date</label>
-        <input type="date" name="dueDate" class="form-control" required>
-      </div>
+        <div class="col-md-3">
+          <label class="form-label">Due date</label>
+          <input type="date" name="dueDate" class="form-control" required>
+        </div>
 
-      <div class="col-md-4">
-        <label class="form-label">User</label>
-        <select name="user_id" class="form-select" required>
-          <option value="">Select user…</option>
-          <?php foreach ($users as $u): ?>
-            <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+        <div class="col-md-4">
+          <label class="form-label">User</label>
+          <select name="user_id" class="form-select" required>
+            <option value="">Select user</option>
+            <?php foreach ($users as $u): ?>
+              <option value="<?= (int)$u['id'] ?>"><?= htmlspecialchars($u['username']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
 
-      <div class="col-md-3">
-        <label class="form-label">Price (optional)</label>
-        <input type="number" name="price" step="0.01" value="0" class="form-control">
-      </div>
+        <div class="col-md-3">
+          <label class="form-label">Price (optional)</label>
+          <input type="number" name="price" step="0.01" value="0" class="form-control">
+        </div>
 
-      <div class="col-12">
-        <button class="btn btn-primary">Create Borrow</button>
-        <a href="AdminArea.php" class="btn btn-outline-secondary">Back</a>
-      </div>
-    </form>
+        <div class="col-12">
+          <button class="btn btn-primary">Create Borrow</button>
+          <a href="<?= BASE_URL ?>app/view/reservations.php" class="btn btn-outline-secondary">Reservations</a>
+        </div>
+      </form>
 
-    <div class="mt-3">
-      <small class="text-muted">
-        Tip: If a book has no available copies, use the <a href="reservations.php">Reservations</a> page to add
-        users to the queue.
-        When a copy is returned, the next user in line is automatically notified.
-      </small>
+      <div class="mt-3">
+        <small class="text-muted">
+          Tip: If a book has no available copies, use the <a href="<?= BASE_URL ?>app/view/reservations.php">Reservations</a> page to add
+          users to the queue. When a copy is returned, the next user in line is automatically notified.
+        </small>
+      </div>
     </div>
-  </div>
+  </main>
+
+  <footer class="app-footer text-center">
+    <small>&copy; 2025 Library System. All rights reserved.</small>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 
 </html>

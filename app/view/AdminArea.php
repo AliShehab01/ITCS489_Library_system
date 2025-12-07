@@ -11,7 +11,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Area</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        crossorigin="anonymous">
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
     <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -45,7 +45,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             User Management
                         </h5>
                         <p class="card-text flex-grow-1">Add, edit, or remove users, assign roles, manage borrowing limits.</p>
-                        <a href="../controller/ManagingUsers.php" class="btn btn-primary mt-auto">Manage Users</a>
+                        <a href="<?= BASE_URL ?>app/controller/ManagingUsers.php" class="btn btn-primary mt-auto">Manage Users</a>
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Book Management
                         </h5>
                         <p class="card-text flex-grow-1">Add, update, remove books, track availability, categorize books via database.</p>
-                        <a href="bookPage.php" class="btn btn-primary mt-auto">Manage Books</a>
+                        <a href="<?= BASE_URL ?>app/view/bookPage.php" class="btn btn-primary mt-auto">Manage Books</a>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Catalog Search
                         </h5>
                         <p class="card-text flex-grow-1">Search and browse books by title, author, category, or filters.</p>
-                        <a href="CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">Search Catalog</a>
+                        <a href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">Search Catalog</a>
                     </div>
                 </div>
             </div>
@@ -84,8 +84,8 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Borrow / Return
                         </h5>
                         <p class="card-text flex-grow-1">Issue and return books, handle due dates, renewals, and fines.</p>
-                        <a href="BorrowBook.php" class="btn btn-primary mt-auto">Manage Borrowing</a>
-                        <a href="bookReturnAndRenew.php" class="btn btn-outline-primary mt-2">Return / Renew</a>
+                        <a href="<?= BASE_URL ?>app/controller/BorrowBook.php" class="btn btn-primary mt-auto">Manage Borrowing</a>
+                        <a href="<?= BASE_URL ?>app/view/bookReturnAndRenew.php" class="btn btn-outline-primary mt-2">Return / Renew</a>
                     </div>
                 </div>
             </div>
@@ -98,7 +98,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Reservations
                         </h5>
                         <p class="card-text flex-grow-1">Allow users to reserve books currently on loan. Manage queues and notifications.</p>
-                        <a href="reservations.php" class="btn btn-primary mt-auto">Manage Reservations</a>
+                        <a href="<?= BASE_URL ?>app/view/reservations.php" class="btn btn-primary mt-auto">Manage Reservations</a>
                     </div>
                 </div>
             </div>
@@ -111,7 +111,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Notifications
                         </h5>
                         <p class="card-text flex-grow-1">View and manage notifications sent to users when books become available.</p>
-                        <a href="notifications.php" class="btn btn-primary mt-auto">Manage Notifications</a>
+                        <a href="<?= BASE_URL ?>app/view/notifications.php" class="btn btn-primary mt-auto">Manage Notifications</a>
                     </div>
                 </div>
             </div>
@@ -124,7 +124,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             Reports &amp; Tracking
                         </h5>
                         <p class="card-text flex-grow-1">Generate reports on borrowed, overdue, and reserved books, fines, and statistics.</p>
-                        <a href="reports.php" class="btn btn-primary mt-auto">View Reports</a>
+                        <a href="<?= BASE_URL ?>app/view/reports.php" class="btn btn-primary mt-auto">View Reports</a>
                     </div>
                 </div>
             </div>
@@ -137,7 +137,7 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
                             System Administration
                         </h5>
                         <p class="card-text flex-grow-1">Manage staff access, configure policies, backup data, and monitor system usage.</p>
-                        <a href="adminSettings.php" class="btn btn-primary mt-auto">Admin Settings</a>
+                        <a href="<?= BASE_URL ?>app/view/adminSettings.php" class="btn btn-primary mt-auto">Admin Settings</a>
                     </div>
                 </div>
             </div>
@@ -146,11 +146,11 @@ require_once __DIR__ . '/../controller/checkifadmin.php';
     </main>
 
     <footer class="app-footer text-center">
-        <small>© 2025 Library System. All rights reserved.</small>
+        <small>&copy; 2025 Library System. All rights reserved.</small>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous">
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script>
     lucide.createIcons();
