@@ -1,57 +1,116 @@
-
-/* Catalog specific tweaks that respect the shared theme */
-:root{
-  --catalog-shadow: 0 10px 26px rgba(15, 23, 42, 0.10);
-  --catalog-radius: 14px;
-  --transition: all .2s cubic-bezier(.4,0,.2,1);
+:root {
+  --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  --radius: .85rem;
 }
 
-body{ padding-top: var(--nav-h); }
-.navbar .nav-link{ transition: var(--transition); }
-
-.searchBar{
-  padding: 20px 0;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--catalog-radius);
-  box-shadow: var(--catalog-shadow);
-}
-.searchBar .form-control{
-  height: 52px;
-  border-radius: 14px;
+/* نخلي الخلفية مثل الهوم */
+body {
+  background-color: #f3f4f6;
 }
 
-.filtersArea{
-  background: var(--card);
-  padding: 18px 0;
-  margin-top: 18px;
-  border: 1px solid var(--border);
-  border-radius: var(--catalog-radius);
-  box-shadow: var(--catalog-shadow);
+/* شريط البحث العلوي */
+.searchBar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 1.5rem 0 1.25rem;
 }
-.filtersArea h2{ font-size: 1.1rem; }
-.sortWrap, .filtersWrap .filterBlock{ min-width: 180px; }
-.form-select{ border-color: var(--border); }
 
-.catalog{ padding: 24px 0; }
-.bookCard{
-  background: var(--card);
-  border-radius: var(--catalog-radius);
-  box-shadow: var(--catalog-shadow);
-  padding: 16px;
+.searchBar .form-control {
+  max-width: 640px;
+  margin-inline: auto;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding-inline: 1.25rem;
+}
+
+/* منطقة الفلاتر */
+.filtersArea {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 0 1.1rem;
+}
+
+.filtersArea h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.sortWrap,
+.filterBlock {
+  min-width: 170px;
+}
+
+/* الكاتالوج (الكروت) */
+.catalog {
+  padding: 2rem 0 3rem;
+}
+
+/* card الخاصة بكل كتاب – متوافقة مع HTML اللي يطلّعه CatalogSearch.js */
+.bookCard {
+  border-radius: var(--radius);
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  box-shadow: var(--shadow);
+  padding: 1rem 1.25rem 1.1rem;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border: 1px solid var(--border);
-}
-.bookHead{ display:flex; justify-content:space-between; align-items:start; gap:8px; }
-.bookTitle{ font-size:1rem; font-weight: 700; }
-.bookMeta{ color:var(--muted); line-height:1.5; }
-.bookActions{ display:flex; gap:8px; }
-
-@media (max-width:768px){
-  .filtersArea .d-flex{ gap:12px; }
-  .filtersWrap{ width:100%; }
 }
 
+.bookHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: .5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bookTitle {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bookMeta {
+  font-size: 0.88rem;
+  color: #4b5563;
+  margin-bottom: 0.75rem;
+}
+
+/* فورم الاستعارة داخل الكارت */
+.bookCard form .form-control,
+.bookCard form input[type="number"],
+.bookCard form input[type="date"] {
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+  height: 36px;
+}
+
+.bookCard form .btn {
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+/* رسائل الخطأ / اللاودينغ من JS */
+.bookCard strong {
+  font-weight: 600;
+}
+
+/* البادج "Available / Reserved ..." هي Bootstrap .badge – بس نخليها لطيفة شوي */
+.bookHead .badge {
+  border-radius: 999px;
+  padding-inline: 0.8rem;
+}
+
+/* pager تحت النتائج (أزرار الصفحات) */
+#results > .d-flex button {
+  border-radius: 999px;
+}
+
+/* responsive */
+@media (max-width: 576px) {
+  .searchBar {
+    padding-top: 1.25rem;
+    padding-bottom: 1rem;
+  }
+}

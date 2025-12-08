@@ -1,89 +1,151 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../config.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+    <title>Create account – Library System</title>
+
+    <!-- Bootstrap + الثيم العام -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
-    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
 <body>
-    <?php include __DIR__ . '/navbar.php'; ?>
 
-    <main class="page-shell">
-        <section class="page-hero mb-4">
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-                <div>
-                    <p class="text-uppercase text-muted fw-semibold mb-2">Create account</p>
-                    <h1 class="display-6 mb-1">Join the library</h1>
-                    <p class="text-muted mb-0">Reserve, borrow, and stay updated with a single login.</p>
-                </div>
-                <div class="text-end">
-                    <span class="badge bg-light text-dark border">Quick signup</span>
-                </div>
-            </div>
-        </section>
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-xl-5">
-                <div class="form-shell">
-                    <h1 class="h3 mb-3 text-center">Create your account</h1>
-                    <p class="text-muted text-center mb-4">Join the library to reserve, borrow, and get updates.</p>
-                    <form action="../controller/RegisterSubmit.php" method="post" class="row g-3">
-                        <div class="col-12">
-                            <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-                            <input type="text" name="username" id="username" class="form-control" required>
-                        </div>
+<?php include __DIR__ . '/navbar.php'; ?>
 
-                        <div class="col-12">
-                            <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" id="password" class="form-control" required>
-                        </div>
+<main class="site-content">
 
-                        <div class="col-md-6">
-                            <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" name="first_name" id="first_name" class="form-control" required>
-                        </div>
+    <!-- هيدر الصفحة -->
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <h1 class="h4 mb-1">Create your account</h1>
+            <p class="text-muted mb-0">
+                Sign up to borrow books, manage your reservations, and track your reading history.
+            </p>
+        </div>
+    </section>
 
-                        <div class="col-md-6">
-                            <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" name="last_name" id="last_name" class="form-control" required>
-                        </div>
+    <!-- كرت التسجيل -->
+    <section class="py-5">
+        <div class="container my-3">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-8">
 
-                        <div class="col-md-6">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" class="form-control">
-                        </div>
+                    <div class="card shadow-custom">
+                        <div class="card-body p-4">
+                            <h2 class="h5 mb-3 text-center">Register</h2>
+                            <p class="text-muted small text-center mb-4">
+                                Please fill in the required fields to create your library account.
+                            </p>
 
-                        <div class="col-md-6">
-                            <label for="phone_number" class="form-label">Phone Number</label>
-                            <input type="number" name="phone_number" id="phone_number" class="form-control">
-                        </div>
+                            <?php if (!empty($_GET['error'])): ?>
+                                <div class="alert alert-danger py-2 small">
+                                    <?= htmlspecialchars($_GET['error']); ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <div class="col-12 d-grid">
-                            <button type="submit" class="btn btn-primary w-100">Register</button>
+                            <form action="../controller/RegisterSubmit.php"
+                                  method="post"
+                                  class="d-flex flex-column gap-3">
+
+                                <div class="row g-3">
+    <div class="col-md-6">
+        <label for="firstName" class="form-label small mb-1">
+            First name <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="firstName"
+               id="firstName"
+               class="form-control"
+               required>
+    </div>
+
+    <div class="col-md-6">
+        <label for="lastName" class="form-label small mb-1">
+            Last name <span class="text-danger">*</span>
+        </label>
+        <input type="text"
+               name="lastName"
+               id="lastName"
+               class="form-control"
+               required>
+    </div>
+</div>
+
+                                <div>
+                                    <label for="username" class="form-label small mb-1">
+                                        Username <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text"
+                                           name="username"
+                                           id="username"
+                                           class="form-control"
+                                           required>
+                                </div>
+
+                                <div>
+                                    <label for="password" class="form-label small mb-1">
+                                        Password <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="password"
+                                           name="password"
+                                           id="password"
+                                           class="form-control"
+                                           required>
+                                </div>
+
+                                <div>
+                                    <label for="email" class="form-label small mb-1">
+                                        Email
+                                    </label>
+                                    <input type="email"
+                                           name="email"
+                                           id="email"
+                                           class="form-control">
+                                </div>
+
+                                <div>
+                                    <label for="phoneNumber" class="form-label small mb-1">
+                                        Phone number
+                                    </label>
+                                    <input type="tel"
+                                           name="phoneNumber"
+                                           id="phoneNumber"
+                                           class="form-control">
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100 mt-2">
+                                    Create account
+                                </button>
+                            </form>
+
+                            <div class="mt-3 text-center small text-muted">
+                                Already have an account?
+                                <a href="login.php" class="link-primary">Log in</a>
+                            </div>
+
+                            <div class="mt-1 text-center small text-muted">
+                                If you need help, please contact the library staff.
+                            </div>
                         </div>
-                    </form>
-                    <p class="mt-3 text-center text-muted">Already have an account? <a href="<?= BASE_URL ?>app/view/login.php">Log in</a></p>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+    </section>
+</main>
 
-    <footer class="app-footer text-center">
-        <small>&copy; 2025 Library System. All rights reserved.</small>
-    </footer>
+<footer class="py-3 mt-4">
+    <div class="container text-center small text-muted">
+        © 2025 Library System. All rights reserved.
+    </div>
+</footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

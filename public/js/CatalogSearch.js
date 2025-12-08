@@ -33,10 +33,21 @@ if (availSel) {
   }
 }
 
-// Get the current script path to determine the project root
-const scriptPath = document.currentScript.src;
-const projectRoot = scriptPath.substring(0, scriptPath.indexOf('/public/js/'));
-const API_URL = projectRoot + "/app/controller/CatalogSearch_API.php";
+// Resolve API URL robustly (inline override wins; fall back to script path)
+const inlineApiUrl = (typeof window !== "undefined" && (window.CATALOG_API_URL || window.catalogApiUrl)) || "";
+let projectRoot = "";
+if (document.currentScript && document.currentScript.src) {
+  const scriptPath = document.currentScript.src;
+  const idx = scriptPath.indexOf("/public/js/");
+  if (idx !== -1) {
+    projectRoot = scriptPath.substring(0, idx);
+  }
+}
+const API_URL =
+  inlineApiUrl ||
+  (projectRoot
+    ? projectRoot + "/app/controller/CatalogSearch_API.php"
+    : "/app/controller/CatalogSearch_API.php");
 
 
 // Detect page language
@@ -72,6 +83,7 @@ const categoryMap = pageLang.startsWith("ar")
 // Fetch books
 
 async function fetchBooks() {
+  console.log("Fetching books from:", API_URL);
   try {
     const res = await fetch(API_URL, { method: "GET", cache: "no-store" });
 
@@ -189,12 +201,25 @@ function paginate(list, page, per) {
 
 function renderPager(total) {
   const pageCount = Math.ceil(total / perPage) || 1;
+  if (pageCount <= 1) return ""; // لا تعرض الترقيم لو ما فيه إلا صفحة واحدة
+
   let html = "";
   for (let i = 1; i <= pageCount; i++) {
-    html += `<button class="btn btn-sm ${i === currentPage ? "btn-primary" : "btn-outline-primary"
-      } me-1 mb-2" data-page="${i}">${i}</button>`;
+    html += `
+      <button
+        class="btn ${i === currentPage ? "btn-primary" : "btn-outline-primary"} mx-1 mb-2 px-3 py-2"
+        data-page="${i}"
+      >
+        ${i}
+      </button>
+    `;
   }
-  return `<div class="col-12 d-flex flex-wrap align-items-center mt-2">${html}</div>`;
+
+  return `
+    <div class="col-12 d-flex justify-content-center flex-wrap mt-3">
+      ${html}
+    </div>
+  `;
 }
 
 // Render
@@ -241,43 +266,52 @@ function bookCard(b) {
 
   if (avail === "available") {
     return (
-      `
-  <div class="col-12 col-sm-6 col-lg-4">
-    <div class="bookCard" data-book-id="${b.id}">
-      <div class="bookHead">
-        <strong class="bookTitle">${title}</strong>
-        ${badge}
-      </div>
-      <div class="bookMeta">${metaLines}</div>
-      
-      <form action="BorrowBook.php?bookid=` +
-        b.id +
-        `" method="post">
-
-       <label for="">Quantity:</label>
-       <input type="number" name="QuantityWanted" min=1, max=5> <br>
-       <label for="">Due date:</label>
-       <input type="date" name="dueDate"><br>
-      <input type="submit" value="Borrow">
-       </form>
+     `
+<div class="col-12 col-sm-6 col-lg-4">
+  <div class="card h-100 border shadow-sm rounded-3 p-3" data-book-id="${b.id}">
+    
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <strong class="fw-semibold">${title}</strong>
+      ${badge}
     </div>
-  </div>
 
+    <div class="text-muted small mb-3">
+      ${metaLines}
+    </div>
+
+    <form action="BorrowBook.php?bookid=${b.id}" method="post" class="mt-auto">
+      <label class="small text-muted">Quantity:</label>
+      <input type="number" name="QuantityWanted" min="1" max="5" class="form-control form-control-sm mb-2">
+
+      <label class="small text-muted">Due date:</label>
+      <input type="date" name="dueDate" class="form-control form-control-sm mb-3">
+
+      <button type="submit" class="btn btn-primary btn-sm w-100">
+        Borrow
+      </button>
+    </form>
+
+  </div>
+</div>
 `
     );
   }
 
-  return `
-  <div class="col-12 col-sm-6 col-lg-4">
-    <div class="bookCard" data-book-id="${b.id}">
-      <div class="bookHead">
-        <strong class="bookTitle">${title}</strong>
-        ${badge}
-      </div>
-      <div class="bookMeta">${metaLines}</div>
-      
+  return  `
+<div class="col-12 col-sm-6 col-lg-4">
+  <div class="card h-100 border shadow-sm rounded-3 p-3" data-book-id="${b.id}">
+    
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <strong class="fw-semibold">${title}</strong>
+      ${badge}
     </div>
+
+    <div class="text-muted small mb-2">
+      ${metaLines}
+    </div>
+
   </div>
+</div>
 `;
 }
 

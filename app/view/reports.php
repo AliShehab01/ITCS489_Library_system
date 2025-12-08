@@ -1,332 +1,359 @@
 <?php
-// Reporting & Tracking page for Admins
-
 session_start();
 
-// Only allow admins
+// فقط الأدمن
 require_once __DIR__ . '/../controller/checkifadmin.php';
-require_once __DIR__ . '/../../config.php';
 
-// DB connection
+// الاتصال بقاعدة البيانات (PDO)
 require_once __DIR__ . '/../models/dbconnect.php';
 $db  = new Database();
-$pdo = $db->getPdo(); // PDO instance
+$pdo = $db->getPdo();
 
+// --------- 1) Summary cards ---------
+$totalBooks = (int)$pdo->query("SELECT COUNT(*) FROM books")->fetchColumn();
+$totalUsers = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 
+$activeBorrows = (int)$pdo->query("
+    SELECT COUNT(*) 
+    FROM borrows 
+    WHERE isReturned = 'false'
+")->fetchColumn();
 
-// ---------- 1) SUMMARY COUNTS ----------
-
-// Total borrows (all time)
-$stmt = $pdo->query("SELECT COUNT(*) FROM borrows");
-$totalBorrowed = (int)$stmt->fetchColumn();
-
-// Total returned (isReturned = 'true')
-$stmt = $pdo->query("SELECT COUNT(*) FROM borrows WHERE isReturned = 'true'");
-$totalReturned = (int)$stmt->fetchColumn();
-
-// Overdue now: not returned AND dueDate < today
-$stmt = $pdo->query("
+$overdueBorrows = (int)$pdo->query("
     SELECT COUNT(*) 
     FROM borrows 
     WHERE isReturned = 'false'
       AND dueDate < CURDATE()
-");
-$totalOverdue = (int)$stmt->fetchColumn();
+")->fetchColumn();
 
-// Active reservations
-$stmt = $pdo->query("
+$activeReservations = (int)$pdo->query("
     SELECT COUNT(*) 
     FROM reservations 
-    WHERE status = 'active'
-");
-$totalReserved = (int)$stmt->fetchColumn();
+    WHERE status IN ('active','notified')
+")->fetchColumn();
 
-
-// ---------- 2) MOST BORROWED BOOKS ----------
-
-$sqlPopularBooks = "
-    SELECT b.id, b.title, COUNT(*) AS borrow_count
+// --------- 2) Top borrowed books (أفضل الكتب استعارة) ---------
+$sqlTopBooks = "
+    SELECT 
+        b.id,
+        b.title,
+        b.author,
+        COUNT(*) AS borrow_count
     FROM borrows br
-    JOIN books b ON br.bookId = b.id
-    GROUP BY b.id, b.title
+    JOIN books b ON b.id = br.bookId
+    GROUP BY br.bookId
     ORDER BY borrow_count DESC
-    LIMIT 10
+    LIMIT 5
 ";
-$popularBooks = $pdo->query($sqlPopularBooks)->fetchAll(PDO::FETCH_ASSOC);
+$topBooks = $pdo->query($sqlTopBooks)->fetchAll(PDO::FETCH_ASSOC);
 
-
-// ---------- 3) TOP ACTIVE USERS (USER STATISTICS) ----------
-
-$sqlTopUsers = "
-    SELECT u.id, u.firstName, u.lastName, COUNT(*) AS borrow_count
-    FROM borrows br
-    JOIN users u ON br.user_id = u.id
-    GROUP BY u.id, u.firstName, u.lastName
-    ORDER BY borrow_count DESC
-    LIMIT 10
+// --------- 3) Borrows per category (إحصاء على مستوى التصنيف) ---------
+$sqlPerCategory = "
+    SELECT 
+        b.category,
+        COUNT(br.borrow_id) AS borrow_count
+    FROM books b
+    LEFT JOIN borrows br ON br.bookId = b.id
+    GROUP BY b.category
+    ORDER BY b.category
 ";
-$topUsers = $pdo->query($sqlTopUsers)->fetchAll(PDO::FETCH_ASSOC);
+$perCategory = $pdo->query($sqlPerCategory)->fetchAll(PDO::FETCH_ASSOC);
 
+// --------- 4) User borrowing history (حسب المستخدم) ---------
+$selectedUserId = isset($_GET['user']) ? (int)$_GET['user'] : 0;
 
-// ---------- 4) SIMPLE FINES ESTIMATE ----------
-
-$sqlOutstandingFines = "
-    SELECT SUM(price) 
-    FROM borrows
-    WHERE isReturned = 'false'
-      AND dueDate < CURDATE()
-";
-$outstandingFines = (float)$pdo->query($sqlOutstandingFines)->fetchColumn();
-$outstandingFines = $outstandingFines ?: 0.0;
-
-
-// ---------- 5) USER BORROWING HISTORY ----------
-
-$selectedUserId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
-
-// Get list of users for dropdown
+// قائمة المستخدمين للـ dropdown
 $usersStmt = $pdo->query("SELECT id, firstName, lastName FROM users ORDER BY firstName");
 $usersList = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 
 $userHistory = [];
 if ($selectedUserId > 0) {
     $sqlHistory = "
-        SELECT br.borrow_id, br.bookId, br.dueDate, br.isReturned, br.price,
-               b.title
+        SELECT 
+            br.borrow_id,
+            br.bookId,
+            br.dueDate,
+            br.isReturned,
+            br.price,
+            b.title
         FROM borrows br
         JOIN books b ON br.bookId = b.id
         WHERE br.user_id = :uid
         ORDER BY br.borrow_id DESC
+        LIMIT 50
     ";
-    $stmtHist = $pdo->prepare($sqlHistory);
-    $stmtHist->execute([':uid' => $selectedUserId]);
-    $userHistory = $stmtHist->fetchAll(PDO::FETCH_ASSOC);
+    $stmtHistory = $pdo->prepare($sqlHistory);
+    $stmtHistory->execute([':uid' => $selectedUserId]);
+    $userHistory = $stmtHistory->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Helper بسيط لعرض اسم المستخدم في التاريخ
+function formatUserName($row) {
+    $first = $row['firstName'] ?? '';
+    $last  = $row['lastName'] ?? '';
+    $full  = trim("$first $last");
+    return $full !== '' ? $full : 'User #' . ($row['id'] ?? '');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Reports & Tracking</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+    <title>Reports &amp; Analytics – Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
-    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
 <body>
 
-    <?php include 'navbar.php'; ?>
+<?php include __DIR__ . '/navbar.php'; ?>
 
-    <main class="page-shell">
+<main class="site-content">
 
-        <section class="page-hero mb-4">
-            <div class="row align-items-center g-3">
-                <div class="col-lg-8">
-                    <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
-                    <h1 class="display-6 mb-1">Reports &amp; Tracking</h1>
-                    <p class="text-muted mb-0">Overview of borrowed, returned, overdue and reserved books, user statistics, fines and history.</p>
-                </div>
-                <div class="col-lg-4 text-lg-end">
-                    <span class="badge bg-light text-dark border me-2">Borrowed: <?= $totalBorrowed ?></span>
-                    <span class="badge bg-warning text-dark">Overdue: <?= $totalOverdue ?></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 1) SUMMARY CARDS -->
-        <div class="row my-4 g-3">
-            <div class="col-6 col-md-3">
-                <div class="card text-center shadow-custom h-100">
-                    <div class="card-header">Borrowed (all time)</div>
-                    <div class="card-body">
-                        <h3 class="mb-0"><?php echo $totalBorrowed; ?></h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <div class="card text-center shadow-custom h-100">
-                    <div class="card-header">Returned</div>
-                    <div class="card-body">
-                        <h3 class="mb-0"><?php echo $totalReturned; ?></h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <div class="card text-center shadow-custom h-100">
-                    <div class="card-header">Overdue now</div>
-                    <div class="card-body text-danger">
-                        <h3 class="mb-0"><?php echo $totalOverdue; ?></h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-md-3">
-                <div class="card text-center shadow-custom h-100">
-                    <div class="card-header">Active Reservations</div>
-                    <div class="card-body">
-                        <h3 class="mb-0"><?php echo $totalReserved; ?></h3>
-                    </div>
-                </div>
-            </div>
+    <!-- Header -->
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <h1 class="h4 mb-1">Reports &amp; Analytics</h1>
+            <p class="text-muted mb-0">
+                Overview of library usage, borrowing activity, and user history.
+            </p>
         </div>
+    </section>
 
-        <!-- 2) MOST BORROWED BOOKS -->
-        <section class="card shadow-custom mb-4">
-            <div class="card-body">
-                <div class="section-title mb-3">
-                    <span class="pill">&#128214;</span>
-                    <span>Most Borrowed Books</span>
+    <section class="py-4">
+        <div class="container my-2">
+            <div class="admin-wrapper mx-auto">
+
+                <!-- Summary cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body py-3">
+                                <div class="text-muted small mb-1">Total books</div>
+                                <div class="h5 mb-0"><?= $totalBooks; ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body py-3">
+                                <div class="text-muted small mb-1">Total users</div>
+                                <div class="h5 mb-0"><?= $totalUsers; ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-lg-2">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body py-3">
+                                <div class="text-muted small mb-1">Active borrows</div>
+                                <div class="h5 mb-0"><?= $activeBorrows; ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body py-3">
+                                <div class="text-muted small mb-1">Overdue borrows</div>
+                                <div class="h5 mb-0 text-danger"><?= $overdueBorrows; ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-4 col-lg-3">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body py-3">
+                                <div class="text-muted small mb-1">Active reservations</div>
+                                <div class="h5 mb-0"><?= $activeReservations; ?></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <?php if (count($popularBooks) === 0): ?>
-                    <p class="text-muted">No borrowing data yet.</p>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Book ID</th>
-                                    <th>Title</th>
-                                    <th>Times Borrowed</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($popularBooks as $row): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($row['id']); ?></td>
-                                        <td><?php echo htmlspecialchars($row['title']); ?></td>
-                                        <td><?php echo (int)$row['borrow_count']; ?></td>
-                                    </tr>
+
+                <!-- Top books + per category -->
+                <div class="row g-4 mb-4">
+                    <!-- Top borrowed books -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Top borrowed books</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <?php if (empty($topBooks)): ?>
+                                    <div class="p-3 text-muted small">
+                                        No borrowing data available yet.
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Author</th>
+                                                <th style="width: 120px;">Borrows</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($topBooks as $row): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($row['title']); ?></td>
+                                                    <td class="small text-muted">
+                                                        <?= htmlspecialchars($row['author']); ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-primary-subtle text-primary">
+                                                            <?= (int)$row['borrow_count']; ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrows per category -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Borrowing by category</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <?php if (empty($perCategory)): ?>
+                                    <div class="p-3 text-muted small">
+                                        No category data available.
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Category</th>
+                                                <th style="width: 140px;">Borrows</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($perCategory as $row): ?>
+                                                <tr>
+                                                    <td><?= htmlspecialchars($row['category'] ?? '—'); ?></td>
+                                                    <td>
+                                                        <span class="badge bg-secondary-subtle text-secondary">
+                                                            <?= (int)$row['borrow_count']; ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User borrowing history -->
+                <div class="card shadow-custom">
+                    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div>
+                            <h2 class="h6 mb-0">User borrowing history</h2>
+                            <small class="text-muted">
+                                Select a user to view recent borrows.
+                            </small>
+                        </div>
+
+                        <form method="get" class="d-flex align-items-center gap-2">
+                            <label for="user" class="small text-muted mb-0">User:</label>
+                            <select name="user" id="user" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="0">All / none selected</option>
+                                <?php foreach ($usersList as $u): ?>
+                                    <?php $uid = (int)$u['id']; ?>
+                                    <option value="<?= $uid; ?>" <?= $uid === $selectedUserId ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars(formatUserName($u)); ?>
+                                    </option>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                            </select>
+                        </form>
                     </div>
-                <?php endif; ?>
-            </div>
-        </section>
 
-        <!-- 3) TOP ACTIVE BORROWERS -->
-        <section class="card shadow-custom mb-4">
-            <div class="card-body">
-                <div class="section-title mb-3">
-                    <span class="pill">&#128101;</span>
-                    <span>Top Active Borrowers</span>
-                </div>
-                <?php if (count($topUsers) === 0): ?>
-                    <p class="text-muted">No borrowing data yet.</p>
-                <?php else: ?>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-sm align-middle">
-                            <thead>
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Name</th>
-                                    <th>Total Borrows</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($topUsers as $u): ?>
+                    <div class="card-body p-0">
+                        <?php if ($selectedUserId <= 0): ?>
+                            <div class="p-3 text-muted small">
+                                Select a user from the dropdown above to view their recent borrowing history.
+                            </div>
+                        <?php elseif (empty($userHistory)): ?>
+                            <div class="p-3 text-muted small">
+                                No borrowing history found for this user.
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
                                     <tr>
-                                        <td><?php echo (int)$u['id']; ?></td>
-                                        <td><?php echo htmlspecialchars($u['firstName'] . ' ' . $u['lastName']); ?></td>
-                                        <td><?php echo (int)$u['borrow_count']; ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </section>
-
-        <!-- 4) FINES SUMMARY (ESTIMATED) -->
-        <section class="card border-danger shadow-custom mb-4">
-            <div class="card-body">
-                <div class="section-title mb-2">
-                    <span class="pill">!</span>
-                    <span>Fines (Estimated)</span>
-                </div>
-                <p class="text-muted">
-                    This estimate uses the <code>price</code> field of overdue and not-yet-returned borrows.
-                    If your group later adds dedicated fine columns, this section can be updated.
-                </p>
-                <div class="fw-bold text-danger fs-5">
-                    Outstanding estimated fines: <?php echo number_format($outstandingFines, 2); ?>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5) USER BORROWING HISTORY -->
-        <section class="card shadow-custom">
-            <div class="card-body">
-                <div class="section-title mb-3">
-                    <span class="pill">&#128197;</span>
-                    <span>User Borrowing History</span>
-                </div>
-                <form method="get" class="row g-2 mb-3">
-                    <div class="col-md-6">
-                        <select name="user_id" class="form-select" required>
-                            <option value="">Select a user</option>
-                            <?php foreach ($usersList as $u): ?>
-                                <option value="<?php echo $u['id']; ?>"
-                                    <?php echo ($selectedUserId === (int)$u['id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($u['firstName'] . ' ' . $u['lastName']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100">View History</button>
-                    </div>
-                </form>
-
-                <?php if ($selectedUserId > 0): ?>
-                    <?php if (count($userHistory) === 0): ?>
-                        <p class="text-muted">No borrowing records found for this user.</p>
-                    <?php else: ?>
-                        <div class="table-responsive">
-                            <table class="table table-striped table-sm align-middle mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Borrow ID</th>
+                                        <th>Borrow #</th>
                                         <th>Book</th>
-                                        <th>Due Date</th>
-                                        <th>Returned?</th>
+                                        <th>Due date</th>
+                                        <th>Status</th>
                                         <th>Price</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($userHistory as $row): ?>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($userHistory as $h): ?>
+                                        <?php
+                                        $isReturned = ($h['isReturned'] ?? '') === 'true';
+                                        $statusLabel = $isReturned ? 'Returned' : 'Active';
+                                        $statusClass = $isReturned ? 'bg-success' : 'bg-warning text-dark';
+                                        ?>
                                         <tr>
-                                            <td><?php echo (int)$row['borrow_id']; ?></td>
-                                            <td><?php echo htmlspecialchars($row['title']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['dueDate']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['isReturned']); ?></td>
-                                            <td><?php echo number_format((float)$row['price'], 2); ?></td>
+                                            <td>#<?= htmlspecialchars($h['borrow_id']); ?></td>
+                                            <td><?= htmlspecialchars($h['title']); ?></td>
+                                            <td class="small">
+                                                <?= htmlspecialchars($h['dueDate'] ?? '—'); ?>
+                                            </td>
+                                            <td>
+                                                <span class="badge <?= $statusClass; ?>">
+                                                    <?= $statusLabel; ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php if (isset($h['price'])): ?>
+                                                    <span class="small">
+                                                        <?= number_format((float)$h['price'], 2); ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="small text-muted">—</span>
+                                                <?php endif; ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </section>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-    </main>
+            </div><!-- /.admin-wrapper -->
+        </div>
+    </section>
 
-    <footer class="app-footer text-center">
-        <small>&copy; 2025 Library System. All rights reserved.</small>
-    </footer>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<footer class="py-3 mt-4 bg-dark text-white">
+    <div class="container text-center small">
+        © 2025 Library System. All rights reserved.
+    </div>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

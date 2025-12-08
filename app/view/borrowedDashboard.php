@@ -1,135 +1,304 @@
 <?php
 session_start();
-
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
-require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
-$userid = $_SESSION['user_id'] ?? null;
-
-if (!$userid) {
-    echo "User not logged in.";
+// تأكد أن المستخدم مسجل دخول
+if (!isset($_SESSION['user_id'])) {
+    $loginUrl = (defined('BASE_URL') ? BASE_URL : '/') . 'app/view/login.php';
+    header('Location: ' . $loginUrl);
     exit;
 }
 
-// Prepare the PDO statement
-$db = new Database();
+$userId   = (int)$_SESSION['user_id'];
+$username = $_SESSION['username'] ?? '';
+
+$db   = new Database();
 $conn = $db->conn;
-$stmt = $conn->prepare('SELECT * FROM borrows WHERE user_id = :userid');
-$stmt->bindParam(':userid', $userid, PDO::PARAM_INT);
-$stmt->execute();
 
-$borrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$borrowCount = count($borrows);
+// --------------------
+// جلب البيانات من قاعدة البيانات
+// --------------------
+date_default_timezone_set('Asia/Bahrain');
+$today = date('Y-m-d');
 
+// Current borrows (لم تُرجع بعد)
+$sqlCurrent = "
+    SELECT
+        b.borrow_id,
+        b.bookId,
+        b.dueDate,
+        b.isReturned,
+        bk.title,
+        bk.author
+    FROM borrows b
+    JOIN books bk ON bk.id = b.bookId
+    WHERE b.user_id = :uid
+      AND b.isReturned = 'false'
+    ORDER BY b.dueDate ASC
+";
+$stmt = $conn->prepare($sqlCurrent);
+$stmt->execute([':uid' => $userId]);
+$currentBorrows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// History (كتب أُرجعت)
+$sqlHistory = "
+    SELECT
+        b.borrow_id,
+        b.bookId,
+        b.dueDate,
+        b.isReturned,
+        bk.title,
+        bk.author
+    FROM borrows b
+    JOIN books bk ON bk.id = b.bookId
+    WHERE b.user_id = :uid
+      AND b.isReturned = 'true'
+    ORDER BY b.dueDate DESC
+    LIMIT 20
+";
+$stmtH = $conn->prepare($sqlHistory);
+$stmtH->execute([':uid' => $userId]);
+$historyBorrows = $stmtH->fetchAll(PDO::FETCH_ASSOC);
+
+// تقسيم current إلى overdue و active
+$activeNow  = [];
+$overdueNow = [];
+
+foreach ($currentBorrows as $row) {
+    $due = $row['dueDate'] ?? null;
+    if ($due && $due < $today) {
+        $overdueNow[] = $row;
+    } else {
+        $activeNow[] = $row;
+    }
+}
+
+$activeCount   = count($activeNow);
+$overdueCount  = count($overdueNow);
+$historyCount  = count($historyBorrows);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrowed Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <title>My Borrowed Items – Library</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
-    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
 </head>
 
 <body>
 
-    <?php include __DIR__ . '/navbar.php'; ?>
+<?php include __DIR__ . '/navbar.php'; ?>
 
-    <main class="page-shell">
-        <section class="page-hero mb-4">
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-                <div>
-                    <p class="text-uppercase text-muted fw-semibold mb-2">My library</p>
-                    <h1 class="display-6 mb-1">Borrowed items</h1>
-                    <p class="text-muted mb-0">Review due dates, renew eligible titles, and return books in one place.</p>
-                </div>
-                <div class="text-end">
-                    <span class="badge bg-primary-subtle text-dark border">Total items: <?= (int)$borrowCount ?></span>
-                </div>
-            </div>
-        </section>
+<main class="site-content">
 
-        <div class="section-title">
-            <span class="pill">&#128218;</span>
-            <span>Your borrowed items</span>
+    <!-- Header -->
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <h1 class="h4 mb-1">My borrowed items</h1>
+            <p class="text-muted mb-0">
+                Track due dates, overdue items, and your borrowing history.
+            </p>
         </div>
+    </section>
 
-        <?php if (empty($borrows)): ?>
-            <div class="alert alert-secondary">You have no borrowed items right now.</div>
-        <?php else: ?>
-            <div class="row g-3">
-                <?php foreach ($borrows as $row): ?>
-                    <?php
-                        $currentDate = strtotime(date("Y-m-d"));
-                        $dueDate = strtotime($row["dueDate"]);
-                        $datediff = round(($currentDate - $dueDate) / (60 * 60 * 24));
+    <section class="py-4">
+        <div class="container my-2">
+            <div class="admin-wrapper mx-auto">
 
-                        $fines = 0;
-                        if ($datediff > 0) {
-                            $fines = $datediff * $row["quantity"];
-                        }
-
-                        $totalPrice = $row['price'] + $fines;
-                    ?>
-                    <div class="col-12 col-lg-6">
+                <!-- Summary cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-md-4">
                         <div class="card shadow-custom h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h5 class="card-title mb-1">Borrow ID: <?= htmlspecialchars($row['borrow_id']) ?></h5>
-                                        <p class="card-text mb-0 text-muted">Book ID: <?= htmlspecialchars($row['bookId']) ?></p>
-                                    </div>
-                                    <?php if ($row["isReturned"] === "false"): ?>
-                                        <span class="badge bg-warning text-dark">Issued</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-success">Returned</span>
-                                    <?php endif; ?>
-                                </div>
+                                <div class="text-muted small mb-1">Currently borrowed</div>
+                                <div class="h4 mb-0"><?= (int)$activeCount; ?></div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="row g-2 text-muted">
-                                    <div class="col-6"><small>Copies</small><div class="fw-semibold text-dark"><?= htmlspecialchars($row['quantity']) ?></div></div>
-                                    <div class="col-6"><small>Price</small><div class="fw-semibold text-dark"><?= htmlspecialchars($row['price']) ?> BD</div></div>
-                                    <div class="col-6"><small>Fines</small><div class="fw-semibold text-dark"><?= $fines ?> BD</div></div>
-                                    <div class="col-6"><small>Total</small><div class="fw-semibold text-dark"><?= $totalPrice ?> BD</div></div>
-                                </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body">
+                                <div class="text-muted small mb-1">Overdue</div>
+                                <div class="h4 mb-0 text-danger"><?= (int)$overdueCount; ?></div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <?php if ($row["isReturned"] === "false"): ?>
-                                    <div class="mt-3">
-                                        <small class="text-muted d-block mb-1">Due date: <?= htmlspecialchars($row['dueDate']) ?></small>
-                                        <form action="bookReturnAndRenew.php" method="post" class="row g-2 align-items-end">
-                                            <input type="hidden" name="borrow_id" value="<?= htmlspecialchars($row['borrow_id']) ?>">
-                                            <input type="hidden" name="book_id" value="<?= htmlspecialchars($row['bookId']) ?>">
-                                            <div class="col-sm-7">
-                                                <label for="newDueDate-<?= htmlspecialchars($row['borrow_id']) ?>" class="form-label">New due date</label>
-                                                <input type="date" class="form-control" id="newDueDate-<?= htmlspecialchars($row['borrow_id']) ?>" name="newDueDate">
-                                            </div>
-                                            <div class="col-sm-5 d-flex gap-2">
-                                                <button type="submit" name="RenewReturnAction" value="Renew" class="btn btn-outline-primary w-100">Renew</button>
-                                                <button type="submit" name="RenewReturnAction" value="Return book" class="btn btn-primary w-100">Return</button>
-                                            </div>
-                                        </form>
+                    <div class="col-12 col-md-4">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-body">
+                                <div class="text-muted small mb-1">History records</div>
+                                <div class="h4 mb-0"><?= (int)$historyCount; ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active + Overdue -->
+                <div class="row g-4 mb-4">
+                    <!-- Active -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Currently borrowed</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <?php if (empty($activeNow)): ?>
+                                    <div class="p-3 text-muted small">
+                                        You have no currently borrowed items.
                                     </div>
                                 <?php else: ?>
-                                    <div class="mt-3 text-success fw-semibold">Borrow status: Returned</div>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Due date</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($activeNow as $b): ?>
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-semibold">
+                                                            <?= htmlspecialchars($b['title']); ?>
+                                                        </div>
+                                                        <?php if (!empty($b['author'])): ?>
+                                                            <div class="small text-muted">
+                                                                <?= htmlspecialchars($b['author']); ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="small">
+                                                            <?= htmlspecialchars($b['dueDate'] ?? '—'); ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 <?php endif; ?>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </main>
 
-    <footer class="app-footer text-center">
-        <small>&copy; 2025 Library System. All rights reserved.</small>
-    </footer>
+                    <!-- Overdue -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Overdue items</h2>
+                            </div>
+                            <div class="card-body p-0">
+                                <?php if (empty($overdueNow)): ?>
+                                    <div class="p-3 text-muted small">
+                                        You have no overdue items. Great job keeping up!
+                                    </div>
+                                <?php else: ?>
+                                    <div class="table-responsive">
+                                        <table class="table align-middle mb-0">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Due date</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <?php foreach ($overdueNow as $b): ?>
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-semibold">
+                                                            <?= htmlspecialchars($b['title']); ?>
+                                                        </div>
+                                                        <?php if (!empty($b['author'])): ?>
+                                                            <div class="small text-muted">
+                                                                <?= htmlspecialchars($b['author']); ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                    <td>
+                                                        <span class="small text-danger fw-semibold">
+                                                            <?= htmlspecialchars($b['dueDate'] ?? '—'); ?>
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <!-- History -->
+                <div class="card shadow-custom">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="h6 mb-0">Borrowing history</h2>
+                            <small class="text-muted">Most recent 20 records</small>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <?php if (empty($historyBorrows)): ?>
+                            <div class="p-3 text-muted small">
+                                No past borrowing history yet.
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Due date</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($historyBorrows as $b): ?>
+                                        <tr>
+                                            <td>
+                                                <div class="fw-semibold">
+                                                    <?= htmlspecialchars($b['title']); ?>
+                                                </div>
+                                                <?php if (!empty($b['author'])): ?>
+                                                    <div class="small text-muted">
+                                                        <?= htmlspecialchars($b['author']); ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <span class="small">
+                                                    <?= htmlspecialchars($b['dueDate'] ?? '—'); ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div><!-- /.admin-wrapper -->
+        </div>
+    </section>
+</main>
+
+<footer class="py-3 mt-4 bg-dark text-white">
+    <div class="container text-center small">
+        © 2025 Library System. All rights reserved.
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>

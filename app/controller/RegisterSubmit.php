@@ -7,12 +7,12 @@ require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
 $username = trim($_POST["username"]);
 $password = trim($_POST["password"]);
-$first_name = trim($_POST["first_name"]);
-$last_name = trim($_POST["last_name"]);
+$firstName = trim($_POST["firstName"]);
+$lastName = trim($_POST["lastName"]);
 $email = trim($_POST["email"]);
-$phone_number = trim($_POST["phone_number"]);
+$phoneNumber = trim($_POST["phoneNumber"] ?? '');
 
-if (empty($username) || empty($password) || empty($first_name) || empty($last_name)) {
+if (empty($username) || empty($password) || empty($firstName) || empty($lastName)) {
     echo "Please fill all the required fields";
     exit;
 }
@@ -38,13 +38,14 @@ if ($user) {
         ':username' => $username,
         ':password' => $password,
         ':email' => $email,
-        ':firstName' => $first_name,
-        ':lastName' => $last_name,
-        ':phoneNumber' => $phone_number
+        ':firstName' => $firstName,
+        ':lastName' => $lastName,
+        ':phoneNumber' => $phoneNumber
     ]);
 
     $_SESSION['username'] = $username;
-    $_SESSION['first_name'] = $first_name;
+    $_SESSION['firstName'] = $firstName;
+    $_SESSION['lastName'] = $lastName;
     $_SESSION["user_id"] = $conn->lastInsertId(); // get the new user's ID
     $_SESSION["BorrowLimit"] = 3;
 

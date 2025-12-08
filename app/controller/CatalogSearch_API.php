@@ -9,24 +9,24 @@ header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 
-$db = new Database();
-$conn = $db->conn;
-
-if ($conn->connect_errno) {
-  // clear any buffered output
+// Establish PDO connection (dbconnect.php returns PDO)
+try {
+  $db   = new Database();
+  $conn = $db->conn; // PDO instance
+  $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+  $conn->exec("SET NAMES utf8mb4");
+} catch (Throwable $e) {
   ob_end_clean();
   http_response_code(500);
-  echo json_encode(["status" => "error", "message" => "DB connect failed: " . $conn->connect_error]);
+  echo json_encode(["status" => "error", "message" => "DB connect failed: " . $e->getMessage()]);
   exit;
 }
-
-$conn->set_charset('utf8mb4');
 
 // Serve GET requests
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   // First check if publication_year column exists
   $checkColumn = $conn->query("SHOW COLUMNS FROM books LIKE 'publication_year'");
-  $hasPublicationYear = $checkColumn && $checkColumn->num_rows > 0;
+  $hasPublicationYear = $checkColumn && $checkColumn->rowCount() > 0;
 
   // Build query based on available columns
   $columns = "id, image_path, title, author, isbn, category, status, quantity, publisher";
@@ -38,17 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
   $columns .= ", created_at";
   
   $q = "SELECT $columns FROM books";
-  $r = $conn->query($q);
-
-  if (!$r) {
+  try {
+    $stmt = $conn->query($q);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  } catch (PDOException $e) {
     ob_end_clean();
     http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "Query failed: " . $conn->error]);
+    echo json_encode(["status" => "error", "message" => "Query failed: " . $e->getMessage()]);
     exit;
   }
 
   $out = [];
-  while ($row = $r->fetch_assoc()) {
+  foreach ($rows as $row) {
     // support both publication_year and year column names if present
     $pubYear = null;
     if (array_key_exists('publication_year', $row) && $row['publication_year'] !== null) {

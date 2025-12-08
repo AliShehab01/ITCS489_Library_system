@@ -1,333 +1,426 @@
 <?php
+session_start();
 
 /*
-  This file need to divided to controller and view parts which is how mvc do
-
+  Book management page (Admin/Staff)
+  Uses BookApi.php and changestatus.php for backend operations.
 */
 
-require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
-$db = new Database();
-$conn = $db->conn; // $conn is your PDO object
+$db   = new Database();
+$conn = $db->conn;
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
+// نفس التحقق القديم (مستخدم مسجل دخول)
 if (!isset($_SESSION['username'])) {
-    header('Location: ' . BASE_URL . 'app/view/login.php');
+    header("Location: ../../public.php");
     exit;
 }
 
-$stmt = $conn->query("SELECT * FROM books");
+// جلب جميع الكتب لعرضها في الجدول
+$stmt  = $conn->query("
+    SELECT id, image_path, title, author, isbn, category, publisher, year, quantity, status, created_at
+    FROM books
+    ORDER BY created_at DESC
+");
 $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>Add New Book</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Books – Admin</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
-    <?php if (!defined('STYLE_LOADED')) { define('STYLE_LOADED', true); } ?>
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-    </script>
 </head>
 
 <body>
-    <?php include __DIR__ . '/navbar.php'; ?>
 
-    <main class="page-shell">
-        <section class="page-hero mb-4">
-            <div class="row align-items-center g-3">
-                <div class="col-lg-8">
-                    <p class="text-uppercase text-muted fw-semibold mb-2">Admin</p>
-                    <h1 class="display-6 mb-1">Book Management</h1>
-                    <p class="text-muted mb-0">Add, update, or adjust inventory with the same layout used throughout the app.</p>
-                </div>
-                <div class="col-lg-4 text-lg-end">
-                    <a href="<?= BASE_URL ?>app/view/AdminArea.php" class="btn btn-outline-primary">Back to admin</a>
-                </div>
-            </div>
-        </section>
+<?php include __DIR__ . '/navbar.php'; ?>
 
-        <div class="row g-4">
-            <div class="col-lg-6">
-                <div class="form-shell h-100">
-                    <h2 class="h5 mb-3">Add New Book</h2>
+<main class="site-content">
 
-                    <form id="bookForm" method="post" class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Title:</label>
-                            <input type="text" name="title" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Author:</label>
-                            <input type="text" name="author" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">ISBN:</label>
-                            <input type="text" name="isbn" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Category:</label>
-                            <select name="category" id="" class="form-select">
-                                <option value="Science">Science</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="History">History</option>
-                                <option value="Literature">Literature</option>
-                                <option value="Business">Business</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Publisher:</label>
-                            <input type="text" name="publisher" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Year:</label>
-                            <input type="number" name="year" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Available Quantity:</label>
-                            <input type="number" name="quantity" class="form-control">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Book Cover:</label>
-                            <input type="file" name="image" accept="image/*" class="form-control">
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Add Book</button>
-                        </div>
-                    </form>
-
-                    <p id="message" class="mt-3 mb-0"></p>
-                </div>
-            </div>
-
-            <div class="col-lg-6">
-                <div class="form-shell h-100">
-                    <h2 class="h5 mb-3">Update Book</h2>
-
-                    <form id="updateBookForm" method="post" class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">ISBN (Book to update):</label>
-                            <input type="text" name="isbn" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">New Title:</label>
-                            <input type="text" name="title" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">New Author:</label>
-                            <input type="text" name="author" class="form-control" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">New Category:</label>
-                            <input type="text" name="category" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">New Publisher:</label>
-                            <input type="text" name="publisher" class="form-control">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">New Year:</label>
-                            <input type="number" name="year" class="form-control">
-                        </div>
-
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-success">Update Book</button>
-                        </div>
-                    </form>
-
-                    <p id="updateMessage" class="mt-3 mb-0"></p>
-                </div>
-            </div>
+    <!-- Header -->
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <h1 class="h4 mb-1">Manage books</h1>
+            <p class="text-muted mb-0">
+                Add new books, update details, change status, and remove books from the catalog.
+            </p>
         </div>
+    </section>
 
-        <div class="card shadow-custom mt-4">
-            <div class="card-body">
-                <h2 class="h5 mb-3">Remove Book by ISBN</h2>
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-6">
-                        <form>
-                            <label class="form-label">ISBN of book:</label>
-                            <input type="number" name="isbntodel" id="isbnToDelete" class="form-control">
-                        </form>
-                    </div>
-                    <div class="col-md-3 d-grid">
-                        <button id="deleteBtn" class="btn btn-danger mt-md-2">Delete Book</button>
-                    </div>
-                </div>
-                <p id="delRes" class="mt-3 mb-0"></p>
-            </div>
-        </div>
+    <section class="py-4">
+        <div class="container my-2">
+            <div class="admin-wrapper mx-auto">
 
-        <div class="form-shell mt-4">
-            <form method="POST" class="row g-3">
-                <h2 class="h5">Change Status of a Book by ISBN</h2>
+                <!-- Forms row -->
+                <div class="row g-4 mb-4">
 
-                <div class="col-md-6">
-                    <label for="isbn" class="form-label">ISBN:</label>
-                    <input type="text" id="isbn" name="isbn" class="form-control" placeholder="Enter ISBN" required>
-                </div>
+                    <!-- Add new book -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Add new book</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="bookForm" method="post" enctype="multipart/form-data" class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Title</label>
+                                        <input type="text" name="title" class="form-control" required>
+                                    </div>
 
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Author</label>
+                                        <input type="text" name="author" class="form-control" required>
+                                    </div>
 
-                <div class="col-md-6">
-                    <label for="options" class="form-label">Status:</label>
-                    <select id="options" name="status" class="form-select" required>
-                        <option value="">--Select an option--</option>
-                        <option value="available">Available</option>
-                        <option value="unavailable">Unavailable</option>
-                    </select>
-                </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">ISBN</label>
+                                        <input type="text" name="isbn" class="form-control" required>
+                                    </div>
 
-                <!-- Submit Button -->
-                <div class="col-12">
-                    <button type="submit" id="b1" class="btn btn-primary">Submit</button>
-                    <p id="status_res" class="mt-3 mb-0"></p>
-                </div>
-            </form>
-        </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Category</label>
+                                        <select name="category" class="form-select">
+                                            <option value="Science">Science</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="History">History</option>
+                                            <option value="Literature">Literature</option>
+                                            <option value="Business">Business</option>
+                                        </select>
+                                    </div>
 
-        <div class="card shadow-custom mt-4">
-            <div class="card-body">
-                <div class="section-title">
-                    <span class="pill">&#128214;</span>
-                    <span>Current catalog</span>
-                </div>
-                <div class="row">
-                    <?php foreach ($books as $book): ?>
-                        <div class="col-md-3 mb-4">
-                            <div class="card h-100">
-                                <img src="<?= $book['image_path'] ?? 'placeholder.jpg' ?>" class="card-img-top"
-                                    alt="<?= htmlspecialchars($book['title']) ?>">
-                                <div class="card-body">
-                                    <h5 class="card-title"><?= htmlspecialchars($book['title']) ?></h5>
-                                    <p class="card-text"><?= htmlspecialchars($book['author']) ?></p>
-                                    <a href="bookDetails.php?id=<?= $book['id'] ?>" class="btn btn-primary btn-sm">View Details</a>
-                                </div>
-                                <!--maybe up a path problem-->
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Publisher</label>
+                                        <input type="text" name="publisher" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Year</label>
+                                        <input type="number" name="year" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Available quantity</label>
+                                        <input type="number" name="quantity" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">Book cover</label>
+                                        <input type="file" name="image" accept="image/*" class="form-control">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary btn-sm">Add book</button>
+                                    </div>
+                                </form>
+
+                                <p id="message" class="mt-2 small"></p>
                             </div>
                         </div>
-                    <?php endforeach; ?>
+                    </div>
+
+                    <!-- Update book -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Update book (by ISBN)</h2>
+                            </div>
+                            <div class="card-body">
+                                <form id="updateBookForm" method="post" class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label small">ISBN (book to update)</label>
+                                        <input type="text" name="isbn" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">New title</label>
+                                        <input type="text" name="title" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">New author</label>
+                                        <input type="text" name="author" class="form-control" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">New category</label>
+                                        <input type="text" name="category" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">New publisher</label>
+                                        <input type="text" name="publisher" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label small">New year</label>
+                                        <input type="number" name="year" class="form-control">
+                                    </div>
+
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-success btn-sm">Update book</button>
+                                    </div>
+                                </form>
+
+                                <p id="updateMessage" class="mt-2 small"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /row -->
+
+                <!-- Status + Delete -->
+                <div class="row g-4 mb-4">
+                    <!-- Change status -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Change book status (by ISBN)</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="isbn" class="form-label small">ISBN</label>
+                                        <input type="text" id="isbn" class="form-control" placeholder="Enter ISBN">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="options" class="form-label small">Status</label>
+                                        <select id="options" class="form-select">
+                                            <option value="">--Select an option--</option>
+                                            <option value="available">Available</option>
+                                            <option value="reserved">Reserved</option>
+                                            <option value="unavailable">Unavailable</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="button" id="b1" class="btn btn-outline-primary btn-sm">
+                                            Update status
+                                        </button>
+                                    </div>
+                                </div>
+                                <p id="status_res" class="mt-2 small"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete book -->
+                    <div class="col-12 col-lg-6">
+                        <div class="card shadow-custom h-100">
+                            <div class="card-header">
+                                <h2 class="h6 mb-0">Remove book (by ISBN)</h2>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label small">ISBN of book</label>
+                                    <input type="text" id="isbnToDelete" class="form-control" placeholder="Enter ISBN">
+                                </div>
+                                <button type="button" id="deleteBtn" class="btn btn-danger btn-sm">
+                                    Delete book
+                                </button>
+                                <p id="delRes" class="mt-2 small"></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Books table -->
+                <div class="card shadow-custom">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="h6 mb-0">Books catalog</h2>
+                            <small class="text-muted">All books in the system</small>
+                        </div>
+                        <span class="badge bg-secondary">
+                            Total: <?= $books ? count($books) : 0; ?>
+                        </span>
+                    </div>
+                    <div class="card-body p-0">
+                        <?php if (!$books): ?>
+                            <div class="p-3 text-muted small">
+                                No books found. Use the form above to add the first book.
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table align-middle mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>ISBN</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Qty</th>
+                                        <th>Details</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php foreach ($books as $book): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($book['id']); ?></td>
+                                            <td><?= htmlspecialchars($book['title']); ?></td>
+                                            <td class="small text-muted">
+                                                <?= htmlspecialchars($book['author']); ?>
+                                            </td>
+                                            <td class="small">
+                                                <?= htmlspecialchars($book['isbn']); ?>
+                                            </td>
+                                            <td class="small">
+                                                <?= htmlspecialchars($book['category'] ?? '—'); ?>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary text-capitalize">
+                                                    <?= htmlspecialchars($book['status'] ?? 'available'); ?>
+                                                </span>
+                                            </td>
+                                            <td><?= (int)($book['quantity'] ?? 0); ?></td>
+                                            <td>
+                                                <a href="bookDetails.php?id=<?= urlencode($book['id']); ?>"
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+            </div><!-- /.admin-wrapper -->
         </div>
-    </main>
+    </section>
 
-    <footer class="app-footer text-center">
-        <small>&copy; 2025 Library System. All rights reserved.</small>
-    </footer>
+</main>
 
-    <script>
-        const resmsg = document.getElementById('delRes');
-        document.getElementById('deleteBtn').addEventListener('click', function() {
-            const isbn = document.getElementById('isbnToDelete').value.trim();
-            if (!isbn) {
-                resmsg.textContent = "Please enter an ISBN.";
-                return;
-            }
+<footer class="py-3 mt-4 bg-dark text-white">
+    <div class="container text-center small">
+        © 2025 Library System. All rights reserved.
+    </div>
+</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-            fetch('../controller/deleterecord.php', {
-                method: 'Post',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    isbn: isbn
-                })
-            }).then(res => res.json()).then(data => {
-                resmsg.textContent = data.success || data.error;
-            }).catch(err => {
-                resmsg.textContent = "Error: " + err;
-            });
-        });
-    </script>
+<script>
+// --- Change book status (changestatus.php) ---
+const statusResEl = document.getElementById('status_res');
+const statusBtn   = document.getElementById('b1');
 
+if (statusBtn) {
+    statusBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const isbnVal   = document.getElementById('isbn').value.trim();
+        const statusVal = document.getElementById('options').value;
 
+        if (!isbnVal || !statusVal) {
+            alert('Please enter ISBN and select a status.');
+            return;
+        }
 
-    <script>
-        const res = document.getElementById("status_res");
-
-
-        document.getElementById("b1").addEventListener("click", function(e) {
-            e.preventDefault();
-            const status = document.getElementById("options").value;
-            const isbn = document.getElementById("isbn").value.trim();
-            if (!isbn || !status) {
-                alert("Please fill in all fields");
-            }
-
-            fetch("../controller/changestatus.php", {
-                method: "PUT",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    isbn: isbn,
-                    status: status
-                })
-            }).then(res => res.json()).then(data => {
-                res.textContent = data.message || data.error;
-            }).catch(err => {
-                document.getElementById("status_res").textContent = "Error: " + err;
-            });
-        });
-    </script>
-
-    <script>
-        document.getElementById("updateBookForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-            const formdata = new FormData(this);
-            const book = {}
-
-            formdata.forEach((value, key) => {
-                book[key] = value;
-            });
-
-            fetch("../controller/BookApi.php", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(book)
-            }).then(res => res.json()).then(data => {
-                document.getElementById("updateMessage").textContent = data.message || data.error;
+        fetch('../controller/changestatus.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                isbn: isbnVal,
+                status: statusVal
             })
         })
-    </script>
-
-    <script>
-        document.getElementById("bookForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-
-            fetch("../controller/BookApi.php", {
-                    method: "POST",
-                    body: formData // no headers needed for FormData
-                })
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById("message").textContent = data.message || data.error;
-                });
+        .then(res => res.json())
+        .then(data => {
+            statusResEl.textContent = data.message || data.error || '';
+        })
+        .catch(err => {
+            statusResEl.textContent = 'Error: ' + err;
         });
-    </script>
-</body>
+    });
+}
 
+// --- Delete book (BookApi.php DELETE) ---
+const delBtn   = document.getElementById('deleteBtn');
+const delResEl = document.getElementById('delRes');
+
+if (delBtn) {
+    delBtn.addEventListener('click', function () {
+        const isbnToDel = document.getElementById('isbnToDelete').value.trim();
+        if (!isbnToDel) {
+            alert('Please enter ISBN to delete.');
+            return;
+        }
+
+        fetch('../controller/BookApi.php?isbn=' + encodeURIComponent(isbnToDel), {
+            method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+            delResEl.textContent = data.message || data.error || '';
+        })
+        .catch(err => {
+            delResEl.textContent = 'Error: ' + err;
+        });
+    });
+}
+
+// --- Add book (BookApi.php POST) ---
+const bookForm = document.getElementById('bookForm');
+const addMsgEl = document.getElementById('message');
+
+if (bookForm) {
+    bookForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(bookForm);
+
+        fetch('../controller/BookApi.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            addMsgEl.textContent = data.message || data.error || '';
+        })
+        .catch(err => {
+            addMsgEl.textContent = 'Error: ' + err;
+        });
+    });
+}
+
+// --- Update book (BookApi.php PUT) ---
+const updateForm  = document.getElementById('updateBookForm');
+const updateMsgEl = document.getElementById('updateMessage');
+
+if (updateForm) {
+    updateForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(updateForm);
+        const book     = {};
+
+        formData.forEach((value, key) => {
+            book[key] = value;
+        });
+
+        fetch('../controller/BookApi.php', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(book)
+        })
+        .then(res => res.json())
+        .then(data => {
+            updateMsgEl.textContent = data.message || data.error || '';
+        })
+        .catch(err => {
+            updateMsgEl.textContent = 'Error: ' + err;
+        });
+    });
+}
+</script>
+</body>
 </html>
