@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
 
-include __DIR__ . "/navbar.php";
 if (!isset($_SESSION['username'])) {
     header("Location: " . BASE_URL . "view/login.php");
     exit;
@@ -70,9 +69,32 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
     <title>Library System - Home</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding-top: 56px;
+        }
+
+        .welcome-section {
+            margin-top: 0;
+            padding-top: 1.5rem;
+        }
+
+        /* Remove any default margins from first element */
+        body>section:first-of-type,
+        body>.welcome-section {
+            margin-top: 0 !important;
+        }
+    </style>
 </head>
 
 <body>
+    <?php include __DIR__ . "/navbar.php"; ?>
 
     <!-- Welcome Section -->
     <section class="welcome-section py-4 bg-light">
@@ -190,7 +212,7 @@ if (isset($_SESSION['user_id'])) {
                         <div class="card-body">
                             <h5 class="card-title">📖 Borrowed & Returns</h5>
                             <p class="card-text">
-                                Track due dates, view current loans, and check your borrowing history.
+                                Track due dates, view current loans, return books early, and check your borrowing history.
                             </p>
                             <a class="btn btn-outline-primary btn-sm" href="<?= BASE_URL ?>view/borrowedDashboard.php">View Borrowed</a>
                         </div>

@@ -49,8 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = '<div class="alert alert-danger">Error updating profile.</div>';
     }
 }
-
-include __DIR__ . '/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -61,14 +59,22 @@ include __DIR__ . '/navbar.php';
     <title>Edit Profile</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        html,
         body {
-            padding-top: 80px;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding-top: 56px;
             background: #f8f9fa;
         }
     </style>
 </head>
 
 <body>
+    <?php include __DIR__ . '/navbar.php'; ?>
+
     <div class="container py-4" style="max-width: 600px;">
         <h1 class="mb-4">Edit Profile</h1>
         <?= $message ?>

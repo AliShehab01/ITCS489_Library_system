@@ -673,4 +673,29 @@ INSERT INTO notifications (user_id, book_id, type, title, message, is_read)
 VALUES (NULL, NULL, 'announcement', 'System Announcement 5', 'This is announcement #5.', 0);
 INSERT INTO notifications (user_id, book_id, type, title, message, is_read)
 VALUES (NULL, NULL, 'announcement', 'System Announcement 6', 'This is announcement #6.', 0);
+
+-- === SYSTEM CONFIG (default policies) ===
+INSERT IGNORE INTO system_config (config_key, config_value, description) VALUES
+  ('loan_days_student', '14', 'Default loan duration for Students (days)'),
+  ('loan_days_vipstudent', '30', 'Default loan duration for VIP Students (days)'),
+  ('loan_days_staff', '60', 'Default loan duration for Staff (days)'),
+  ('loan_days_admin', '60', 'Default loan duration for Admin (days)'),
+  ('borrow_limit_student', '3', 'Max books a Student can borrow'),
+  ('borrow_limit_vipstudent', '7', 'Max books a VIP Student can borrow'),
+  ('borrow_limit_staff', '10', 'Max books Staff can borrow'),
+  ('borrow_limit_admin', '10', 'Max books Admin can borrow'),
+  ('fine_rate_per_day', '1.00', 'Fine rate per day for overdue books ($)'),
+  ('max_renewals', '2', 'Maximum number of renewals allowed'),
+  ('reservation_limit', '5', 'Max active reservations per user'),
+  ('reservation_expiry_days', '3', 'Days before a notified reservation expires');
+
+-- === SAMPLE AUDIT LOGS ===
+INSERT INTO audit_logs (user_id, username, action, entity_type, entity_id, details, ip_address) VALUES
+  (1, 'u01', 'LOGIN', 'user', 1, 'User logged in successfully', '127.0.0.1'),
+  (1, 'u01', 'BORROW_BOOK', 'book', 1, 'Borrowed Test Book 01', '127.0.0.1'),
+  (2, 'u02', 'LOGIN', 'user', 2, 'User logged in successfully', '127.0.0.1'),
+  (7, 'u07', 'UPDATE_USER', 'user', 4, 'Changed role from Student to VIPStudent', '127.0.0.1'),
+  (1, 'u01', 'CREATE_BACKUP', 'system', NULL, 'Created system backup', '127.0.0.1'),
+  (7, 'u07', 'UPDATE_POLICIES', 'system_config', NULL, 'Updated 3 policy settings', '127.0.0.1');
+
 COMMIT;

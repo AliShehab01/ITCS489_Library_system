@@ -103,12 +103,40 @@ $createNotificationsTable = "CREATE TABLE IF NOT EXISTS notifications (
     KEY idx_notifications_type (type)
 )";
 
+// SYSTEM CONFIG Table - for borrowing policies
+$createSystemConfigTable = "CREATE TABLE IF NOT EXISTS system_config (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    config_key VARCHAR(100) NOT NULL UNIQUE,
+    config_value TEXT NOT NULL,
+    description VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)";
+
+// AUDIT LOGS Table - for monitoring system activity
+$createAuditLogsTable = "CREATE TABLE IF NOT EXISTS audit_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    username VARCHAR(50),
+    action VARCHAR(100) NOT NULL,
+    entity_type VARCHAR(50),
+    entity_id INT NULL,
+    details TEXT,
+    ip_address VARCHAR(45),
+    user_agent VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_audit_user (user_id),
+    KEY idx_audit_action (action),
+    KEY idx_audit_date (created_at)
+)";
+
 try {
     $conn->exec($createUsersTable);
     $conn->exec($createBorrowsTable);
     $conn->exec($createBooksTable);
     $conn->exec($createReservationsTable);
     $conn->exec($createNotificationsTable);
+    $conn->exec($createSystemConfigTable);
+    $conn->exec($createAuditLogsTable);
 
     // Default users (silent)
     $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
@@ -119,6 +147,27 @@ try {
         VALUES ('vipstudent', 'vipstudent','VIPStudent','VIPStudent',0,'VIPStudent')");
     $conn->exec("INSERT IGNORE INTO users (username,password,firstName,lastName,currentNumOfBorrows,role)
         VALUES ('student', 'student','Student','Student',0,'Student')");
+
+    // Default borrowing policies
+    $defaultPolicies = [
+        ['loan_days_student', '14', 'Default loan duration for Students (days)'],
+        ['loan_days_vipstudent', '30', 'Default loan duration for VIP Students (days)'],
+        ['loan_days_staff', '60', 'Default loan duration for Staff (days)'],
+        ['loan_days_admin', '60', 'Default loan duration for Admin (days)'],
+        ['borrow_limit_student', '3', 'Max books a Student can borrow'],
+        ['borrow_limit_vipstudent', '7', 'Max books a VIP Student can borrow'],
+        ['borrow_limit_staff', '10', 'Max books Staff can borrow'],
+        ['borrow_limit_admin', '10', 'Max books Admin can borrow'],
+        ['fine_rate_per_day', '1.00', 'Fine rate per day for overdue books ($)'],
+        ['max_renewals', '2', 'Maximum number of renewals allowed'],
+        ['reservation_limit', '5', 'Max active reservations per user'],
+        ['reservation_expiry_days', '3', 'Days before a notified reservation expires'],
+    ];
+
+    $stmt = $conn->prepare("INSERT IGNORE INTO system_config (config_key, config_value, description) VALUES (?, ?, ?)");
+    foreach ($defaultPolicies as $policy) {
+        $stmt->execute($policy);
+    }
 } catch (PDOException $e) {
     // swallow errors for page safety
     return;

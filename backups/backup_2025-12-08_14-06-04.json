@@ -1,0 +1,476 @@
+{
+    "created_at": "2025-12-08 14:06:04",
+    "tables": {
+        "users": [
+            {
+                "id": 1,
+                "username": "admin",
+                "password": "admin",
+                "firstName": "Admin",
+                "lastName": "Admin",
+                "email": null,
+                "phoneNumber": null,
+                "currentNumOfBorrows": 0,
+                "role": "Admin"
+            },
+            {
+                "id": 2,
+                "username": "staff",
+                "password": "staff",
+                "firstName": "Staff",
+                "lastName": "Staff",
+                "email": null,
+                "phoneNumber": null,
+                "currentNumOfBorrows": 0,
+                "role": "Staff"
+            },
+            {
+                "id": 3,
+                "username": "vipstudent",
+                "password": "vipstudent",
+                "firstName": "VIPStudent",
+                "lastName": "VIPStudent",
+                "email": null,
+                "phoneNumber": null,
+                "currentNumOfBorrows": 0,
+                "role": "VIPStudent"
+            },
+            {
+                "id": 4,
+                "username": "student",
+                "password": "student",
+                "firstName": "Stu",
+                "lastName": "Stu",
+                "email": "",
+                "phoneNumber": "",
+                "currentNumOfBorrows": 2,
+                "role": "Student"
+            },
+            {
+                "id": 49,
+                "username": "a",
+                "password": "a",
+                "firstName": "a",
+                "lastName": "a",
+                "email": "abc@gmail.com",
+                "phoneNumber": "333333333333",
+                "currentNumOfBorrows": 4,
+                "role": "Student"
+            },
+            {
+                "id": 350,
+                "username": "ab",
+                "password": "a",
+                "firstName": "a",
+                "lastName": "a",
+                "email": "abc@gmail.com",
+                "phoneNumber": "3",
+                "currentNumOfBorrows": 3,
+                "role": "Student"
+            },
+            {
+                "id": 359,
+                "username": "aba",
+                "password": "a",
+                "firstName": "a",
+                "lastName": "a",
+                "email": "abc@gmail.com",
+                "phoneNumber": "3",
+                "currentNumOfBorrows": 3,
+                "role": "Student"
+            },
+            {
+                "id": 364,
+                "username": "aaa",
+                "password": "aaa",
+                "firstName": "a",
+                "lastName": "a",
+                "email": "abc@gmail.com",
+                "phoneNumber": "3",
+                "currentNumOfBorrows": 3,
+                "role": "Student"
+            },
+            {
+                "id": 1389,
+                "username": "x",
+                "password": "x",
+                "firstName": "aaa",
+                "lastName": "aaa",
+                "email": "",
+                "phoneNumber": "",
+                "currentNumOfBorrows": 1,
+                "role": "Student"
+            }
+        ],
+        "books": [
+            {
+                "id": 3,
+                "image_path": "public\/uploads\/books\/book_6935e0d21a114.jpg",
+                "title": "\u0643\u0644\u064a\u0644\u0629 \u0648\u062f\u0645\u0646\u0629",
+                "author": "\u0627\u0628\u0646 \u0627\u0644\u0645\u0642\u0641\u0639",
+                "isbn": "9789770916731",
+                "category": "Literature",
+                "publisher": "\u062f\u0627\u0631 \u0627\u0644\u0634\u0631\u0648\u0642",
+                "year": 2010,
+                "quantity": 3,
+                "status": "available",
+                "created_at": "2025-12-07 23:17:22"
+            },
+            {
+                "id": 4,
+                "image_path": "public\/uploads\/books\/book_6935e10f1ab5e.jpg",
+                "title": "\u062b\u0644\u0627\u062b\u064a\u0629 \u063a\u0631\u0646\u0627\u0637\u0629",
+                "author": "\u0631\u0636\u0648\u0649 \u0639\u0627\u0634\u0648\u0631",
+                "isbn": "9789770925290",
+                "category": "History",
+                "publisher": "\u062f\u0627\u0631 \u0627\u0644\u0634\u0631\u0648\u0642",
+                "year": 2014,
+                "quantity": 1,
+                "status": "available",
+                "created_at": "2025-12-07 23:18:23"
+            },
+            {
+                "id": 5,
+                "image_path": "public\/uploads\/books\/book_6935e14d3c633.webp",
+                "title": "The Brothers Karamazov",
+                "author": "Fyodor Dostoevsky",
+                "isbn": "9780140449242",
+                "category": "Literature",
+                "publisher": "Penguin Classics",
+                "year": 2003,
+                "quantity": 1,
+                "status": "available",
+                "created_at": "2025-12-07 23:19:25"
+            },
+            {
+                "id": 6,
+                "image_path": "public\/uploads\/books\/book_6935e1787d5e1.webp",
+                "title": "To Kill a Mockingbird",
+                "author": "Harper Lee",
+                "isbn": "9780061120084",
+                "category": "Literature",
+                "publisher": "Harper Perennial Modern Classics",
+                "year": 2006,
+                "quantity": 1,
+                "status": "available",
+                "created_at": "2025-12-07 23:20:08"
+            },
+            {
+                "id": 7,
+                "image_path": "public\/uploads\/books\/book_6935e1b830fbf.webp",
+                "title": "The Art of War",
+                "author": "Sun Tzu",
+                "isbn": "9780140449198",
+                "category": "",
+                "publisher": "Penguin Classics",
+                "year": 2006,
+                "quantity": 0,
+                "status": "unavailable",
+                "created_at": "2025-12-07 23:21:12"
+            }
+        ],
+        "borrows": [
+            {
+                "borrow_id": 1,
+                "bookId": 1,
+                "quantity": 1,
+                "price": 0,
+                "dueDate": "2025-12-21",
+                "isReturned": "false",
+                "user_id": 49
+            },
+            {
+                "borrow_id": 2,
+                "bookId": 1,
+                "quantity": 1,
+                "price": 0,
+                "dueDate": "2025-12-21",
+                "isReturned": "false",
+                "user_id": 1389
+            },
+            {
+                "borrow_id": 3,
+                "bookId": 2,
+                "quantity": 1,
+                "price": 0,
+                "dueDate": "2025-12-21",
+                "isReturned": "false",
+                "user_id": 4
+            },
+            {
+                "borrow_id": 4,
+                "bookId": 7,
+                "quantity": 1,
+                "price": 0,
+                "dueDate": "2025-12-22",
+                "isReturned": "false",
+                "user_id": 4
+            }
+        ],
+        "reservations": [
+            {
+                "reservation_id": 1,
+                "user_id": 49,
+                "book_id": 1,
+                "status": "notified",
+                "reserved_at": "2025-12-07 22:30:59"
+            },
+            {
+                "reservation_id": 2,
+                "user_id": 4,
+                "book_id": 1,
+                "status": "notified",
+                "reserved_at": "2025-12-07 22:36:37"
+            },
+            {
+                "reservation_id": 3,
+                "user_id": 1,
+                "book_id": 1,
+                "status": "cancelled",
+                "reserved_at": "2025-12-07 22:37:11"
+            }
+        ],
+        "notifications": [
+            {
+                "id": 1,
+                "user_id": 49,
+                "book_id": 1,
+                "type": "reservation",
+                "title": "Reservation available",
+                "message": "Good news! \"b\" is ready for pickup.",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "reservation",
+                "context_id": 1,
+                "created_at": "2025-12-07 22:34:32",
+                "updated_at": "2025-12-07 22:35:34"
+            },
+            {
+                "id": 2,
+                "user_id": 49,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": "2025-12-07 22:35:24"
+            },
+            {
+                "id": 3,
+                "user_id": 364,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 0,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": null
+            },
+            {
+                "id": 4,
+                "user_id": 350,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 0,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": null
+            },
+            {
+                "id": 5,
+                "user_id": 359,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 0,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": null
+            },
+            {
+                "id": 6,
+                "user_id": 1,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": "2025-12-07 22:36:48"
+            },
+            {
+                "id": 7,
+                "user_id": 2,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 0,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": null
+            },
+            {
+                "id": 8,
+                "user_id": 4,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": "2025-12-07 22:36:24"
+            },
+            {
+                "id": 9,
+                "user_id": 3,
+                "book_id": null,
+                "type": "announcement",
+                "title": "There is maintenance in next day",
+                "message": "5 -2 pm",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "announcement",
+                "context_id": null,
+                "created_at": "2025-12-07 22:35:18",
+                "updated_at": "2025-12-07 23:05:55"
+            },
+            {
+                "id": 10,
+                "user_id": 4,
+                "book_id": 1,
+                "type": "reservation",
+                "title": "Reservation available",
+                "message": "Good news! \"b\" is ready for pickup.",
+                "due_date": null,
+                "is_read": 1,
+                "context_type": "reservation",
+                "context_id": 2,
+                "created_at": "2025-12-07 22:38:23",
+                "updated_at": "2025-12-07 22:38:33"
+            }
+        ],
+        "system_config": [
+            {
+                "id": 1,
+                "config_key": "loan_days_student",
+                "config_value": "14",
+                "description": "Default loan duration for Students (days)",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 2,
+                "config_key": "loan_days_vipstudent",
+                "config_value": "30",
+                "description": "Default loan duration for VIP Students (days)",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 3,
+                "config_key": "loan_days_staff",
+                "config_value": "60",
+                "description": "Default loan duration for Staff (days)",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 4,
+                "config_key": "loan_days_admin",
+                "config_value": "60",
+                "description": "Default loan duration for Admin (days)",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 5,
+                "config_key": "borrow_limit_student",
+                "config_value": "3",
+                "description": "Max books a Student can borrow",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 6,
+                "config_key": "borrow_limit_vipstudent",
+                "config_value": "7",
+                "description": "Max books a VIP Student can borrow",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 7,
+                "config_key": "borrow_limit_staff",
+                "config_value": "10",
+                "description": "Max books Staff can borrow",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 8,
+                "config_key": "borrow_limit_admin",
+                "config_value": "10",
+                "description": "Max books Admin can borrow",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 9,
+                "config_key": "fine_rate_per_day",
+                "config_value": "1.00",
+                "description": "Fine rate per day for overdue books ($)",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 10,
+                "config_key": "max_renewals",
+                "config_value": "2",
+                "description": "Maximum number of renewals allowed",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 11,
+                "config_key": "reservation_limit",
+                "config_value": "5",
+                "description": "Max active reservations per user",
+                "updated_at": "2025-12-08 16:01:22"
+            },
+            {
+                "id": 12,
+                "config_key": "reservation_expiry_days",
+                "config_value": "3",
+                "description": "Days before a notified reservation expires",
+                "updated_at": "2025-12-08 16:01:22"
+            }
+        ],
+        "audit_logs": [
+            {
+                "id": 1,
+                "user_id": 4,
+                "username": "student",
+                "action": "BORROW_BOOK",
+                "entity_type": "book",
+                "entity_id": 7,
+                "details": "User borrowed 'The Art of War' (qty: 1, due: 2025-12-22)",
+                "ip_address": "::1",
+                "user_agent": "Mozilla\/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/142.0.0.0 Safari\/537.36",
+                "created_at": "2025-12-08 16:03:15"
+            }
+        ]
+    }
+}

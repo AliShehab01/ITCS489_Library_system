@@ -3,8 +3,6 @@ session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 
-include __DIR__ . '/navbar.php';
-
 if (!isset($_SESSION['username'])) {
   header("Location: " . BASE_URL . "view/login.php");
   exit;
@@ -75,9 +73,17 @@ if ($userId) {
   <title>My Reservations</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+  <style>
+    body {
+      padding-top: 56px;
+      background: #f8f9fa;
+    }
+  </style>
 </head>
 
 <body>
+  <?php include __DIR__ . '/navbar.php'; ?>
+
   <div class="container mt-5">
     <h1 class="mb-4">My Reservations</h1>
 

@@ -33,22 +33,57 @@ $firstName = $_SESSION['first_name'] ?? $_SESSION['username'] ?? '';
 $publicHomeUrl = '/public/index.php';
 ?>
 
-<nav class="navbar navbar-expand-lg fixed-top shadow-sm navbar-dark" style="background-color: #111827; border-bottom: 3px solid #3b82f6;">
-    <div class="container-fluid">
-        <!-- Logo -->
-        <a class="navbar-brand d-flex align-items-center" href="<?= $isLoggedIn ? BASE_URL . 'view/HomePage-EN.php' : $publicHomeUrl ?>">
-            <span class="fw-bold text-white">📚 Library</span>
-        </a>
+<style>
+    /* Navbar fixed positioning with no gaps */
+    .navbar-library {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1030;
+        margin: 0;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
 
-        <!-- Hamburger for mobile -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-            aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+    /* Ensure no margin/padding issues */
+    .navbar-library .container {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .navbar .nav-link {
+        color: rgba(255, 255, 255, 0.85) !important;
+    }
+
+    .navbar .nav-link:hover {
+        color: #3b82f6 !important;
+    }
+
+    .dropdown-menu-dark {
+        background-color: #1f2937;
+    }
+
+    .dropdown-menu-dark .dropdown-item {
+        color: #f3f4f6;
+    }
+
+    .dropdown-menu-dark .dropdown-item:hover {
+        background-color: #374151;
+        color: #3b82f6;
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-library shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="<?= $isLoggedIn ? BASE_URL . 'view/HomePage-EN.php' : $publicHomeUrl ?>">
+            📚 University Library
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
-
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="<?= $isLoggedIn ? BASE_URL . 'view/HomePage-EN.php' : $publicHomeUrl ?>">Home</a>
                 </li>
@@ -105,26 +140,3 @@ $publicHomeUrl = '/public/index.php';
         </div>
     </div>
 </nav>
-
-<style>
-    .navbar .nav-link {
-        color: rgba(255, 255, 255, 0.85) !important;
-    }
-
-    .navbar .nav-link:hover {
-        color: #3b82f6 !important;
-    }
-
-    .dropdown-menu-dark {
-        background-color: #1f2937;
-    }
-
-    .dropdown-menu-dark .dropdown-item {
-        color: #f3f4f6;
-    }
-
-    .dropdown-menu-dark .dropdown-item:hover {
-        background-color: #374151;
-        color: #3b82f6;
-    }
-</style>

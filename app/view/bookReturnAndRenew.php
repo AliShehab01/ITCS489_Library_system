@@ -3,6 +3,8 @@ session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../controller/checkifadmin.php';
 require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../controller/policy_helper.php';
+require_once __DIR__ . '/../controller/audit_logger.php';
 
 $db = new Database();
 $conn = $db->conn;
@@ -15,8 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['return_id'])) {
     $borrowId = (int)$_POST['return_id'];
     try {
-      // Get borrow details
-      $stmt = $conn->prepare("SELECT * FROM borrows WHERE borrow_id = :id AND isReturned = 'false'");
+      $stmt = $conn->prepare("SELECT bo.*, b.title FROM borrows bo JOIN books b ON b.id = bo.bookId WHERE bo.borrow_id = :id AND bo.isReturned = 'false'");
       $stmt->execute([':id' => $borrowId]);
       $borrow = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -36,6 +37,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           ':uid' => (int)$borrow['user_id']
         ]);
 
+        logAuditEvent(
+          $conn,
+          'RETURN_BOOK',
+          'borrow',
+          $borrowId,
+          "Returned '{$borrow['title']}' (qty: {$borrow['quantity']})"
+        );
+
         $message = "Book returned successfully!";
         $messageType = 'success';
       }
@@ -45,12 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   } elseif (isset($_POST['renew_id'])) {
     $borrowId = (int)$_POST['renew_id'];
-    $newDueDate = date('Y-m-d', strtotime('+14 days'));
+
+    // Get renewal days from policy
+    $renewalDays = (int)getSystemConfig($conn, 'loan_days_student', 14);
+    $newDueDate = date('Y-m-d', strtotime("+{$renewalDays} days"));
+
     try {
       $conn->prepare("UPDATE borrows SET dueDate = :due WHERE borrow_id = :id AND isReturned = 'false'")->execute([
         ':due' => $newDueDate,
         ':id' => $borrowId
       ]);
+
+      logAuditEvent($conn, 'RENEW_LOAN', 'borrow', $borrowId, "Renewed to: {$newDueDate}");
+
       $message = "Loan renewed. New due date: $newDueDate";
       $messageType = 'success';
     } catch (PDOException $e) {
@@ -71,8 +87,6 @@ $borrows = $conn->query("
     WHERE bo.isReturned = 'false'
     ORDER BY bo.dueDate ASC
 ")->fetchAll(PDO::FETCH_ASSOC);
-
-include __DIR__ . '/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,13 +98,15 @@ include __DIR__ . '/navbar.php';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
-      padding-top: 80px;
+      padding-top: 56px;
       background: #f8f9fa;
     }
   </style>
 </head>
 
 <body>
+  <?php include __DIR__ . '/navbar.php'; ?>
+
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1>🔄 Return & Renew Books</h1>

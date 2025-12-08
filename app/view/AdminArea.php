@@ -20,8 +20,6 @@ try {
     $overdueBorrows = (int)$conn->query("SELECT COUNT(*) FROM borrows WHERE isReturned = 'false' AND dueDate < CURDATE()")->fetchColumn();
 } catch (Exception $e) {
 }
-
-include __DIR__ . '/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,8 +30,14 @@ include __DIR__ . '/navbar.php';
     <title>Admin Control Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        html,
         body {
-            padding-top: 80px;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding-top: 56px;
             background: #f8f9fa;
         }
 
@@ -57,6 +61,8 @@ include __DIR__ . '/navbar.php';
 </head>
 
 <body>
+    <?php include __DIR__ . '/navbar.php'; ?>
+
     <div class="container py-4">
         <h1 class="mb-4">⚙️ Admin Control Panel</h1>
 
@@ -139,7 +145,7 @@ include __DIR__ . '/navbar.php';
                     <div class="card-body">
                         <h5 class="card-title">🔔 Notifications</h5>
                         <p class="card-text">Send announcements to all users or specific groups.</p>
-                        <a href="<?= BASE_URL ?>view/adminNotifications.php" class="btn btn-outline-primary">Send Notifications</a>
+                        <a href="<?= BASE_URL ?>view/notifications.php" class="btn btn-outline-primary">Send Notifications</a>
                     </div>
                 </div>
             </div>
@@ -149,6 +155,33 @@ include __DIR__ . '/navbar.php';
                         <h5 class="card-title">📊 Reports</h5>
                         <p class="card-text">View borrowing statistics, popular books, and user activity.</p>
                         <a href="<?= BASE_URL ?>view/reports.php" class="btn btn-outline-primary">View Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card admin-card h-100 shadow-sm border-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">📋 Borrowing Policies</h5>
+                        <p class="card-text">Configure loan durations, borrowing limits, fine rates, and reservation rules.</p>
+                        <a href="<?= BASE_URL ?>view/adminPolicies.php" class="btn btn-warning">Configure Policies</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card admin-card h-100 shadow-sm border-success">
+                    <div class="card-body">
+                        <h5 class="card-title">💾 Backup & Restore</h5>
+                        <p class="card-text">Create backups, download, and restore system data.</p>
+                        <a href="<?= BASE_URL ?>view/adminBackup.php" class="btn btn-success">Manage Backups</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="card admin-card h-100 shadow-sm border-info">
+                    <div class="card-body">
+                        <h5 class="card-title">📊 Audit Logs</h5>
+                        <p class="card-text">Monitor system usage, track user activities, and review security events.</p>
+                        <a href="<?= BASE_URL ?>view/adminAuditLogs.php" class="btn btn-info">View Audit Logs</a>
                     </div>
                 </div>
             </div>

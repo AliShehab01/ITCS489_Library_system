@@ -2,6 +2,8 @@
 session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
+require_once __DIR__ . '/../controller/policy_helper.php';
+require_once __DIR__ . '/../controller/audit_logger.php';
 
 // Redirect if not logged in
 if (!isset($_SESSION['username'])) {
@@ -18,42 +20,12 @@ $message = '';
 $bookId = $_GET['bookid'] ?? null;
 $book = null;
 
-// Get borrowing limits based on role
-function getBorrowLimit($role)
-{
-    $role = strtolower($role);
-    switch ($role) {
-        case 'admin':
-        case 'staff':
-            return 10;
-        case 'vipstudent':
-            return 7;
-        case 'student':
-        default:
-            return 3;
-    }
-}
-
-// Get max loan days based on role
-function getMaxLoanDays($role)
-{
-    $role = strtolower($role);
-    switch ($role) {
-        case 'admin':
-        case 'staff':
-            return 60;
-        case 'vipstudent':
-            return 30;
-        case 'student':
-        default:
-            return 14;
-    }
-}
-
 $userId = $_SESSION['user_id'] ?? null;
 $userRole = $_SESSION['role'] ?? 'Student';
-$borrowLimit = getBorrowLimit($userRole);
-$maxLoanDays = getMaxLoanDays($userRole);
+
+// Get limits from database policies
+$borrowLimit = getBorrowLimitByRole($conn, $userRole);
+$maxLoanDays = getLoanDaysByRole($conn, $userRole);
 
 // Get current borrow count
 $currentBorrows = 0;
@@ -128,6 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $book) {
             $stmt->execute([':id' => (int)$bookId]);
             $book = $stmt->fetch(PDO::FETCH_ASSOC);
             $currentBorrows += $quantity;
+
+            // Log the borrow event
+            logAuditEvent(
+                $conn,
+                'BORROW_BOOK',
+                'book',
+                (int)$book['id'],
+                "User borrowed '{$book['title']}' (qty: {$quantity}, due: {$dueDate})"
+            );
         } catch (PDOException $e) {
             $conn->rollBack();
             $message = '<div class="alert alert-danger">Failed to borrow book. Please try again.</div>';
@@ -148,10 +129,21 @@ $minDate = date('Y-m-d');
     <title>Borrow Book</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding-top: 56px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-5" style="max-width: 700px;">
+    <div class="container mt-4" style="max-width: 700px;">
         <h1 class="mb-4">Borrow Book</h1>
 
         <!-- User borrowing status -->
