@@ -108,7 +108,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Issue and return books, handle due dates, renewals, and fines.
                                 </p>
-                                <a href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/BorrowBook.php" class="btn btn-primary mt-auto">
                                     Manage Borrowing
                                 </a>
                                 <a href="<?= BASE_URL ?>app/view/bookReturnAndRenew.php" class="btn btn-outline-secondary btn-sm mt-2">
