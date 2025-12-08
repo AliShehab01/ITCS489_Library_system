@@ -38,7 +38,7 @@ if (isset($_SESSION['user_id'])) {
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center gap-2" href="<?= BASE_URL ?>app/view/HomePage-EN.php">
             <img src="<?= BASE_URL ?>imgs/tlp-logo.svg" alt="Logo" height="44">
-            <span class="fw-bold">Library</span>
+            
         </a>
 
         <!-- Hamburger for mobile -->

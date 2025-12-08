@@ -442,14 +442,14 @@ $recentNotifications = $conn->query("
                             <input type="hidden" name="action" value="send_announcement">
 
                             <div class="col-md-6">
-                                <label class="form-label small mb-1">Title</label>
+                                
                                 <input type="text" name="title"
                                        class="form-control form-control-sm"
-                                       placeholder="e.g. Holiday hours update" required>
+                                       placeholder="Announcement Title" required>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label small mb-1">Audience</label>
+                              
                                 <select name="audience"
                                         class="form-select form-select-sm"
                                         id="audienceSelect"
@@ -473,7 +473,7 @@ $recentNotifications = $conn->query("
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label small mb-1">Message</label>
+                               
                                 <textarea name="message"
                                           class="form-control form-control-sm"
                                           rows="3"

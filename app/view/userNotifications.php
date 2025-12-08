@@ -23,6 +23,28 @@ if (!in_array($filter, $allowedFilters, true)) {
     $filter = 'all';
 }
 
+// معالجة زر "Mark as read"
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_read_id'])) {
+    $notifId = (int)$_POST['mark_read_id'];
+
+    if ($notifId > 0) {
+        $upd = $conn->prepare("
+            UPDATE notifications
+            SET is_read = 1
+            WHERE id = :id AND user_id = :uid
+        ");
+        $upd->execute([
+            ':id'  => $notifId,
+            ':uid' => $userId,
+        ]);
+    }
+
+    // نرجّع المستخدم لنفس الفلتر
+    $redirectFilter = $_POST['current_filter'] ?? $filter;
+    header('Location: userNotifications.php?filter=' . urlencode($redirectFilter));
+    exit;
+}
+
 // بناء الشرط حسب الفلتر
 $where = "user_id = :uid";
 $params = [':uid' => $userId];
@@ -223,15 +245,28 @@ function safeInt($arr, $key) {
                                                     <span class="badge <?= $badgeClass; ?>">
                                                         <?= htmlspecialchars($typeLabel); ?>
                                                     </span>
+
                                                     <?php if ($isUnread): ?>
                                                         <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
                                                             Unread
                                                         </span>
+
+                                                        <!-- زر Mark as read -->
+                                                        <form method="post" class="d-inline">
+                                                            <input type="hidden" name="mark_read_id" value="<?= (int)$n['id']; ?>">
+                                                            <input type="hidden" name="current_filter" value="<?= htmlspecialchars($filter); ?>">
+                                                            <button type="submit"
+                                                                    class="btn btn-link btn-sm p-0 ms-2 text-decoration-none">
+                                                                Mark as read
+                                                            </button>
+                                                        </form>
                                                     <?php endif; ?>
                                                 </div>
+
                                                 <div class="fw-semibold mb-1">
                                                     <?= htmlspecialchars($title); ?>
                                                 </div>
+
                                                 <?php if (!empty($n['message'])): ?>
                                                     <div class="text-muted small">
                                                         <?= nl2br(htmlspecialchars($n['message'])); ?>
