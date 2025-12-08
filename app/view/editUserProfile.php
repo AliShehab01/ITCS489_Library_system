@@ -10,14 +10,39 @@ if(!isset($_GET["username"])){
     exit;
 }
 
-$username = $_GET['username'];
+$user_name = $_GET['username'];
 
 $db = new Database();
+$pdo = $db->getPdo();
+
+$stmt = $pdo->prepare("SELECT username, role FROM users WHERE username = :username");
+$stmt->execute([':username' => $user_name]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
+// app/view/editUserProfile.php
+session_start();
+
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../models/dbconnect.php';
+
+// تحضير الاتصال
+$db  = new Database();
 $conn = $db->conn;
 
-// Get user data
+// نحدد أي مستخدم نعدّل بياناته:
+// - لو فيه ?username=... في الرابط (غالباً أدمن يحرر مستخدم)
+// - غير كذا نستخدم المستخدم الحالي من السيشن
+$username = $_GET['username'] ?? ($_SESSION['username'] ?? null);
+
+if (!$username) {
+    header("Location: login.php");
+    exit;
+}
+
+// نجيب بيانات المستخدم
 $stmt = $conn->prepare("
-    SELECT username, role, email, firstName, lastName, phoneNumber
+    SELECT username, role, email, first_name, last_name, phone_number
     FROM users
     WHERE username = :username
 ");
@@ -28,7 +53,7 @@ if (!$row) {
     $error = "User not found.";
 }
 
-// Available roles
+// الأدوار المتاحة
 $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
 ?>
 <!DOCTYPE html>
@@ -39,9 +64,9 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account</title>
 
-    <!-- Bootstrap + theme -->
+    <!-- Bootstrap + الثيم العام -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/style.css">
 </head>
 
 <body>
@@ -50,7 +75,7 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
 
 <main class="site-content">
 
-    <!-- Header section -->
+    <!-- شريط علوي بسيط -->
     <section class="py-4 bg-white border-bottom">
         <div class="container">
             <h1 class="h4 mb-1">My Account</h1>
@@ -83,11 +108,11 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
                         </p>
 
                         <form action="../controller/UserProfileUpdatedSubmit.php" method="post" class="row g-3">
-                            <!-- Send old username as hidden -->
+                            <!-- نرسل الـ username القديم كـ hidden -->
                             <input type="hidden" name="username"
                                    value="<?= htmlspecialchars($row['username']); ?>">
 
-                            <!-- Role (admin only) -->
+                            <!-- Role (للأدمن فقط) -->
                             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                                 <div class="col-12">
                                     <label class="form-label">Role</label>
@@ -101,7 +126,7 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
                                     </select>
                                 </div>
                             <?php else: ?>
-                                <!-- If not admin, show role as badge -->
+                                <!-- لو مو أدمن نخلي الدور ثابت بس نعرضه -->
                                 <div class="col-12">
                                     <label class="form-label">Role</label><br>
                                     <span class="badge bg-secondary">
@@ -112,27 +137,27 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
 
                             <!-- First / Last name -->
                             <div class="col-md-6">
-                                <label for="firstName" class="form-label">
+                                <label for="first_name" class="form-label">
                                     First name <span class="text-danger">*</span>
                                 </label>
                                 <input type="text"
                                        class="form-control"
-                                       id="firstName"
-                                       name="new_firstName"
+                                       id="first_name"
+                                       name="new_first_name"
                                        required
-                                       value="<?= htmlspecialchars($row['firstName'] ?? ''); ?>">
+                                       value="<?= htmlspecialchars($row['first_name'] ?? ''); ?>">
                             </div>
 
                             <div class="col-md-6">
-                                <label for="lastName" class="form-label">
+                                <label for="last_name" class="form-label">
                                     Last name <span class="text-danger">*</span>
                                 </label>
                                 <input type="text"
                                        class="form-control"
-                                       id="lastName"
-                                       name="new_lastName"
+                                       id="last_name"
+                                       name="new_last_name"
                                        required
-                                       value="<?= htmlspecialchars($row['lastName'] ?? ''); ?>">
+                                       value="<?= htmlspecialchars($row['last_name'] ?? ''); ?>">
                             </div>
 
                             <!-- Email -->
@@ -150,14 +175,14 @@ $roles = ['Admin','Librarian','Staff','VIP Student','Student'];
 
                             <!-- Phone -->
                             <div class="col-12">
-                                <label for="phoneNumber" class="form-label">
+                                <label for="phone_number" class="form-label">
                                     Phone number
                                 </label>
                                 <input type="tel"
                                        class="form-control"
-                                       id="phoneNumber"
-                                       name="new_phoneNumber"
-                                       value="<?= htmlspecialchars($row['phoneNumber'] ?? ''); ?>">
+                                       id="phone_number"
+                                       name="new_phone_number"
+                                       value="<?= htmlspecialchars($row['phone_number'] ?? ''); ?>">
                             </div>
 
                             <div class="col-12 d-flex justify-content-between align-items-center mt-3">

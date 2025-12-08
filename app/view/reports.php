@@ -1,14 +1,6 @@
 <?php
 session_start();
 
-// Ensure BASE_URL is available before any output
-$configPath = __DIR__ . '/../../config.php';
-if (file_exists($configPath)) {
-    require_once $configPath;
-} elseif (!defined('BASE_URL')) {
-    define('BASE_URL', '/');
-}
-
 // فقط الأدمن
 require_once __DIR__ . '/../controller/checkifadmin.php';
 
@@ -80,6 +72,7 @@ if ($selectedUserId > 0) {
         SELECT 
             br.borrow_id,
             br.bookId,
+            br.borrowDate,
             br.dueDate,
             br.isReturned,
             br.price,
@@ -112,7 +105,7 @@ function formatUserName($row) {
     <title>Reports &amp; Analytics – Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="../public/css/style.css">
 </head>
 
 <body>
@@ -308,6 +301,7 @@ function formatUserName($row) {
                                     <tr>
                                         <th>Borrow #</th>
                                         <th>Book</th>
+                                        <th>Borrowed on</th>
                                         <th>Due date</th>
                                         <th>Status</th>
                                         <th>Price</th>
@@ -323,6 +317,9 @@ function formatUserName($row) {
                                         <tr>
                                             <td>#<?= htmlspecialchars($h['borrow_id']); ?></td>
                                             <td><?= htmlspecialchars($h['title']); ?></td>
+                                            <td class="small">
+                                                <?= htmlspecialchars($h['borrowDate'] ?? '—'); ?>
+                                            </td>
                                             <td class="small">
                                                 <?= htmlspecialchars($h['dueDate'] ?? '—'); ?>
                                             </td>

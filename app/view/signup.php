@@ -1,13 +1,5 @@
 <?php
 session_start();
-
-// Ensure BASE_URL is available before any output
-$configPath = __DIR__ . '/../../config.php';
-if (file_exists($configPath)) {
-    require_once $configPath;
-} elseif (!defined('BASE_URL')) {
-    define('BASE_URL', '/');
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +11,7 @@ if (file_exists($configPath)) {
 
     <!-- Bootstrap + الثيم العام -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/style.css">
 </head>
 
 <body>
@@ -63,23 +55,23 @@ if (file_exists($configPath)) {
 
                                 <div class="row g-3">
     <div class="col-md-6">
-        <label for="firstName" class="form-label small mb-1">
+        <label for="first_name" class="form-label small mb-1">
             First name <span class="text-danger">*</span>
         </label>
         <input type="text"
-               name="firstName"
-               id="firstName"
+               name="first_name"
+               id="first_name"
                class="form-control"
                required>
     </div>
 
     <div class="col-md-6">
-        <label for="lastName" class="form-label small mb-1">
+        <label for="last_name" class="form-label small mb-1">
             Last name <span class="text-danger">*</span>
         </label>
         <input type="text"
-               name="lastName"
-               id="lastName"
+               name="last_name"
+               id="last_name"
                class="form-control"
                required>
     </div>
@@ -118,12 +110,12 @@ if (file_exists($configPath)) {
                                 </div>
 
                                 <div>
-                                    <label for="phoneNumber" class="form-label small mb-1">
+                                    <label for="phone_number" class="form-label small mb-1">
                                         Phone number
                                     </label>
                                     <input type="tel"
-                                           name="phoneNumber"
-                                           id="phoneNumber"
+                                           name="phone_number"
+                                           id="phone_number"
                                            class="form-control">
                                 </div>
 

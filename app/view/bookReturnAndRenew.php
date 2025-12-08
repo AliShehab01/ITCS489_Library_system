@@ -44,7 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // تعليم كسُجّل مُرجع
                         $upd = $pdo->prepare("
                             UPDATE borrows
-                            SET isReturned = 'true'
+                            SET isReturned = 'true',
+                                returnDate = CURDATE()
                             WHERE borrow_id = :bid
                         ");
                         $upd->execute([':bid' => $borrowId]);

@@ -30,7 +30,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
     <?php define('STYLE_LOADED', true); ?>
 <?php endif; ?>
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+<link rel="stylesheet" href="../../public/css/style.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
@@ -92,9 +92,9 @@ if (isset($_SESSION['user_id'])) {
 
                 <!-- Welcome/Login -->
                 <div class="ms-2 d-flex align-items-center gap-1">
-                    <?php if (isset($_SESSION['firstName'])): ?>
-                        <span class="badge bg-success">Welcome <?= htmlspecialchars($_SESSION['firstName']) ?></span>
-                        <a href="<?= BASE_URL ?>app/controller/Logout.php"
+                    <?php if (isset($_SESSION['first_name'])): ?>
+                        <span class="badge bg-success">Welcome <?= htmlspecialchars($_SESSION['first_name']) ?></span>
+                        <a href="<?= BASE_URL ?>app/controller/logout.php"
                             class="btn btn-outline-secondary btn-sm">Logout</a>
                     <?php else: ?>
                         <a href="<?= BASE_URL ?>app/view/signup.php" class="btn btn-outline-primary btn-sm">Sign up</a>

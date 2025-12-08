@@ -36,10 +36,9 @@ try {
     foreach ($rows as $row) {
         if ($row['username'] === $username && $row['password'] === $password) {
             $found = true;
-            $_SESSION['firstName'] = $row['firstName'];
-            $_SESSION['lastName'] = $row['lastName'];
+            $first_name = $row['firstName'];
+            $_SESSION['first_name'] = $first_name;
             $_SESSION['user_id'] = $row['id'];
-            $_SESSION['username'] = $username;
 
             // Set borrow limit
             if ($row['role'] !== 'Student') {
@@ -60,6 +59,7 @@ try {
     }
 
     if ($found) {
+        $_SESSION['username'] = $username;
         echo "Login successful";
 
         // Redirect based on role

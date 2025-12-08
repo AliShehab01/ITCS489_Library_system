@@ -1,14 +1,6 @@
 <?php
 session_start();
 require '../controller/checkifadmin.php';
-
-// Ensure BASE_URL is available before any output
-$configPath = __DIR__ . '/../../config.php';
-if (file_exists($configPath)) {
-    require_once $configPath;
-} elseif (!defined('BASE_URL')) {
-    define('BASE_URL', '/');
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +12,7 @@ if (file_exists($configPath)) {
 
     <!-- Bootstrap + الثيم العام -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
+    <link rel="stylesheet" href="../../public/css/style.css">
 
     <!-- Lucide Icons (اختياري للأيقونات في الكروت) -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -62,7 +54,7 @@ if (file_exists($configPath)) {
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Add, edit, or remove users, assign roles, and manage borrowing limits.
                                 </p>
-                                <a href=\"<?= BASE_URL ?>app/controller/ManagingUsers.php\" class=\"btn btn-primary mt-auto\">
+                                <a href="../controller/ManagingUsers.php" class="btn btn-primary mt-auto">
                                     Manage Users
                                 </a>
                             </div>
