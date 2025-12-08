@@ -55,9 +55,9 @@ session_start();
 
                                 <div class="row g-3">
     <div class="col-md-6">
-        <label for="first_name" class="form-label small mb-1">
-            First name <span class="text-danger">*</span>
-        </label>
+          <label for="first_name" class="form-label small mb-3 text-nowrap">
+    First name <span class="text-danger">* </span> 
+</label><br>
         <input type="text"
                name="first_name"
                id="first_name"
@@ -66,9 +66,9 @@ session_start();
     </div>
 
     <div class="col-md-6">
-        <label for="last_name" class="form-label small mb-1">
-            Last name <span class="text-danger">*</span>
-        </label>
+        <label for="last_name" class="form-label small mb-3 text-nowrap">
+    Last name <span class="text-danger">* </span> 
+</label><br>
         <input type="text"
                name="last_name"
                id="last_name"

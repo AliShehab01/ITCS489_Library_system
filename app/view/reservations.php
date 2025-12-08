@@ -1,65 +1,14 @@
 <?php
+session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 
-$db = new Database();
-$conn = $db->conn;
-$msg = "";
-
-// Create reservation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_res'])) {
-  $userId = filter_input(INPUT_POST, 'user_id', FILTER_VALIDATE_INT);
-  $bookId = filter_input(INPUT_POST, 'book_id', FILTER_VALIDATE_INT);
-
-  if ($userId && $bookId) {
-    $chk = $conn->prepare("SELECT 1 FROM reservations WHERE user_id = :user_id AND book_id = :book_id AND status IN ('active','notified')");
-    $chk->execute([':user_id' => $userId, ':book_id' => $bookId]);
-
-    if ($chk->fetch()) {
-      $msg = "User already has an active reservation for this book.";
-    } else {
-      $ins = $conn->prepare("INSERT INTO reservations (user_id, book_id) VALUES (:user_id, :book_id)");
-      $ins->execute([':user_id' => $userId, ':book_id' => $bookId]);
-      $msg = "Reservation added successfully.";
-    }
-  } else {
-    $msg = "Please select both user and book.";
-  }
+// Require login (any authenticated user can access)
+if (!isset($_SESSION['user_id'])) {
+    $loginUrl = (defined('BASE_URL') ? BASE_URL : '/') . 'app/view/login.php';
+    header('Location: ' . $loginUrl);
+    exit;
 }
-
-// Cancel reservation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_res'])) {
-  $resId = filter_input(INPUT_POST, 'reservation_id', FILTER_VALIDATE_INT);
-  if ($resId) {
-    $upd = $conn->prepare("UPDATE reservations SET status = 'cancelled' WHERE reservation_id = :res_id");
-    $upd->execute([':res_id' => $resId]);
-    $msg = "Reservation cancelled.";
-  }
-}
-
-// Lists
-$unavailableBooks = $conn->query("
-  SELECT id, title, status, quantity FROM books
-  WHERE quantity = 0 OR status IN ('issued','unavailable','reserved')
-  ORDER BY title
-")->fetchAll(PDO::FETCH_ASSOC);
-
-$users = $conn->query("SELECT id, username FROM users ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
-
-$queues = $conn->query("
-  SELECT r.reservation_id, r.status, r.reserved_at, u.username, b.title
-  FROM reservations r
-  JOIN users u ON u.id = r.user_id
-  JOIN books b ON b.id = r.book_id
-  WHERE r.status IN ('active','notified')
-  ORDER BY b.title, r.reserved_at
-")->fetchAll(PDO::FETCH_ASSOC);
-
-// app/view/reservations.php
-session_start();
-
-require_once __DIR__ . '/../controller/checkifadmin.php';
-require_once __DIR__ . '/../models/dbconnect.php';
 
 $db  = new Database();
 $conn = $db->conn;
@@ -146,9 +95,9 @@ $queues = $conn->query("
     <meta charset="utf-8">
     <title>Reservation Management</title>
 
-    <!-- Bootstrap + الثيم العام -->
+    <!-- Bootstrap + styles -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 
 <body>

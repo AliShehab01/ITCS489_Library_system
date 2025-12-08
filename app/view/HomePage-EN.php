@@ -42,7 +42,7 @@ try {
     <title>Library Home</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 <body>
 
@@ -111,7 +111,7 @@ try {
                                 publication year or date added.
                             </p>
                             <a class="btn btn-primary btn-sm mt-auto"
-                               href="CatalogSearch_Browsing-EN.php">
+                               href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php">
                                 Go to Catalog
                             </a>
                         </div>
@@ -128,7 +128,7 @@ try {
                                 membership type.
                             </p>
                             <a class="btn btn-outline-primary btn-sm mt-auto"
-                               href="editUserProfile.php?username=<?= urlencode($username); ?>">
+                               href="<?= BASE_URL ?>app/view/editUserProfile.php?username=<?= urlencode($username); ?>">
                                 Manage Account
                             </a>
                         </div>
@@ -144,7 +144,7 @@ try {
                                 Track due dates, renew eligible items, and review fines or overdues if any.
                             </p>
                             <a class="btn btn-outline-primary btn-sm mt-auto"
-                               href="borrowedDashboard.php">
+                               href="<?= BASE_URL ?>app/view/borrowedDashboard.php">
                                 View Borrowed
                             </a>
                         </div>
@@ -160,7 +160,7 @@ try {
                                 Reserve checked-out books and get notified when they become available.
                             </p>
                             <a class="btn btn-outline-primary btn-sm mt-auto"
-                               href="reservations.php">
+                               href="<?= BASE_URL ?>app/view/reservations.php">
                                 Manage Reservations
                             </a>
                         </div>
@@ -176,7 +176,7 @@ try {
                                 Due-date reminders, reservation alerts, and key library updates in one place.
                             </p>
                             <a class="btn btn-outline-primary btn-sm mt-auto"
-                               href="userNotifications.php">
+                               href="<?= BASE_URL ?>app/view/userNotifications.php">
                                 Open Notifications
                             </a>
                         </div>
@@ -193,7 +193,7 @@ try {
                             </p>
                             <!-- حالياً نستخدم نفس صفحة borrowedDashboard كـ history -->
                             <a class="btn btn-outline-primary btn-sm mt-auto"
-                               href="borrowedDashboard.php">
+                               href="<?= BASE_URL ?>app/view/borrowedDashboard.php">
                                 View History
                             </a>
                         </div>

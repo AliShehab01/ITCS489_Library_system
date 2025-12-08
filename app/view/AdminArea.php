@@ -12,7 +12,7 @@ require '../controller/checkifadmin.php';
 
     <!-- Bootstrap + الثيم العام -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 
     <!-- Lucide Icons (اختياري للأيقونات في الكروت) -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -54,7 +54,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Add, edit, or remove users, assign roles, and manage borrowing limits.
                                 </p>
-                                <a href="../controller/ManagingUsers.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/controller/ManagingUsers.php" class="btn btn-primary mt-auto">
                                     Manage Users
                                 </a>
                             </div>
@@ -72,7 +72,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Add or edit books, update copies, and manage availability status.
                                 </p>
-                                <a href="bookPage.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/bookPage.php" class="btn btn-primary mt-auto">
                                     Manage Books
                                 </a>
                             </div>
@@ -90,7 +90,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Search and browse books by title, author, category, or filters.
                                 </p>
-                                <a href="CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">
                                     Search Catalog
                                 </a>
                             </div>
@@ -108,10 +108,10 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Issue and return books, handle due dates, renewals, and fines.
                                 </p>
-                                <a href="BorrowBook.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/CatalogSearch_Browsing-EN.php" class="btn btn-primary mt-auto">
                                     Manage Borrowing
                                 </a>
-                                <a href="bookReturnAndRenew.php" class="btn btn-outline-secondary btn-sm mt-2">
+                                <a href="<?= BASE_URL ?>app/view/bookReturnAndRenew.php" class="btn btn-outline-secondary btn-sm mt-2">
                                     Return / Renew
                                 </a>
                             </div>
@@ -129,7 +129,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Manage reservation queues, notify users, and track availability.
                                 </p>
-                                <a href="reservations.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/reservations.php" class="btn btn-primary mt-auto">
                                     Manage Reservations
                                 </a>
                             </div>
@@ -147,7 +147,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Send borrowing alerts, reservation availability, and library announcements.
                                 </p>
-                                <a href="notifications.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/notifications.php" class="btn btn-primary mt-auto">
                                     Open Notification Center
                                 </a>
                             </div>
@@ -165,7 +165,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     View borrowing trends, popular titles, and usage statistics.
                                 </p>
-                                <a href="reports.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/reports.php" class="btn btn-primary mt-auto">
                                     View Reports
                                 </a>
                             </div>
@@ -183,7 +183,7 @@ require '../controller/checkifadmin.php';
                                 <p class="card-text flex-grow-1 text-muted small">
                                     Configure policies, manage staff access, and update system settings.
                                 </p>
-                                <a href="adminSettings.php" class="btn btn-primary mt-auto">
+                                <a href="<?= BASE_URL ?>app/view/adminSettings.php" class="btn btn-primary mt-auto">
                                     Admin Settings
                                 </a>
                             </div>

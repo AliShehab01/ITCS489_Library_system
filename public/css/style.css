@@ -358,7 +358,7 @@ footer {
 /* الحاوية العامة للكرت */
 .notifications-wrapper {
     width: 100%;
-    max-width: 750px;   /* كبير على الديسكتوب */
+     /* كبير على الديسكتوب */
     padding-inline: 1rem;
 }
 

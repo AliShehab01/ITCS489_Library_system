@@ -13,28 +13,44 @@ if (!isset($_SESSION['user_id'])) {
 $userId   = (int)($_SESSION['user_id'] ?? 0);
 $username = $_SESSION['username'] ?? '';
 
-// bookid من الكاتالوج
-$bookId = isset($_GET['bookid']) ? (int)$_GET['bookid'] : 0;
+// bookid (accept GET/POST fallback to handle different entry points)
+$bookId = null;
+foreach (['bookid', 'bookId'] as $paramName) {
+    if ($bookId === null && isset($_GET[$paramName])) {
+        $bookId = (int)$_GET[$paramName];
+    } elseif ($bookId === null && isset($_POST[$paramName])) {
+        $bookId = (int)$_POST[$paramName];
+    }
+}
+$bookId = ($bookId !== null && $bookId > 0) ? $bookId : 0;
 
 // قيم جاية من الكرت (لو أرسلتها من هناك)
 $qtyFromPost     = isset($_POST['QuantityWanted']) ? (int)$_POST['QuantityWanted'] : null;
 $dueDateFromPost = $_POST['dueDate'] ?? null;
 
 // لو ما في bookId أصلاً، نعرض رسالة بدل ما نرجّعك بالهيدر
-if ($bookId <= 0) {
-    $bookTitle  = '';
-    $bookAuthor = '';
-} else {
-    $db   = new Database();
-    $pdo  = $db->getPdo();
+$bookTitle  = '';
+$bookAuthor = '';
+if ($bookId > 0) {
+    try {
+        $db  = new Database();
+        $pdo = $db->getPdo();
 
-    // جلب معلومات الكتاب
-    $stmt = $pdo->prepare("SELECT title, author FROM books WHERE bookId = :id");
-    $stmt->execute([':id' => $bookId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Use the real primary key column (id), not bookId
+        $stmt = $pdo->prepare("SELECT id, title, author FROM books WHERE id = :id");
+        $stmt->execute([':id' => $bookId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $bookTitle  = $row['title']  ?? '';
-    $bookAuthor = $row['author'] ?? '';
+        if ($row) {
+            $bookId     = (int)($row['id'] ?? $bookId);
+            $bookTitle  = $row['title']  ?? '';
+            $bookAuthor = $row['author'] ?? '';
+        } else {
+            $bookId = 0;
+        }
+    } catch (Throwable $e) {
+        $bookId = 0;
+    }
 }
 
 // قيم افتراضية للفورم

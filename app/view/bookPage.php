@@ -6,6 +6,14 @@ session_start();
   Uses BookApi.php and changestatus.php for backend operations.
 */
 
+// Ensure BASE_URL is available before any output
+$configPath = __DIR__ . '/../../config.php';
+if (file_exists($configPath)) {
+    require_once $configPath;
+} elseif (!defined('BASE_URL')) {
+    define('BASE_URL', '/');
+}
+
 require_once __DIR__ . '/../models/dbconnect.php';
 $db   = new Database();
 $conn = $db->conn;
@@ -33,7 +41,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Manage Books – Admin</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../public/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>public/css/style.css">
 </head>
 
 <body>
@@ -68,23 +76,21 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body">
                                 <form id="bookForm" method="post" enctype="multipart/form-data" class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label small">Title</label>
-                                        <input type="text" name="title" class="form-control" required>
+                                         <input type="text" name="title" class="form-control" placeholder="Title" required>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label small">Author</label>
-                                        <input type="text" name="author" class="form-control" required>
+                                        <input type="text" name="author" class="form-control" placeholder="Author" required>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label small">ISBN</label>
-                                        <input type="text" name="isbn" class="form-control" required>
+                                        <input type="text" name="isbn" class="form-control" placeholder="ISBN" required>
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label small">Category</label>
+                                     
                                         <select name="category" class="form-select">
+                                            <option value="Science">Category</option>
                                             <option value="Science">Science</option>
                                             <option value="Engineering">Engineering</option>
                                             <option value="History">History</option>
@@ -94,28 +100,25 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label small">Publisher</label>
-                                        <input type="text" name="publisher" class="form-control">
+                                        
+                                         <input type="text" name="publisher" class="form-control" placeholder="Publisher">
                                     </div>
 
                                     <div class="col-md-6">
-                                        <label class="form-label small">Year</label>
-                                        <input type="number" name="year" class="form-control">
+                                        <input type="number" name="year" class="form-control" placeholder="Year">
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">Available quantity</label>
-                                        <input type="number" name="quantity" class="form-control">
-                                    </div>
+                                     <div class="col-md-6">
+        <input type="number" name="quantity" class="form-control" placeholder="Available quantity">
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">Book cover</label>
-                                        <input type="file" name="image" accept="image/*" class="form-control">
-                                    </div>
+    <div class="col-md-6">
+        <input type="file" name="image" accept="image/*" class="form-control" placeholder="Book cover">
+    </div>
 
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-primary btn-sm">Add book</button>
-                                    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary btn-sm">Add book</button>
+    </div>
                                 </form>
 
                                 <p id="message" class="mt-2 small"></p>
@@ -132,38 +135,33 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body">
                                 <form id="updateBookForm" method="post" class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label small">ISBN (book to update)</label>
-                                        <input type="text" name="isbn" class="form-control" required>
-                                    </div>
+        <input type="text" name="isbn" class="form-control" placeholder="ISBN (book to update)" required>
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">New title</label>
-                                        <input type="text" name="title" class="form-control" required>
-                                    </div>
+    <div class="col-md-6">
+        <input type="text" name="title" class="form-control" placeholder="New title" required>
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">New author</label>
-                                        <input type="text" name="author" class="form-control" required>
-                                    </div>
+    <div class="col-md-6">
+        <input type="text" name="author" class="form-control" placeholder="New author" required>
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">New category</label>
-                                        <input type="text" name="category" class="form-control">
-                                    </div>
+    <div class="col-md-6">
+        <input type="text" name="category" class="form-control" placeholder="New category">
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">New publisher</label>
-                                        <input type="text" name="publisher" class="form-control">
-                                    </div>
+    <div class="col-md-6">
+        <input type="text" name="publisher" class="form-control" placeholder="New publisher">
+    </div>
 
-                                    <div class="col-md-6">
-                                        <label class="form-label small">New year</label>
-                                        <input type="number" name="year" class="form-control">
-                                    </div>
+    <div class="col-md-6">
+        <input type="number" name="year" class="form-control" placeholder="New year">
+    </div>
 
-                                    <div class="col-12">
-                                        <button type="submit" class="btn btn-success btn-sm">Update book</button>
-                                    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-success btn-sm">Update book</button>
+    </div>
+
                                 </form>
 
                                 <p id="updateMessage" class="mt-2 small"></p>
@@ -184,17 +182,16 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label for="isbn" class="form-label small">ISBN</label>
-                                        <input type="text" id="isbn" class="form-control" placeholder="Enter ISBN">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="options" class="form-label small">Status</label>
-                                        <select id="options" class="form-select">
-                                            <option value="">--Select an option--</option>
-                                            <option value="available">Available</option>
-                                            <option value="reserved">Reserved</option>
-                                            <option value="unavailable">Unavailable</option>
-                                        </select>
+        <input type="text" id="isbn" class="form-control" placeholder="ISBN">
+    </div>
+
+    <div class="col-md-6">
+        <select id="options" class="form-select">
+            <option value="" disabled selected>Status</option>
+            <option value="available">Available</option>
+            <option value="reserved">Reserved</option>
+            <option value="unavailable">Unavailable</option>
+        </select>
                                     </div>
                                     <div class="col-12">
                                         <button type="button" id="b1" class="btn btn-outline-primary btn-sm">
@@ -215,8 +212,8 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <label class="form-label small">ISBN of book</label>
-                                    <input type="text" id="isbnToDelete" class="form-control" placeholder="Enter ISBN">
+                                    <input type="text" id="isbnToDelete" class="form-control mb-3" placeholder="ISBN of book">
+
                                 </div>
                                 <button type="button" id="deleteBtn" class="btn btn-danger btn-sm">
                                     Delete book
