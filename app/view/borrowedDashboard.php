@@ -293,8 +293,8 @@ $historyCount  = count($historyBorrows);
     </section>
 </main>
 
-<footer class="py-3 mt-4 bg-dark text-white">
-    <div class="container text-center small">
+<footer class="py-3 mt-4">
+    <div class="container text-center small text-muted">
         © 2025 Library System. All rights reserved.
     </div>
 </footer>

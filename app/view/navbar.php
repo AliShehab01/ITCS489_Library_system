@@ -33,7 +33,7 @@ if (isset($_SESSION['user_id'])) {
 <link rel="stylesheet" href="../../public/css/style.css">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<nav class="navbar navbar-expand-lg navbar-light fixed-top shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand d-flex align-items-center gap-2" href="<?= BASE_URL ?>app/view/HomePage-EN.php">

@@ -137,11 +137,12 @@ $queues = $conn->query("
                     <h2 class="h6 mb-0">Create new reservation</h2>
                 </div>
                 <div class="card-body">
+                    <br>
           <form method="POST"
       class="reservation-form">
 
     <div class="reservation-field flex-grow-1">
-        <label class="form-label">User</label>
+        
         <select name="user_id"
                 class="form-select reservation-select"
                 required>
@@ -153,11 +154,10 @@ $queues = $conn->query("
             <?php endforeach; ?>
         </select>
     </div>
+    <br>
 
     <div class="reservation-field flex-grow-1">
-        <label class="form-label">
-            Book (currently on loan/unavailable)
-        </label>
+        
         <select name="book_id"
                 class="form-select reservation-select"
                 required>
