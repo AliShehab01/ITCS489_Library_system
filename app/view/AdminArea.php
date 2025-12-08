@@ -1,6 +1,14 @@
 <?php
 session_start();
 require '../controller/checkifadmin.php';
+
+// Ensure BASE_URL is available before any output
+$configPath = __DIR__ . '/../../config.php';
+if (file_exists($configPath)) {
+    require_once $configPath;
+} elseif (!defined('BASE_URL')) {
+    define('BASE_URL', '/');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

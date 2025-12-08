@@ -2,6 +2,14 @@
 // app/view/notifications.php – Admin: send borrowing alerts & announcements
 session_start();
 
+// Ensure BASE_URL is available before any output
+$configPath = __DIR__ . '/../../config.php';
+if (file_exists($configPath)) {
+    require_once $configPath;
+} elseif (!defined('BASE_URL')) {
+    define('BASE_URL', '/');
+}
+
 require_once __DIR__ . '/../controller/checkifadmin.php';
 require_once __DIR__ . '/../models/dbconnect.php';
 

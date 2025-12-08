@@ -1,5 +1,17 @@
 <?php
+// Debug – remove later
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
+
+$configPath = __DIR__ . '/../../config.php';
+if (file_exists($configPath)) {
+    require_once $configPath;
+} elseif (!defined('BASE_URL')) {
+    define('BASE_URL', '/');
+}
 
 require_once __DIR__ . '/../models/dbconnect.php';
 require_once __DIR__ . '/../models/CreateDefaultDBTables.php';
