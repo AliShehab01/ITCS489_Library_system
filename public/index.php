@@ -28,6 +28,7 @@ $isLoggedIn = isset($_SESSION['username']);
 </head>
 
 <body>
+    <div style="height: 55px;"></div>
     <?php include __DIR__ . '/../app/view/navbar.php'; ?>
 
     <!-- Hero Section -->

@@ -41,8 +41,6 @@ if ($userId) {
 }
 
 $unreadCount = count(array_filter($notifications, fn($n) => !$n['is_read']));
-
-include __DIR__ . '/navbar.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -61,6 +59,8 @@ include __DIR__ . '/navbar.php';
 </head>
 
 <body>
+    <?php include __DIR__ . '/navbar.php'; ?>
+
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1>🔔 My Notifications</h1>
