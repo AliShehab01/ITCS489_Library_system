@@ -211,7 +211,7 @@ $userRole = $_SESSION['role'] ?? '';
     window.userLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     window.userRole = '<?= htmlspecialchars($userRole) ?>';
   </script>
-  <script src="/public/js/CatalogSearch.js"></script>
+  <script src="<?= PUBLIC_URL ?>js/CatalogSearch.js"></script>
 </body>
 
 </html>

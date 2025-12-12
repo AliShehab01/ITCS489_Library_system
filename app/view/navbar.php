@@ -30,7 +30,7 @@ $isAdmin = in_array($userRole, ['admin', 'staff']);
 $firstName = $_SESSION['first_name'] ?? $_SESSION['username'] ?? '';
 
 // Define public home URL
-$publicHomeUrl = '/public/index.php';
+$publicHomeUrl = PUBLIC_URL . 'index.php';
 ?>
 
 <style>

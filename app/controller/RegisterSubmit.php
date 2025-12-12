@@ -3,6 +3,7 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL);
 session_start();
 
+require_once __DIR__ . '/../../config.php';
 require '../models/CreateDefaultDBTables.php';
 
 $username = trim($_POST["username"]);
@@ -48,6 +49,6 @@ if ($user) {
     $_SESSION["user_id"] = $conn->lastInsertId(); // get the new user's ID
     $_SESSION["BorrowLimit"] = 3;
 
-    header("Location: ../../public/index.php");
+    header("Location: " . PUBLIC_URL . "index.php");
     exit;
 }

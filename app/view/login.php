@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <!-- Back to home link - Fixed path -->
         <div class="text-center mb-3">
-            <a href="/public/index.php" class="back-link">
+            <a href="<?= PUBLIC_URL ?>index.php" class="back-link">
                 ← Back to Library Home
             </a>
         </div>

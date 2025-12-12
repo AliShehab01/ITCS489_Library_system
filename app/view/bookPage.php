@@ -46,6 +46,26 @@ function handleImageUpload($file)
     return null;
 }
 
+function buildBookImageUrl(?string $path): string
+{
+    $fallback = PUBLIC_URL . 'uploads/books/book_6935dd844fc0d.jpg';
+    if (!$path) {
+        return $fallback;
+    }
+    if (preg_match('#^https?://#', $path)) {
+        return $path;
+    }
+
+    $normalized = ltrim($path, '/');
+    if (str_starts_with($normalized, 'public/')) {
+        $normalized = substr($normalized, strlen('public/'));
+    } elseif (!str_contains($normalized, '/')) {
+        $normalized = 'uploads/books/' . $normalized;
+    }
+
+    return PUBLIC_URL . $normalized;
+}
+
 // Handle Add Book
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
@@ -295,7 +315,7 @@ $books = $conn->query("SELECT * FROM books ORDER BY title ASC")->fetchAll(PDO::F
                                     <tr>
                                         <td>
                                             <?php if (!empty($book['image_path'])): ?>
-                                                <img src="/<?= htmlspecialchars($book['image_path']) ?>" class="book-cover" alt="Cover">
+                                                <img src="<?= htmlspecialchars(buildBookImageUrl($book['image_path'])) ?>" class="book-cover" alt="Cover">
                                             <?php else: ?>
                                                 <div class="book-cover-placeholder">📕</div>
                                             <?php endif; ?>
@@ -359,7 +379,7 @@ $books = $conn->query("SELECT * FROM books ORDER BY title ASC")->fetchAll(PDO::F
                                                     </div>
                                                     <div class="modal-body text-center">
                                                         <?php if (!empty($book['image_path'])): ?>
-                                                            <img src="/<?= htmlspecialchars($book['image_path']) ?>" class="img-fluid mb-3" style="max-height:200px">
+                                                            <img src="<?= htmlspecialchars(buildBookImageUrl($book['image_path'])) ?>" class="img-fluid mb-3" style="max-height:200px">
                                                         <?php else: ?>
                                                             <div class="text-muted mb-3">No cover image</div>
                                                         <?php endif; ?>
